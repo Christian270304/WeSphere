@@ -1,0 +1,14 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend de WeSphere",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Christian Torres",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
