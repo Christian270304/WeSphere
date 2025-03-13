@@ -1,10 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
-        
+     
+.body-container {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #f0f9ff;
+    min-height: 100vh;
+    padding-top: 70px;
+}
 
 .navbar {
     position: fixed;
     top: 0;
-    width: 98vw;
+    width: 97vw;
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -136,7 +144,7 @@
 /* Responsive */
 @media (max-width: 768px) {
     .logo {
-        margin-right: 0;
+        //margin-right: 0;
     }
     .search-box {
         width: 40vw;

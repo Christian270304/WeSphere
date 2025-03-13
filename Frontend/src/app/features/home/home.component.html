@@ -1,311 +1,311 @@
+<div class="body-container">
+    <nav class="navbar">
+        <div class="logo">WeSphere</div>
+        <input type="text" class="search-box" placeholder="Buscar publicaciones...">
+    </nav>
 
-    
-<nav class="navbar">
-    <div class="logo">WeSphere</div>
-    <input type="text" class="search-box" placeholder="Buscar publicaciones...">
-</nav>
+    <div class="post-container">
+        <div class="post-card">
+            <div class="user-info">
+                <div class="avatar"></div>
+                <div class="user-details">
+                    <div class="username">Usuario123</div>
+                    <div class="timestamp">Hace 2 horas</div>
+                </div>
+            </div>
+            <div class="post-content">
+                ¡Este es mi primer post en WeSphere! 🎉 Compartiendo mis experiencias de viaje.
+            </div>
+            <div class="post-image"></div>
+            <div class="action-buttons">
+                <button class="action-btn like-btn" (click)="toggleLike()">
+                    <i [class.far]="!liked" [class.fas]="liked" class="fa-heart"></i> {{ likeCount}}
+                </button>
+                <button class="action-btn comment-btn">
+                    <i class="far fa-comment"></i> 30
+                </button>
+                <button class="action-btn save-btn">
+                    <i class="far fa-bookmark"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="post-card">
+            <div class="user-info">
+                <div class="avatar"></div>
+                <div class="user-details">
+                    <div class="username">ViajeroMundo</div>
+                    <div class="timestamp">Hace 5 horas</div>
+                </div>
+            </div>
+            <div class="post-content">
+                Atardecer en la playa de Bali 🌅 ¿Qué les parece?
+            </div>
+            <div class="post-image" style="background: #ddd"></div>
+            <div class="action-buttons">
+                <button class="action-btn like-btn">
+                    <i class="far fa-heart"></i> 450
+                </button>
+                <button class="action-btn comment-btn">
+                    <i class="far fa-comment"></i> 89
+                </button>
+                <button class="action-btn save-btn">
+                    <i class="far fa-bookmark"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="post-card">
+            <div class="user-info">
+                <div class="avatar"></div>
+                <div class="user-details">
+                    <div class="username">Usuario123</div>
+                    <div class="timestamp">Hace 2 horas</div>
+                </div>
+            </div>
+            <div class="post-content">
+                ¡Este es mi primer post en WeSphere! 🎉 Compartiendo mis experiencias de viaje.
+            </div>
+            <div class="post-image"></div>
+            <div class="action-buttons">
+                <button class="action-btn like-btn" (click)="toggleLike()">
+                    <i [class.far]="!liked" [class.fas]="liked" class="fa-heart"></i> {{ likeCount}}
+                </button>
+                <button class="action-btn comment-btn">
+                    <i class="far fa-comment"></i> 30
+                </button>
+                <button class="action-btn save-btn">
+                    <i class="far fa-bookmark"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="post-card">
+            <div class="user-info">
+                <div class="avatar"></div>
+                <div class="user-details">
+                    <div class="username">ViajeroMundo</div>
+                    <div class="timestamp">Hace 5 horas</div>
+                </div>
+            </div>
+            <div class="post-content">
+                Atardecer en la playa de Bali 🌅 ¿Qué les parece?
+            </div>
+            <div class="post-image" style="background: #ddd"></div>
+            <div class="action-buttons">
+                <button class="action-btn like-btn">
+                    <i class="far fa-heart"></i> 450
+                </button>
+                <button class="action-btn comment-btn">
+                    <i class="far fa-comment"></i> 89
+                </button>
+                <button class="action-btn save-btn">
+                    <i class="far fa-bookmark"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="post-card">
+            <div class="user-info">
+                <div class="avatar"></div>
+                <div class="user-details">
+                    <div class="username">Usuario123</div>
+                    <div class="timestamp">Hace 2 horas</div>
+                </div>
+            </div>
+            <div class="post-content">
+                ¡Este es mi primer post en WeSphere! 🎉 Compartiendo mis experiencias de viaje.
+            </div>
+            <div class="post-image"></div>
+            <div class="action-buttons">
+                <button class="action-btn like-btn" (click)="toggleLike()">
+                    <i [class.far]="!liked" [class.fas]="liked" class="fa-heart"></i> {{ likeCount}}
+                </button>
+                <button class="action-btn comment-btn">
+                    <i class="far fa-comment"></i> 30
+                </button>
+                <button class="action-btn save-btn">
+                    <i class="far fa-bookmark"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="post-card">
+            <div class="user-info">
+                <div class="avatar"></div>
+                <div class="user-details">
+                    <div class="username">ViajeroMundo</div>
+                    <div class="timestamp">Hace 5 horas</div>
+                </div>
+            </div>
+            <div class="post-content">
+                Atardecer en la playa de Bali 🌅 ¿Qué les parece?
+            </div>
+            <div class="post-image" style="background: #ddd"></div>
+            <div class="action-buttons">
+                <button class="action-btn like-btn">
+                    <i class="far fa-heart"></i> 450
+                </button>
+                <button class="action-btn comment-btn">
+                    <i class="far fa-comment"></i> 89
+                </button>
+                <button class="action-btn save-btn">
+                    <i class="far fa-bookmark"></i>
+                </button>
+            </div>
+        </div>
 
-<div class="post-container">
-    <div class="post-card">
-        <div class="user-info">
-            <div class="avatar"></div>
-            <div class="user-details">
-                <div class="username">Usuario123</div>
-                <div class="timestamp">Hace 2 horas</div>
+        <div class="post-card">
+            <div class="user-info">
+                <div class="avatar"></div>
+                <div class="user-details">
+                    <div class="username">Usuario123</div>
+                    <div class="timestamp">Hace 2 horas</div>
+                </div>
+            </div>
+            <div class="post-content">
+                ¡Este es mi primer post en WeSphere! 🎉 Compartiendo mis experiencias de viaje.
+            </div>
+            <div class="post-image"></div>
+            <div class="action-buttons">
+                <button class="action-btn like-btn" (click)="toggleLike()">
+                    <i [class.far]="!liked" [class.fas]="liked" class="fa-heart"></i> {{ likeCount}}
+                </button>
+                <button class="action-btn comment-btn">
+                    <i class="far fa-comment"></i> 30
+                </button>
+                <button class="action-btn save-btn">
+                    <i class="far fa-bookmark"></i>
+                </button>
             </div>
         </div>
-        <div class="post-content">
-            ¡Este es mi primer post en WeSphere! 🎉 Compartiendo mis experiencias de viaje.
-        </div>
-        <div class="post-image"></div>
-        <div class="action-buttons">
-            <button class="action-btn like-btn" (click)="toggleLike()">
-                <i [class.far]="!liked" [class.fas]="liked" class="fa-heart"></i> {{ likeCount}}
-            </button>
-            <button class="action-btn comment-btn">
-                <i class="far fa-comment"></i> 30
-            </button>
-            <button class="action-btn save-btn">
-                <i class="far fa-bookmark"></i>
-            </button>
-        </div>
-    </div>
-    
-    <div class="post-card">
-        <div class="user-info">
-            <div class="avatar"></div>
-            <div class="user-details">
-                <div class="username">ViajeroMundo</div>
-                <div class="timestamp">Hace 5 horas</div>
+        
+        <div class="post-card">
+            <div class="user-info">
+                <div class="avatar"></div>
+                <div class="user-details">
+                    <div class="username">ViajeroMundo</div>
+                    <div class="timestamp">Hace 5 horas</div>
+                </div>
+            </div>
+            <div class="post-content">
+                Atardecer en la playa de Bali 🌅 ¿Qué les parece?
+            </div>
+            <div class="post-image" style="background: #ddd"></div>
+            <div class="action-buttons">
+                <button class="action-btn like-btn">
+                    <i class="far fa-heart"></i> 450
+                </button>
+                <button class="action-btn comment-btn">
+                    <i class="far fa-comment"></i> 89
+                </button>
+                <button class="action-btn save-btn">
+                    <i class="far fa-bookmark"></i>
+                </button>
             </div>
         </div>
-        <div class="post-content">
-            Atardecer en la playa de Bali 🌅 ¿Qué les parece?
-        </div>
-        <div class="post-image" style="background: #ddd"></div>
-        <div class="action-buttons">
-            <button class="action-btn like-btn">
-                <i class="far fa-heart"></i> 450
-            </button>
-            <button class="action-btn comment-btn">
-                <i class="far fa-comment"></i> 89
-            </button>
-            <button class="action-btn save-btn">
-                <i class="far fa-bookmark"></i>
-            </button>
-        </div>
-    </div>
-    
-    <div class="post-card">
-        <div class="user-info">
-            <div class="avatar"></div>
-            <div class="user-details">
-                <div class="username">Usuario123</div>
-                <div class="timestamp">Hace 2 horas</div>
+
+        <div class="post-card">
+            <div class="user-info">
+                <div class="avatar"></div>
+                <div class="user-details">
+                    <div class="username">Usuario123</div>
+                    <div class="timestamp">Hace 2 horas</div>
+                </div>
+            </div>
+            <div class="post-content">
+                ¡Este es mi primer post en WeSphere! 🎉 Compartiendo mis experiencias de viaje.
+            </div>
+            <div class="post-image"></div>
+            <div class="action-buttons">
+                <button class="action-btn like-btn" (click)="toggleLike()">
+                    <i [class.far]="!liked" [class.fas]="liked" class="fa-heart"></i> {{ likeCount}}
+                </button>
+                <button class="action-btn comment-btn">
+                    <i class="far fa-comment"></i> 30
+                </button>
+                <button class="action-btn save-btn">
+                    <i class="far fa-bookmark"></i>
+                </button>
             </div>
         </div>
-        <div class="post-content">
-            ¡Este es mi primer post en WeSphere! 🎉 Compartiendo mis experiencias de viaje.
-        </div>
-        <div class="post-image"></div>
-        <div class="action-buttons">
-            <button class="action-btn like-btn" (click)="toggleLike()">
-                <i [class.far]="!liked" [class.fas]="liked" class="fa-heart"></i> {{ likeCount}}
-            </button>
-            <button class="action-btn comment-btn">
-                <i class="far fa-comment"></i> 30
-            </button>
-            <button class="action-btn save-btn">
-                <i class="far fa-bookmark"></i>
-            </button>
-        </div>
-    </div>
-    
-    <div class="post-card">
-        <div class="user-info">
-            <div class="avatar"></div>
-            <div class="user-details">
-                <div class="username">ViajeroMundo</div>
-                <div class="timestamp">Hace 5 horas</div>
+        
+        <div class="post-card">
+            <div class="user-info">
+                <div class="avatar"></div>
+                <div class="user-details">
+                    <div class="username">ViajeroMundo</div>
+                    <div class="timestamp">Hace 5 horas</div>
+                </div>
+            </div>
+            <div class="post-content">
+                Atardecer en la playa de Bali 🌅 ¿Qué les parece?
+            </div>
+            <div class="post-image" style="background: #ddd"></div>
+            <div class="action-buttons">
+                <button class="action-btn like-btn">
+                    <i class="far fa-heart"></i> 450
+                </button>
+                <button class="action-btn comment-btn">
+                    <i class="far fa-comment"></i> 89
+                </button>
+                <button class="action-btn save-btn">
+                    <i class="far fa-bookmark"></i>
+                </button>
             </div>
         </div>
-        <div class="post-content">
-            Atardecer en la playa de Bali 🌅 ¿Qué les parece?
-        </div>
-        <div class="post-image" style="background: #ddd"></div>
-        <div class="action-buttons">
-            <button class="action-btn like-btn">
-                <i class="far fa-heart"></i> 450
-            </button>
-            <button class="action-btn comment-btn">
-                <i class="far fa-comment"></i> 89
-            </button>
-            <button class="action-btn save-btn">
-                <i class="far fa-bookmark"></i>
-            </button>
-        </div>
-    </div>
-    
-    <div class="post-card">
-        <div class="user-info">
-            <div class="avatar"></div>
-            <div class="user-details">
-                <div class="username">Usuario123</div>
-                <div class="timestamp">Hace 2 horas</div>
+
+        <div class="post-card">
+            <div class="user-info">
+                <div class="avatar"></div>
+                <div class="user-details">
+                    <div class="username">Usuario123</div>
+                    <div class="timestamp">Hace 2 horas</div>
+                </div>
+            </div>
+            <div class="post-content">
+                ¡Este es mi primer post en WeSphere! 🎉 Compartiendo mis experiencias de viaje.
+            </div>
+            <div class="post-image"></div>
+            <div class="action-buttons">
+                <button class="action-btn like-btn" (click)="toggleLike()">
+                    <i [class.far]="!liked" [class.fas]="liked" class="fa-heart"></i> {{ likeCount}}
+                </button>
+                <button class="action-btn comment-btn">
+                    <i class="far fa-comment"></i> 30
+                </button>
+                <button class="action-btn save-btn">
+                    <i class="far fa-bookmark"></i>
+                </button>
             </div>
         </div>
-        <div class="post-content">
-            ¡Este es mi primer post en WeSphere! 🎉 Compartiendo mis experiencias de viaje.
-        </div>
-        <div class="post-image"></div>
-        <div class="action-buttons">
-            <button class="action-btn like-btn" (click)="toggleLike()">
-                <i [class.far]="!liked" [class.fas]="liked" class="fa-heart"></i> {{ likeCount}}
-            </button>
-            <button class="action-btn comment-btn">
-                <i class="far fa-comment"></i> 30
-            </button>
-            <button class="action-btn save-btn">
-                <i class="far fa-bookmark"></i>
-            </button>
-        </div>
-    </div>
-    
-    <div class="post-card">
-        <div class="user-info">
-            <div class="avatar"></div>
-            <div class="user-details">
-                <div class="username">ViajeroMundo</div>
-                <div class="timestamp">Hace 5 horas</div>
+        
+        <div class="post-card">
+            <div class="user-info">
+                <div class="avatar"></div>
+                <div class="user-details">
+                    <div class="username">ViajeroMundo</div>
+                    <div class="timestamp">Hace 5 horas</div>
+                </div>
+            </div>
+            <div class="post-content">
+                Atardecer en la playa de Bali 🌅 ¿Qué les parece?
+            </div>
+            <div class="post-image" style="background: #ddd"></div>
+            <div class="action-buttons">
+                <button class="action-btn like-btn">
+                    <i class="far fa-heart"></i> 450
+                </button>
+                <button class="action-btn comment-btn">
+                    <i class="far fa-comment"></i> 89
+                </button>
+                <button class="action-btn save-btn">
+                    <i class="far fa-bookmark"></i>
+                </button>
             </div>
         </div>
-        <div class="post-content">
-            Atardecer en la playa de Bali 🌅 ¿Qué les parece?
-        </div>
-        <div class="post-image" style="background: #ddd"></div>
-        <div class="action-buttons">
-            <button class="action-btn like-btn">
-                <i class="far fa-heart"></i> 450
-            </button>
-            <button class="action-btn comment-btn">
-                <i class="far fa-comment"></i> 89
-            </button>
-            <button class="action-btn save-btn">
-                <i class="far fa-bookmark"></i>
-            </button>
-        </div>
+        
     </div>
 
-    <div class="post-card">
-        <div class="user-info">
-            <div class="avatar"></div>
-            <div class="user-details">
-                <div class="username">Usuario123</div>
-                <div class="timestamp">Hace 2 horas</div>
-            </div>
-        </div>
-        <div class="post-content">
-            ¡Este es mi primer post en WeSphere! 🎉 Compartiendo mis experiencias de viaje.
-        </div>
-        <div class="post-image"></div>
-        <div class="action-buttons">
-            <button class="action-btn like-btn" (click)="toggleLike()">
-                <i [class.far]="!liked" [class.fas]="liked" class="fa-heart"></i> {{ likeCount}}
-            </button>
-            <button class="action-btn comment-btn">
-                <i class="far fa-comment"></i> 30
-            </button>
-            <button class="action-btn save-btn">
-                <i class="far fa-bookmark"></i>
-            </button>
-        </div>
-    </div>
-    
-    <div class="post-card">
-        <div class="user-info">
-            <div class="avatar"></div>
-            <div class="user-details">
-                <div class="username">ViajeroMundo</div>
-                <div class="timestamp">Hace 5 horas</div>
-            </div>
-        </div>
-        <div class="post-content">
-            Atardecer en la playa de Bali 🌅 ¿Qué les parece?
-        </div>
-        <div class="post-image" style="background: #ddd"></div>
-        <div class="action-buttons">
-            <button class="action-btn like-btn">
-                <i class="far fa-heart"></i> 450
-            </button>
-            <button class="action-btn comment-btn">
-                <i class="far fa-comment"></i> 89
-            </button>
-            <button class="action-btn save-btn">
-                <i class="far fa-bookmark"></i>
-            </button>
-        </div>
-    </div>
-
-    <div class="post-card">
-        <div class="user-info">
-            <div class="avatar"></div>
-            <div class="user-details">
-                <div class="username">Usuario123</div>
-                <div class="timestamp">Hace 2 horas</div>
-            </div>
-        </div>
-        <div class="post-content">
-            ¡Este es mi primer post en WeSphere! 🎉 Compartiendo mis experiencias de viaje.
-        </div>
-        <div class="post-image"></div>
-        <div class="action-buttons">
-            <button class="action-btn like-btn" (click)="toggleLike()">
-                <i [class.far]="!liked" [class.fas]="liked" class="fa-heart"></i> {{ likeCount}}
-            </button>
-            <button class="action-btn comment-btn">
-                <i class="far fa-comment"></i> 30
-            </button>
-            <button class="action-btn save-btn">
-                <i class="far fa-bookmark"></i>
-            </button>
-        </div>
-    </div>
-    
-    <div class="post-card">
-        <div class="user-info">
-            <div class="avatar"></div>
-            <div class="user-details">
-                <div class="username">ViajeroMundo</div>
-                <div class="timestamp">Hace 5 horas</div>
-            </div>
-        </div>
-        <div class="post-content">
-            Atardecer en la playa de Bali 🌅 ¿Qué les parece?
-        </div>
-        <div class="post-image" style="background: #ddd"></div>
-        <div class="action-buttons">
-            <button class="action-btn like-btn">
-                <i class="far fa-heart"></i> 450
-            </button>
-            <button class="action-btn comment-btn">
-                <i class="far fa-comment"></i> 89
-            </button>
-            <button class="action-btn save-btn">
-                <i class="far fa-bookmark"></i>
-            </button>
-        </div>
-    </div>
-
-    <div class="post-card">
-        <div class="user-info">
-            <div class="avatar"></div>
-            <div class="user-details">
-                <div class="username">Usuario123</div>
-                <div class="timestamp">Hace 2 horas</div>
-            </div>
-        </div>
-        <div class="post-content">
-            ¡Este es mi primer post en WeSphere! 🎉 Compartiendo mis experiencias de viaje.
-        </div>
-        <div class="post-image"></div>
-        <div class="action-buttons">
-            <button class="action-btn like-btn" (click)="toggleLike()">
-                <i [class.far]="!liked" [class.fas]="liked" class="fa-heart"></i> {{ likeCount}}
-            </button>
-            <button class="action-btn comment-btn">
-                <i class="far fa-comment"></i> 30
-            </button>
-            <button class="action-btn save-btn">
-                <i class="far fa-bookmark"></i>
-            </button>
-        </div>
-    </div>
-    
-    <div class="post-card">
-        <div class="user-info">
-            <div class="avatar"></div>
-            <div class="user-details">
-                <div class="username">ViajeroMundo</div>
-                <div class="timestamp">Hace 5 horas</div>
-            </div>
-        </div>
-        <div class="post-content">
-            Atardecer en la playa de Bali 🌅 ¿Qué les parece?
-        </div>
-        <div class="post-image" style="background: #ddd"></div>
-        <div class="action-buttons">
-            <button class="action-btn like-btn">
-                <i class="far fa-heart"></i> 450
-            </button>
-            <button class="action-btn comment-btn">
-                <i class="far fa-comment"></i> 89
-            </button>
-            <button class="action-btn save-btn">
-                <i class="far fa-bookmark"></i>
-            </button>
-        </div>
-    </div>
-    
+    <a href="#" class="fab fa-facebook-messenger chat-btn"></a>
 </div>
-
-<a href="#" class="fab fa-facebook-messenger chat-btn"></a>

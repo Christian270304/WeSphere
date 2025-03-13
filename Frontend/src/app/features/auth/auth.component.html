@@ -1,10 +1,12 @@
+
 @if (!isAuthenticated){
     <div class="body-container">
         <div class="wave"></div>
         <div class="container">
+            <button class="form-toggle" (click)="toggleForm()">Crear cuenta</button>
             <form (submit)="login()">
             <div class="form-section" id="loginSection">
-                <button class="form-toggle" onclick="toggleForm()">Crear cuenta</button>
+                
                     <h2 class="form-title">Iniciar Sesión</h2>
                     <div class="input-group">
                         <input type="text" [(ngModel)]="username" name="username" placeholder="Username" required>
@@ -12,20 +14,21 @@
                     <div class="input-group">
                         <input type="password" [(ngModel)]="password" name="password" placeholder="Contraseña" required>
                     </div>
+                    <app-error-message ></app-error-message>
                     <button class="btn-submit">Ingresar</button>
                     <div class="social-login">
                         <i class="fab fa-facebook social-icon"></i>
                         <i class="fab fa-google social-icon"></i>
                         <i class="fab fa-twitter social-icon"></i>
                     </div>
-                    <p class="mt-3">¿No tienes cuenta? <a href="#" onclick="toggleForm()">Regístrate</a></p>
+                    <p class="mt-3">¿No tienes cuenta? <a href="#" (click)="toggleForm()">Regístrate</a></p>
                 </div>   
             </form>
             
             <div class="signup-section" id="signupSection">
                 <h2 class="signup-title">¡Únete a WeSphere!</h2>
                 <p class="signup-description">Conecta con amigos, comparte tus momentos y descubre nuevas experiencias en nuestra red social</p>
-                <button class="btn-ghost" onclick="toggleForm()">Comenzar ahora</button>
+                <button class="btn-ghost" (click)="toggleForm()">Comenzar ahora</button>
             </div>
         </div>
     </div>

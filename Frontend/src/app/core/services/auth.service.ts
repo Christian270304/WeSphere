@@ -26,7 +26,9 @@ export class AuthService {
         return localStorage.getItem('token');
     }
 
-    isLoggedIn(): boolean {
-        return !!localStorage.getItem('token'); 
-    }
+    isAuthenticated(): boolean {
+        const token = this.getToken();
+        console.log('Verificando autenticación:', token); // Agregar para debug
+        return token !== null; // Devuelve true si hay token
+      }
 }
