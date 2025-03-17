@@ -1,0 +1,77 @@
+<div class="post-container">
+<!-- <div class="post-container" *ngIf="posts.length == 0; else noPosts"> -->
+    @for (post of posts; track post.id) {
+      <div class="post-card">
+        <div class="user-info">
+          <div class="avatar"></div>
+          <div class="user-details">
+            <div class="username">{{ post.user?.username }}</div>
+            <div class="timestamp"></div>
+          </div>
+        </div>
+        <div class="post-content">
+          {{ post.description }}
+        </div>
+        <div class="post-image"></div>
+        <div class="action-buttons">
+          <button class="action-btn like-btn" (click)="toggleLike()">
+            <i [class.far]="!liked" [class.fas]="liked" class="fa-heart"></i> {{ post.likes_count }}
+          </button>
+          <button class="action-btn comment-btn">
+            <i class="far fa-comment"></i> 30
+          </button>
+          <button class="action-btn save-btn">
+            <i class="far fa-bookmark"></i>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+  
+  <!-- Mostrar mensaje si no hay posts -->
+  <ng-template #noPosts>
+    <div class="post-container">
+        <!-- Simulación de carga -->
+        <div class="loading-container">
+            <div class="loading-card">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="loading-avatar"></div>
+                    <div>
+                        <div class="loading-line" style="width: 150px;"></div>
+                        <div class="loading-line" style="width: 100px; margin-top: 5px;"></div>
+                    </div>
+                </div>
+                <div class="loading-line" style="width: 80%; margin-top: 15px;"></div>
+                <div class="loading-line" style="width: 60%; margin-top: 10px;"></div>
+                <div class="loading-image"></div>
+                <div class="loading-actions">
+                    <div class="loading-action"></div>
+                    <div class="loading-action"></div>
+                    <div class="loading-action"></div>
+                </div>
+            </div>
+
+            <div class="loading-card">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="loading-avatar"></div>
+                    <div>
+                        <div class="loading-line" style="width: 150px;"></div>
+                        <div class="loading-line" style="width: 100px; margin-top: 5px;"></div>
+                    </div>
+                </div>
+                <div class="loading-line" style="width: 80%; margin-top: 15px;"></div>
+                <div class="loading-line" style="width: 60%; margin-top: 10px;"></div>
+                <div class="loading-image"></div>
+                <div class="loading-actions">
+                    <div class="loading-action"></div>
+                    <div class="loading-action"></div>
+                    <div class="loading-action"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensaje cuando no hay posts -->
+        <div class="no-posts" style="display: none;">No hay publicaciones disponibles.</div>
+    </div>
+  </ng-template>
+  

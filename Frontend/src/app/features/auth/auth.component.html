@@ -18,7 +18,7 @@
                     <button class="btn-submit">Ingresar</button>
                     <div class="social-login">
                         <i class="fab fa-facebook social-icon"></i>
-                        <i class="fab fa-google social-icon"></i>
+                        <i (click)="loginWithGoogle()" class="fab fa-google social-icon"></i>
                         <i class="fab fa-twitter social-icon"></i>
                     </div>
                     <p class="mt-3">¿No tienes cuenta? <a href="#" (click)="toggleForm()">Regístrate</a></p>
@@ -33,7 +33,7 @@
         </div>
     </div>
 } @else if (isAuthenticated){
-    <router-outlet></router-outlet> 
+    <app-home></app-home>
 }
       
     

@@ -5,9 +5,9 @@ import { User } from '../models/UserModel.js';
 export class AuthController {
   static async register(req, res) {
     try {
-      const { username, email, password } = req.body;
+      const { username, email, password, profile_picture = null, banner = null, bio = null, is_private = false, created_at = new Date() } = req.body;
       const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = await User.create({ username, email, password: hashedPassword });
+      const newUser = await User.create({ username, email, password: hashedPassword, profile_picture, banner, bio, is_private, created_at });
       
       res.json({ msg: "Usuario registrado", user: newUser });
     } catch (err) {

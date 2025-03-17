@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { DB, sequelize } from './config/db.js';
 import authRoutes from './routes/auth.route.js';
+import postRoutes from './routes/post.route.js';
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/posts', postRoutes);
 
 // Conectar a la base de datos y sincronizar modelos
 (async () => {

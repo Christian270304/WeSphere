@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize, Op } from 'sequelize';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -22,3 +22,5 @@ export const DB = async () => {
         console.error('❌ Error al conectar a MySQL:', error);
       }
 };
+
+export { Op }; 

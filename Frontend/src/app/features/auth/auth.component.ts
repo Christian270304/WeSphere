@@ -4,10 +4,11 @@ import { Router, RouterOutlet} from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ErrorService } from '../../core/services/error.service';
 import { ErrorMessageComponent } from '../../shared/components/error-message/error-message.component';
+import { HomeComponent } from '../home/home.component';
 
 @Component({
   selector: 'app-auth',
-  imports: [RouterOutlet, FormsModule, ErrorMessageComponent],
+  imports: [FormsModule, ErrorMessageComponent, HomeComponent],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.scss'
 })
@@ -18,8 +19,18 @@ export class AuthComponent {
 
   constructor(private authService: AuthService, private router: Router, private errorService: ErrorService) {}
 
+  ngOnInit() {
+    this.authService.isAuthenticated$.subscribe(auth => {
+      this.isAuthenticated = auth;
+      if (auth) {
+        this.router.navigate(['/home']); // 🔥 Si está autenticado, lo manda a /home
+      }
+    });
+  }
+
   login() {
     this.authService.login({ username: this.username, password: this.password }).subscribe((res) => {
+      localStorage.setItem('userId', res.user.id);
       this.authService.setToken(res.token);
       this.isAuthenticated = true;
       this.router.navigate(['/home']);
@@ -32,6 +43,10 @@ export class AuthComponent {
       }
       console.error('Error en login', error);
     });
+  }
+  
+  loginWithGoogle() {
+    this.authService.loginWithGoogle();
   }
 
   toggleForm() {
