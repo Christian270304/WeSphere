@@ -8,7 +8,7 @@ import { HomeComponent } from '../home/home.component';
 
 @Component({
   selector: 'app-auth',
-  imports: [FormsModule, ErrorMessageComponent, HomeComponent],
+  imports: [FormsModule, ErrorMessageComponent],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.scss'
 })
@@ -23,7 +23,7 @@ export class AuthComponent {
     this.authService.isAuthenticated$.subscribe(auth => {
       this.isAuthenticated = auth;
       if (auth) {
-        this.router.navigate(['/home']); // 🔥 Si está autenticado, lo manda a /home
+        this.router.navigate(['/home']); 
       }
     });
   }
@@ -61,4 +61,6 @@ export class AuthComponent {
         ? 'translateX(0)' 
         : 'translateX(-100%)';
   }
+
+  
 }

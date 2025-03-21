@@ -1,0 +1,62 @@
+<div class="body-container">
+    
+    <!-- Main Content -->
+    <div class="container">
+        <div class="profile-section">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="cover-photo">
+                    <img [src]="user.bannerImage.url" alt="Foto de portada">
+                </div>
+                <div class="profile-pic">
+                    <img [src]="user.profileImage.url" alt="Foto de perfil">
+                </div>
+                <div class="profile-info">
+                    <div class="username">{{ user.username }}</div>
+                    <div class="bio">{{ user.bio }}</div>
+                    <app-user-stats></app-user-stats>
+                    <app-user-actions></app-user-actions>
+                </div>
+            </div>
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Friends List -->
+                <div class="sidebar-card">
+                    <div class="sidebar-header">
+                        Amigos
+                    </div>
+                    <div class="friends-list">
+                        <div class="friend-item">
+                            <div class="friend-pic">
+                                <img src="/api/placeholder/40/40" alt="Amigo 1">
+                            </div>
+                            <div class="friend-name">María García</div>
+                        </div>
+                        <div class="friend-item">
+                            <div class="friend-pic">
+                                <img src="/api/placeholder/40/40" alt="Amigo 2">
+                            </div>
+                            <div class="friend-name">Juan Pérez</div>
+                        </div>
+                        <div class="friend-item">
+                            <div class="friend-pic">
+                                <img src="/api/placeholder/40/40" alt="Amigo 3">
+                            </div>
+                            <div class="friend-name">Laura Gómez</div>
+                        </div>
+                        <div class="friend-item">
+                            <div class="friend-pic">
+                                <img src="/api/placeholder/40/40" alt="Amigo 4">
+                            </div>
+                            <div class="friend-name">Ana Rodríguez</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Posts Section -->
+            <div>
+                <app-posts [isGrid]="true"></app-posts>
+            </div>
+        </div>
+    </div>
+</div>

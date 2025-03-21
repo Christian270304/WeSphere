@@ -1,77 +1,86 @@
-<div class="post-container">
-<!-- <div class="post-container" *ngIf="posts.length == 0; else noPosts"> -->
+<div [ngClass]="{ 'grid-layout': isGrid, 'post-container': !isGrid }">
+  @if (posts.length != 0 && !isLoading) {
     @for (post of posts; track post.id) {
-      <div class="post-card">
-        <div class="user-info">
-          <div class="avatar"></div>
-          <div class="user-details">
-            <div class="username">{{ post.user?.username }}</div>
-            <div class="timestamp"></div>
-          </div>
+    <div class="post-card" [ngClass]="{'no-image': post.image == null, 'no-description': post.description == ''}" [id]="post.id">
+      <div class="user-info">
+        <div class="avatar">
+          <img [src]="post.user?.profileImage?.url" alt="User avatar" />
         </div>
-        <div class="post-content">
-          {{ post.description }}
+        <div class="user-details">
+          <div class="username">{{ post.user?.username }}</div>
+          <div class="timestamp">{{ calcularDiferenciaDeTiempo(post.created_at) }}</div>
         </div>
-        <div class="post-image"></div>
-        <div class="action-buttons">
-          <button class="action-btn like-btn" (click)="toggleLike()">
+      </div>
+      <div class="post-content">
+        {{ post.description }}
+      </div>
+      <!-- @if (post.image != null) { -->
+        <div class="post-image" [ngClass]="{ 'no-image': post.image == null }">
+          <img [src]="post.image?.url" alt="Post image" />
+        </div>
+      <!-- } -->
+      <div class="action-buttons">
+        @if (post.allow_likes == true) {
+          <button class="action-btn like-btn">
             <i [class.far]="!liked" [class.fas]="liked" class="fa-heart"></i> {{ post.likes_count }}
           </button>
+        } 
+        @if (post.allow_comments == true) {
           <button class="action-btn comment-btn">
             <i class="far fa-comment"></i> 30
           </button>
+        }
+        @if (post.allow_saving == true) {
           <button class="action-btn save-btn">
             <i class="far fa-bookmark"></i>
           </button>
+        }
+      </div>
+    </div>
+    }
+  } @else {
+  <!-- Mostrar mensaje si no hay posts -->
+
+  <!-- Simulación de carga -->
+  <div class="loading-container">
+    <div class="loading-card">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="loading-avatar"></div>
+        <div>
+          <div class="loading-line" style="width: 150px;"></div>
+          <div class="loading-line" style="width: 100px; margin-top: 5px;"></div>
         </div>
       </div>
-    }
-  </div>
-  
-  <!-- Mostrar mensaje si no hay posts -->
-  <ng-template #noPosts>
-    <div class="post-container">
-        <!-- Simulación de carga -->
-        <div class="loading-container">
-            <div class="loading-card">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div class="loading-avatar"></div>
-                    <div>
-                        <div class="loading-line" style="width: 150px;"></div>
-                        <div class="loading-line" style="width: 100px; margin-top: 5px;"></div>
-                    </div>
-                </div>
-                <div class="loading-line" style="width: 80%; margin-top: 15px;"></div>
-                <div class="loading-line" style="width: 60%; margin-top: 10px;"></div>
-                <div class="loading-image"></div>
-                <div class="loading-actions">
-                    <div class="loading-action"></div>
-                    <div class="loading-action"></div>
-                    <div class="loading-action"></div>
-                </div>
-            </div>
-
-            <div class="loading-card">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div class="loading-avatar"></div>
-                    <div>
-                        <div class="loading-line" style="width: 150px;"></div>
-                        <div class="loading-line" style="width: 100px; margin-top: 5px;"></div>
-                    </div>
-                </div>
-                <div class="loading-line" style="width: 80%; margin-top: 15px;"></div>
-                <div class="loading-line" style="width: 60%; margin-top: 10px;"></div>
-                <div class="loading-image"></div>
-                <div class="loading-actions">
-                    <div class="loading-action"></div>
-                    <div class="loading-action"></div>
-                    <div class="loading-action"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mensaje cuando no hay posts -->
-        <div class="no-posts" style="display: none;">No hay publicaciones disponibles.</div>
+      <div class="loading-line" style="width: 80%; margin-top: 15px;"></div>
+      <div class="loading-line" style="width: 60%; margin-top: 10px;"></div>
+      <div class="loading-image"></div>
+      <div class="loading-actions">
+        <div class="loading-action"></div>
+        <div class="loading-action"></div>
+        <div class="loading-action"></div>
+      </div>
     </div>
-  </ng-template>
-  
+
+    <div class="loading-card">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="loading-avatar"></div>
+        <div>
+          <div class="loading-line" style="width: 150px;"></div>
+          <div class="loading-line" style="width: 100px; margin-top: 5px;"></div>
+        </div>
+      </div>
+      <div class="loading-line" style="width: 80%; margin-top: 15px;"></div>
+      <div class="loading-line" style="width: 60%; margin-top: 10px;"></div>
+      <div class="loading-image"></div>
+      <div class="loading-actions">
+        <div class="loading-action"></div>
+        <div class="loading-action"></div>
+        <div class="loading-action"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje cuando no hay posts -->
+  <div class="no-posts" style="display: none;">No hay publicaciones disponibles.</div>
+  }
+</div>

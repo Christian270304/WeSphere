@@ -1,0 +1,31 @@
+.profile-actions {
+    display: flex;
+    gap: 10px;
+}
+.action-button {
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.edit-profile {
+    background-color: var(--primary);
+    color: white;
+}
+.edit-profile:hover {
+    background-color: var(--primary-dark);
+}
+.message-button {
+    background-color: var(--light-gray);
+    color: var(--dark);
+}
+.message-button:hover {
+    background-color: var(--gray);
+    color: white;
+}
+.logout-button {
+    background-color: var(--secondary);
+    color: white;
+}

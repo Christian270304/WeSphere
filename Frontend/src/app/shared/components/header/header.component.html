@@ -1,0 +1,44 @@
+<header>
+    <div class="container">
+        <div class="header-content">
+            <div class="logo" [routerLink]="['/home']" style="cursor: pointer;">
+                We<span>Sphere</span>
+            </div>
+            
+            <div class="search-bar">
+                <input type="text" placeholder="Buscar en WeSphere...">
+                <i class="fas fa-search"></i>
+            </div>
+            
+            <div class="nav-icons">
+                <div class="nav-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <div class="nav-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="nav-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="nav-icon">
+                    <i class="fas fa-envelope"></i>
+                    <span class="notification-badge">5</span>
+                </div>
+            </div>
+            @if (!hideElements) {
+                <div class="user-profile" (click)="toggleDropdown()" style="cursor: pointer;">
+                    <div class="profile-pic">
+                        <img [src]="user?.profileImage?.url || null" *ngIf="user?.profileImage?.url" alt="Usuario">
+                    </div>
+                    <div class="user-name">{{ user?.username }}</div>
+                </div>
+                <!-- Dropdown de opciones -->
+                <div class="profile-dropdown" [class.show]="dropdownOpen">
+                    <a [routerLink]="['/settings']">Configuración</a>
+                    <a (click)="logout()">Cerrar sesión</a>
+                </div>
+            }
+        </div>
+    </div>
+</header>

@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { PostService } from '../../../core/services/post.service';
 
 @Component({
   selector: 'app-posts',
@@ -10,74 +11,47 @@ import { HttpClient } from '@angular/common/http';
   styleUrl: './posts.component.scss'
 })
 export class PostsComponent {
-  private apiUrl = environment.apiUrl;
+  @Input() isGrid: boolean = false;
   liked = false; 
+  isLoading = true;
+  posts: any[] = [];  
 
-  public posts: any[] = [];  
 
-
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private postsService: PostService) {}
 
   ngOnInit() {
-    this.getPosts();
+    // Cargar los posts
+    this.postsService.getPosts().subscribe((posts) => { this.posts = posts; });
+    // Hacer carga falsa para cargar los posts
+    setTimeout(() => { this.isLoading = false; }, 2000);
   }
 
-  // conseguir la id del usuario
-  getUserId() {
-    return localStorage.getItem('userId');
-  }
+  calcularDiferenciaDeTiempo(fecha: any) {
+    const fechaActual = new Date();
+    const fechaPost = new Date(fecha);
+    const diferencia = fechaActual.getTime() - fechaPost.getTime();
+    const segundos = Math.floor(diferencia / 1000);
+    const minutos = Math.floor(segundos / 60);
+    const horas = Math.floor(minutos / 60);
+    const dias = Math.floor(horas / 24);
+    const semanas = Math.floor(dias / 7);
+    const meses = Math.floor(semanas / 4);
+    const años = Math.floor(meses / 12);
 
-  // fetch para conseguir los posts
-  getPosts() {
-    const userId = this.getUserId();
-    this.http.get<any>(`${this.apiUrl}/posts/${userId}`).subscribe(
-      (data) => {
-        if (Array.isArray(data.posts)) {
-          this.posts = data.posts; // ✅ Acceder a 'posts' dentro del objeto
-        } else {
-          console.error("Error: La API no devolvió un array", data);
-          this.posts = [];
-        }
-      },
-      (error) => {
-        console.error("Error al obtener posts:", error);
-        this.posts = [];
-      }
-    );
-  }
-  
-  
-
-  toggleLike() {
-    this.liked = !this.liked; // Cambia entre like y no like
-  }
-
-  calculateTimeDifference(date: string) {
-    const currentDate = new Date();
-    const postDate = new Date(date);
-    const difference = currentDate.getTime() - postDate.getTime();
-    const seconds = Math.floor(difference / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-    const weeks = Math.floor(days / 7);
-    const months = Math.floor(weeks / 4);
-    const years = Math.floor(months / 12);
-
-    if (years > 0) {
-      return `${years} year${years > 1 ? 's' : ''} ago`;
-    } else if (months > 0) {
-      return `${months} month${months > 1 ? 's' : ''} ago`;
-    } else if (weeks > 0) {
-      return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
-    } else if (days > 0) {
-      return `${days} day${days > 1 ? 's' : ''} ago`;
-    } else if (hours > 0) {
-      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    } else if (minutes > 0) {
-      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    if (años > 0) {
+      return `hace ${años} año${años > 1 ? 's' : ''}`;
+    } else if (meses > 0) {
+      return `hace ${meses} mes${meses > 1 ? 'es' : ''}`;
+    } else if (semanas > 0) {
+      return `hace ${semanas} semana${semanas > 1 ? 's' : ''}`;
+    } else if (dias > 0) {
+      return `hace ${dias} día${dias > 1 ? 's' : ''}`;
+    } else if (horas > 0) {
+      return `hace ${horas} hora${horas > 1 ? 's' : ''}`;
+    } else if (minutos > 0) {
+      return `hace ${minutos} minuto${minutos > 1 ? 's' : ''}`;
     } else {
-      return `${seconds} second${seconds > 1 ? 's' : ''} ago`;
+      return `hace ${segundos} segundo${segundos > 1 ? 's' : ''}`;
     }
   }
 
