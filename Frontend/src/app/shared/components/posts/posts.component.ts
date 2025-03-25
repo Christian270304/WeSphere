@@ -12,6 +12,7 @@ import { PostService } from '../../../core/services/post.service';
 })
 export class PostsComponent {
   @Input() isGrid: boolean = false;
+  @Input() userArticles: boolean = false;
   liked = false; 
   isLoading = true;
   posts: any[] = [];  
@@ -21,7 +22,7 @@ export class PostsComponent {
 
   ngOnInit() {
     // Cargar los posts
-    this.postsService.getPosts().subscribe((posts) => { this.posts = posts; });
+    this.postsService.getPosts(this.userArticles).subscribe((posts) => { this.posts = posts; });
     // Hacer carga falsa para cargar los posts
     setTimeout(() => { this.isLoading = false; }, 2000);
   }

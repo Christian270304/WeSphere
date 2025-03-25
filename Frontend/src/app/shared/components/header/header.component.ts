@@ -42,4 +42,8 @@ export class HeaderComponent {
           this.dropdownOpen = false;
       }
   }
+
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 }

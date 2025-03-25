@@ -40,7 +40,7 @@
                         <div class="profile-pic">
                             <img [src]="user.profileImage?.url" alt="Usuario">
                         </div>
-                        <div class="create-post-input" contenteditable="true" (focus)="clearPlaceholder()" (blur)="restorePlaceholder()">
+                        <div class="create-post-input" contenteditable="true" (focus)="clearPlaceholder()" (blur)="restorePlaceholder()" [autofocus]="true">
                             {{ placeholderText }}
                         </div>
                     </div>

@@ -1,7 +1,7 @@
 <header>
     <div class="container">
         <div class="header-content">
-            <div class="logo" [routerLink]="['/home']" style="cursor: pointer;">
+            <div class="logo" [routerLink]="['/home']" style="cursor: pointer;" (click)="scrollToTop()">
                 We<span>Sphere</span>
             </div>
             
@@ -11,7 +11,7 @@
             </div>
             
             <div class="nav-icons">
-                <div class="nav-icon">
+                <div class="nav-icon" [routerLink]="['/home']" (click)="scrollToTop()">
                     <i class="fas fa-home"></i>
                 </div>
                 <div class="nav-icon">

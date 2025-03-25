@@ -5,11 +5,13 @@
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
 }
 
 .grid-layout {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
   }
 
@@ -243,13 +245,11 @@ img {
 /* Si no hay imagen, ocultar el espacio y reducir el tamaño del post */
 .post-card.no-image {
     padding: 20px;
-    max-width: 400px; /* Más pequeño */
 }
 
 /* Si no hay descripción, hacer el post más compacto */
 .post-card.no-description {
     padding: 15px;
-    max-width: 380px;
 }
 
 /* Ocultar completamente el recuadro de la imagen si no hay */
