@@ -13,22 +13,39 @@ export class PostService {
 
   constructor(private http: HttpClient) {}
 
-  getPosts() {
+  getPosts(userArticles = false) {
     const userId = localStorage.getItem('userId');
-    this.http.get<any>(`${this.apiUrl}/posts/${userId}`).subscribe(
-      (data) => {
-        if (Array.isArray(data.posts)) {
-          this.postsSubject.next(data.posts);
-        } else {
-          console.error("Error: La API no devolvió un array", data);
+    if (userArticles) {
+      this.http.get<any>(`${this.apiUrl}/posts/user/${userId}`).subscribe(
+        (data) => {
+          if (Array.isArray(data.posts)) {
+            this.postsSubject.next(data.posts);
+          } else {
+            console.error("Error: La API no devolvió un array", data);
+            this.postsSubject.next([]);
+          }
+        },
+        (error) => {
+          console.error("Error al obtener posts:", error);
           this.postsSubject.next([]);
         }
-      },
-      (error) => {
-        console.error("Error al obtener posts:", error);
-        this.postsSubject.next([]);
-      }
-    );
+      );
+    } else {
+      this.http.get<any>(`${this.apiUrl}/posts/${userId}`).subscribe(
+        (data) => {
+          if (Array.isArray(data.posts)) {
+            this.postsSubject.next(data.posts);
+          } else {
+            console.error("Error: La API no devolvió un array", data);
+            this.postsSubject.next([]);
+          }
+        },
+        (error) => {
+          console.error("Error al obtener posts:", error);
+          this.postsSubject.next([]);
+        }
+      );
+    }
     return this.posts$;
   }
 }
