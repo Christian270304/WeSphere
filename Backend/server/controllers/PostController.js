@@ -1,6 +1,6 @@
 import { Post } from '../models/models.js';
 import { getRecommendedPosts } from '../models/PostQueries.js';
-import { Image } from '../models/models.js';
+import { Image, User } from '../models/models.js';
 import { v2 as cloudinary } from 'cloudinary';
 import sharp from 'sharp';
 import streamifier from 'streamifier';
@@ -184,6 +184,21 @@ export class PostController {
     //         res.status(500).json({ error });
     //     }
     // }
+
+    static async getPostsByUser(req, res) {
+        try {
+        const posts = await Post.findAll({ 
+          include: [
+            { model: User, as: "user", attributes: ['username'], include: { model: Image, as: 'profileImage', attributes: ['url'] } },
+            { model: Image, as: "image", attributes: ['url'] }
+          ],
+          where: { user_id: req.params.id } });
+    
+        res.json({ posts });
+        } catch (err) {
+        res.status(500).json({ error: err.message });
+        }
+    }
 }
 
 

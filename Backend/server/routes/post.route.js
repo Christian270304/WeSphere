@@ -9,7 +9,9 @@ const upload = multer({ storage });
 const router = express.Router();
 
 router.get('/:id', PostController.getPosts);
+router.get('/user/:id', PostController.getPostsByUser);
 router.post('/create', upload.single('image'), PostController.createPost);
+
 // router.post('/upload-image', upload.single('image'), PostController.subirImagens);
 // router.get('/:id', PostController.getPost);   
 // router.put('/:id', PostController.updatePost);
