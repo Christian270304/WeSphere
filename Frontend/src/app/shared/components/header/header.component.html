@@ -11,7 +11,7 @@
             </div>
             
             <div class="nav-icons">
-                <div class="nav-icon" [routerLink]="['/home']" (click)="scrollToTop()">
+                <div class="nav-icon" [routerLink]="['/home']" (click)="scrollToTop()" style="cursor: pointer;">
                     <i class="fas fa-home"></i>
                 </div>
                 <div class="nav-icon">
@@ -21,7 +21,7 @@
                     <i class="fas fa-bell"></i>
                     <span class="notification-badge">3</span>
                 </div>
-                <div class="nav-icon">
+                <div class="nav-icon" [routerLink]="['/messages']" style="cursor: pointer;">
                     <i class="fas fa-envelope"></i>
                     <span class="notification-badge">5</span>
                 </div>
@@ -35,6 +35,7 @@
                 </div>
                 <!-- Dropdown de opciones -->
                 <div class="profile-dropdown" [class.show]="dropdownOpen">
+                    <a [routerLink]="['/profile']">Perfil</a>
                     <a [routerLink]="['/settings']">Configuración</a>
                     <a (click)="logout()">Cerrar sesión</a>
                 </div>

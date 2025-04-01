@@ -17,7 +17,7 @@
                         <i class="fas fa-bell"></i>
                         <span>Notificaciones</span>
                     </div>
-                    <div class="menu-item">
+                    <div class="menu-item" [routerLink]="['/messages']" style="cursor: pointer;">
                         <i class="fas fa-envelope"></i>
                         <span>Mensajes</span>
                     </div>
@@ -40,8 +40,8 @@
                         <div class="profile-pic">
                             <img [src]="user.profileImage?.url" alt="Usuario">
                         </div>
-                        <div class="create-post-input" contenteditable="true" (focus)="clearPlaceholder()" (blur)="restorePlaceholder()" [autofocus]="true">
-                            {{ placeholderText }}
+                        <div class="search-bar">
+                            <input type="text" placeholder="{{ placeholderText }}">
                         </div>
                     </div>
                     <div>
@@ -64,14 +64,14 @@
                             <i class="fas fa-image" style="color: #4CAF50;"></i>
                             <span>Foto/Video</span>
                         </div>
-                        <div class="post-action">
+                        <!-- <div class="post-action">
                             <i class="fas fa-map-marker-alt" style="color: #F44336;"></i>
                             <span>Ubicación</span>
                         </div>
                         <div class="post-action">
                             <i class="fas fa-smile" style="color: #FFC107;"></i>
                             <span>Feeling</span>
-                        </div>
+                        </div> -->
                         <div class="post-action" (click)="createPost()">
                             <i class="fas fa-paper-plane" style="color: #2196F3;"></i>
                             <span>Publicar</span>
