@@ -9,7 +9,7 @@
                         <i class="fas fa-home"></i>
                         <span>Inicio</span>
                     </div>
-                    <div class="menu-item">
+                    <div class="menu-item" [routerLink]="['/explorer']" style="cursor: pointer;">
                         <i class="fas fa-compass"></i>
                         <span>Explorar</span>
                     </div>
@@ -40,7 +40,7 @@
                         <div class="profile-pic">
                             <img [src]="user.profileImage?.url" alt="Usuario">
                         </div>
-                        <div class="search-bar">
+                        <div class="description">
                             <input type="text" placeholder="{{ placeholderText }}">
                         </div>
                     </div>

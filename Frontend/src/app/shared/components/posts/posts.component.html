@@ -21,13 +21,13 @@
       <!-- } -->
       <div class="action-buttons">
         @if (post.allow_likes == true) {
-          <button class="action-btn like-btn">
-            <i [class.far]="!liked" [class.fas]="liked" class="fa-heart"></i> {{ post.likes_count }}
+          <button class="action-btn like-btn" (click)="toggleLike(post)">
+            <i [class]="post.liked ? 'fas fa-heart' : 'far fa-heart'"></i> {{ post.likes_count }}
           </button>
         } 
         @if (post.allow_comments == true) {
-          <button class="action-btn comment-btn">
-            <i class="far fa-comment"></i> 30
+          <button class="action-btn comment-btn" (click)="goToComments(post)">
+            <i class="far fa-comment"></i> {{ post.comments_count }}
           </button>
         }
         @if (post.allow_saving == true) {

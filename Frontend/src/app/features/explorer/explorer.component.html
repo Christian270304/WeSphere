@@ -1,0 +1,190 @@
+
+<!-- Main Content -->
+<div class="body-container">
+    <div class="container">
+        <div class="main-content">
+            <!-- Explore Feed -->
+            <div class="explore-feed">
+                <div class="explore-header">
+                    <div class="explore-header-title">Explorar</div>
+                    <div class="explore-header-filter">
+                        <div class="filter-item active">Recomendados</div>
+                        <div class="filter-item">Populares</div>
+                        <div class="filter-item">Nuevos</div>
+                    </div>
+                </div>
+                <!-- Post Cards -->
+                 <app-posts [isGrid]="true"></app-posts>
+                <!-- <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-author">
+                            <div class="profile-pic">
+                                <img src="/api/placeholder/40/40" alt="María García">
+                            </div>
+                            <div class="author-info">
+                                <div class="author-name">María García</div>
+                                <div class="post-time">Hace 2 horas · <i class="fas fa-globe-americas"></i></div>
+                            </div>
+                        </div>
+                        <div class="post-menu">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <div class="post-text">
+                            ¡Por fin terminé mi nuevo proyecto fotográfico! Después de meses de trabajo, estoy muy contenta de compartir estas imágenes con la comunidad de fotógrafos de WeSphere.
+                        </div>
+                        <div class="post-image">
+                            <img src="/api/placeholder/600/400" alt="Proyecto fotográfico">
+                        </div>
+                    </div>
+                    <div class="post-stats">
+                        <div class="likes-comments">
+                            <span class="stat-item"><i class="fas fa-thumbs-up"></i> 128</span>
+                            <span class="stat-item">24 comentarios</span>
+                        </div>
+                        <div class="shares">
+                            <span class="stat-item">8 compartidos</span>
+                        </div>
+                    </div>
+                    <div class="post-actions">
+                        <div class="action-button">
+                            <i class="far fa-thumbs-up"></i>
+                            <span>Me gusta</span>
+                        </div>
+                        <div class="action-button">
+                            <i class="far fa-comment"></i>
+                            <span>Comentar</span>
+                        </div>
+                        <div class="action-button">
+                            <i class="far fa-share-square"></i>
+                            <span>Compartir</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-author">
+                            <div class="profile-pic">
+                                <img src="/api/placeholder/40/40" alt="Ana Rodríguez">
+                            </div>
+                            <div class="author-info">
+                                <div class="author-name">Ana Rodríguez</div>
+                                <div class="post-time">Hace 8 horas · <i class="fas fa-map-marker-alt"></i> Bogotá, Colombia</div>
+                            </div>
+                        </div>
+                        <div class="post-menu">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <div class="post-text">
+                            Hoy lanzamos oficialmente nuestra startup Innova al mercado internacional. Ha sido un camino lleno de desafíos, pero gracias al apoyo de la comunidad de emprendedores aquí en WeSphere, hemos podido superar cada obstáculo.
+                        </div>
+                        <div class="post-image">
+                            <img src="/api/placeholder/600/350" alt="Lanzamiento Innova">
+                        </div>
+                    </div>
+                    <div class="post-stats">
+                        <div class="likes-comments">
+                            <span class="stat-item"><i class="fas fa-thumbs-up"></i> 345</span>
+                            <span class="stat-item">78 comentarios</span>
+                        </div>
+                        <div class="shares">
+                            <span class="stat-item">56 compartidos</span>
+                        </div>
+                    </div>
+                    <div class="post-actions">
+                        <div class="action-button">
+                            <i class="far fa-thumbs-up"></i>
+                            <span>Me gusta</span>
+                        </div>
+                        <div class="action-button">
+                            <i class="far fa-comment"></i>
+                            <span>Comentar</span>
+                        </div>
+                        <div class="action-button">
+                            <i class="far fa-share-square"></i>
+                            <span>Compartir</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-author">
+                            <div class="profile-pic">
+                                <img src="/api/placeholder/40/40" alt="Club de Fotografía">
+                            </div>
+                            <div class="author-info">
+                                <div class="author-name">Club de Fotografía <i class="fas fa-check-circle" style="color: var(--primary); font-size: 0.8rem;"></i></div>
+                                <div class="post-time">Hace 1 día · <i class="fas fa-users"></i></div>
+                            </div>
+                        </div>
+                        <div class="post-menu">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <div class="post-text">
+                            Únete a nuestra próxima sesión de fotos nocturnas en Madrid. ¡Será una experiencia inolvidable para todos los amantes de la fotografía!
+                        </div>
+                    </div>
+                    <div class="post-stats">
+                        <div class="likes-comments">
+                            <span class="stat-item"><i class="fas fa-thumbs-up"></i> 87</span>
+                            <span class="stat-item">12 comentarios</span>
+                        </div>
+                        <div class="shares">
+                            <span class="stat-item">23 compartidos</span>
+                        </div>
+                    </div>
+                    <div class="post-actions">
+                        <div class="action-button">
+                            <i class="far fa-thumbs-up"></i>
+                            <span>Me gusta</span>
+                        </div>
+                        <div class="action-button">
+                            <i class="far fa-comment"></i>
+                            <span>Comentar</span>
+                        </div>
+                        <div class="action-button">
+                            <i class="far fa-share-square"></i>
+                            <span>Compartir</span>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+            <!-- Right Sidebar -->
+            <div class="right-sidebar">
+                <!-- Trending -->
+                <div class="sidebar-card">
+                    <div class="sidebar-header">
+                        Tendencias para ti
+                    </div>
+                    <div class="trending-list">
+                        <div class="trending-item">
+                            <div class="trending-topic">Tecnología · Tendencia</div>
+                            <div class="trending-title">#InteligenciaArtificial</div>
+                            <div class="trending-stats">24.5K posts</div>
+                        </div>
+                        <div class="trending-item">
+                            <div class="trending-topic">Fotografía · Tendencia</div>
+                            <div class="trending-title">#FotografíaUrbana</div>
+                            <div class="trending-stats">18.2K posts</div>
+                        </div>
+                        <div class="trending-item">
+                            <div class="trending-topic">Viajes · Tendencia</div>
+                            <div class="trending-title">#DestinosOcultos</div>
+                            <div class="trending-stats">12.7K posts</div>
+                        </div>
+                        <div class="trending-item">
+                            <div class="trending-topic">Emprendimiento · Tendencia</div>
+                            <div class="trending-title">#StartupsLatam</div>
+                            <div class="trending-stats">9.3K</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
