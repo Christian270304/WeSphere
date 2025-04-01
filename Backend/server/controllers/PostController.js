@@ -1,5 +1,5 @@
 import { Post } from '../models/models.js';
-import { getRecommendedPosts } from '../models/PostQueries.js';
+import { getRecommendedPosts, getComments } from '../models/PostQueries.js';
 import { Image, User, Like } from '../models/models.js';
 import { v2 as cloudinary } from 'cloudinary';
 import sharp from 'sharp';
@@ -59,6 +59,17 @@ export class PostController {
         } catch (err) {
         res.status(500).json({ error: err.message });
         }
+    }
+
+    static async getComments(req, res) {
+      try {
+        const { id } = req.params;
+        const Post = await getComments(id);
+        if (!Post) return res.status(404).json({ msg: "Post no encontrado" });
+        res.json({ Post });
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      }
     }
     
     static async updatePost(req, res) {

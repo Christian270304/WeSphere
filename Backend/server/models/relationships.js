@@ -3,6 +3,7 @@ import { Post } from './PostModel.js';
 import { Follower } from './FollowerModel.js';
 import { Image } from './ImageModel.js';
 import { Like } from './LikeModel.js';
+import { Comment } from './CommentsModel.js';
 
 // Relación: Un usuario tiene muchos posts
 User.hasMany(Post, { foreignKey: 'user_id', as: 'posts' });
@@ -28,3 +29,11 @@ Like.belongsTo(Post, { foreignKey: 'post_id' });
 // Relación: Un like pertenece a un usuario
 User.hasMany(Like, { foreignKey: 'user_id', as: 'userLikes' });
 Like.belongsTo(User, { foreignKey: 'user_id' });
+
+// Relación: Un post tiene muchos comentarios
+Post.hasMany(Comment, { foreignKey: 'post_id', as: 'comments' });
+Comment.belongsTo(Post, { foreignKey: 'post_id' });
+
+// Relación: Un comentario pertenece a un usuario
+Comment.belongsTo(User, { foreignKey: 'user_id' });
+User.hasMany(Comment, { foreignKey: 'user_id', as: 'userComments' });

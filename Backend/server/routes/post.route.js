@@ -13,6 +13,8 @@ router.get('/user/:id', PostController.getPostsByUser);
 router.post('/create', upload.single('image'), PostController.createPost);
 router.post('/like/:post_id', PostController.likePost);
 
+router.get('/comments/:id', PostController.getComments);
+
 // router.post('/upload-image', upload.single('image'), PostController.subirImagens);
 // router.get('/:id', PostController.getPost);   
 // router.put('/:id', PostController.updatePost);

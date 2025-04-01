@@ -1,4 +1,4 @@
-import { Post, User, Image, Follower, Like } from '../models/models.js';
+import { Post, User, Image, Follower, Like, Comment } from '../models/models.js';
 import { Op , sequelize } from "../config/db.js";
 
 // Función para obtener posts recomendados
@@ -51,3 +51,37 @@ export const getRecommendedPosts = async (user_id) => {
         return error;
     }
   };
+
+  export const getComments = async (Id) => {
+    try {
+        const post = await Post.findByPk(Id, {
+            include: [
+                {
+                    model: Comment,
+                    as: 'comments',
+                    include: [
+                        {
+                            model: User,
+                            as: 'user',
+                            attributes: ['username'],
+                            include: { model: Image, as: 'profileImage', attributes: ['url'] }
+                        }
+                    ]
+                },
+                { model: User, as: "user", attributes: ['username'], include: { model: Image, as: 'profileImage', attributes: ['url'] } },
+                { model: Image, as: "image", attributes: ['url'] }
+            ],
+            attributes: [
+                'id',
+                'user_id',
+                'description',
+                'comments_count',
+                'created_at',
+                ]
+            });
+        return post;
+    } catch (error) {
+        console.error('Error en getComments:', error);
+        return error;
+    }
+  }
