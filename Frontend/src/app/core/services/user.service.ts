@@ -15,8 +15,7 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
-  getUser () {
-    const userId = localStorage.getItem('userId');
+  getUser (userId: number) {
     this.http.get<any>(`${this.apiUrl}/auth/user/${userId}`).subscribe(
       (data) => {
         if (data) {
