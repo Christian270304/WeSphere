@@ -48,4 +48,10 @@ export class PostService {
     }
     return this.posts$;
   }
+
+  toggleLike(postId: number) {
+    const userId = localStorage.getItem('userId');
+    return this.http.post<any>(`${this.apiUrl}/posts/like/${postId}`, { user_id: userId });
+  }
+
 }
