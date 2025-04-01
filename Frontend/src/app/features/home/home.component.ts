@@ -28,12 +28,17 @@ export class HomeComponent {
   
 
   ngOnInit() {
+    const userId = localStorage.getItem('userId');
     this.headerStateService.setHideElements(false);
-    this.userService.getUser().subscribe((user) => {
-      this.user = user;
-      this.placeholderText = `¿Qué estás pensando, ${this.user.username}?`;
-      console.log('Placeholder', this.placeholderText);
-    });
+    if (userId !== null) {
+      const numericUserId = Number(userId);
+      this.userService.getUser(numericUserId).subscribe((user) => {
+        this.user = user;
+        this.placeholderText = `¿Qué estás pensando, ${user.username}?`;
+      });
+    } else {
+      console.error('User ID is null');
+    }
 
     
   }

@@ -38,7 +38,6 @@ export class AuthComponent {
     }, error => {
       console.log(error.status);
       if (error.status === 400) {
-        console.log('dentro');
         this.errorService.setError(error.error.msg);
       }
       console.error('Error en login', error);
