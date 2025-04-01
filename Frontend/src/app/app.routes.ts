@@ -4,11 +4,15 @@ import { AuthGuard } from './core/guards/auth.guard';
 import { ProfileComponent } from './features/profile/profile.component';
 import { AuthComponent } from './features/auth/auth.component';
 import { MessagesComponent } from './features/messages/messages.component';
+import { ExplorerComponent } from './features/explorer/explorer.component';
+import { CommentsComponent } from './features/comments/comments.component';
 
 export const routes: Routes = [
     { path: '', component: AuthComponent },
     { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
     { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
     { path: 'messages', component: MessagesComponent, canActivate: [AuthGuard] },
+    { path: 'explorer', component: ExplorerComponent, canActivate: [AuthGuard] },
+    { path: 'comments', component: CommentsComponent, canActivate: [AuthGuard] },
     { path: '**', redirectTo: 'home' }
 ];
