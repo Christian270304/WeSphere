@@ -21,8 +21,7 @@ cloudinary.config({
 export class PostController {
     static async createPost(req, res) {
         try {
-            console.log(req.body);
-            console.log(req.file)
+            
         const { user_id, title = '', description = '', likes_count = 0, comments_count = 0, allow_comments = true, allow_likes = true, allow_save = true, created_at = new Date() } = req.body || {};
         const imageBuffer = req.file?.buffer;
 
@@ -30,7 +29,7 @@ export class PostController {
         if (imageBuffer) {
             imageId = await PostController.uploadImage(imageBuffer);
         }
-        console.log(imageId);
+        
         const newPost = await Post.create({ user_id, title, description, imageId, likes_count, comments_count, allow_comments, allow_likes, allow_save, created_at });
         
         res.json({ msg: "Post creado", post: newPost });

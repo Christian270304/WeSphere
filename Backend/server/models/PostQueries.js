@@ -19,13 +19,13 @@ export const getRecommendedPosts = async (user_id) => {
                 { model: Image, as: "image", attributes: ['url'] }
             ],
             where: {
-                created_at: { [Op.gte]: sequelize.literal('NOW() - INTERVAL 7 DAY') } // Últimos 7 días
+                created_at: { [Op.gte]: sequelize.literal('NOW() - INTERVAL 6 MONTH') } 
             },
             order: [
-                [sequelize.literal(`CASE WHEN "user_id" IN (${followedIds.join(',') || 0}) THEN 1 ELSE 2 END`), 'ASC'], // Primero los seguidos
-                ['likes_count', 'DESC'],  // Luego por likes
-                ['comments_count', 'DESC'], // Luego por comentarios
-                [sequelize.literal('RAND()')] // Aleatorizar un poco
+                [sequelize.literal(`CASE WHEN "user_id" IN (${followedIds.join(',') || 0}) THEN 1 ELSE 2 END`), 'ASC'], 
+                ['likes_count', 'DESC'],  
+                ['comments_count', 'DESC'], 
+                [sequelize.literal('RAND()')] 
             ],
             limit: 20
         });

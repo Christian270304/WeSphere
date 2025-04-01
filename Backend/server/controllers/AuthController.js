@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+
 import { User } from '../models/models.js';
 import { getUser } from '../models/UserQueries.js';
 
@@ -33,6 +34,12 @@ export class AuthController {
 
       const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
+      // res.cookie('token', token, {
+      //   httpOnly: true,
+      //   secure: 'production',
+      //   sameSite: 'none',
+      //   maxAge: 3600000,
+      // });
       res.json({ token, user: { id: user.id, username: user.username, email: user.email } });
     } catch (err) {
       res.status(500).json({ error: err.message });
