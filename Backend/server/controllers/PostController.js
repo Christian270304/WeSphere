@@ -1,6 +1,6 @@
 import { Post } from '../models/models.js';
 import { getRecommendedPosts } from '../models/PostQueries.js';
-import { Image, User } from '../models/models.js';
+import { Image, User, Like } from '../models/models.js';
 import { v2 as cloudinary } from 'cloudinary';
 import sharp from 'sharp';
 import streamifier from 'streamifier';
@@ -142,6 +142,49 @@ export class PostController {
             console.error("❌ Error en `uploadImageAndGetId`:", err);
            
         }
+    }
+
+
+    static async likePost(req, res) {
+      try {
+        const { user_id } = req.body;
+        const { post_id } = req.params;
+    
+        // Verificar si el usuario ya dio like al post
+        const existingLike = await Like.findOne({ where: { user_id, post_id } });
+    
+        if (existingLike) {
+          // Si ya existe, eliminar el like
+          await existingLike.destroy();
+          await Post.decrement('likes_count', { where: { id: post_id } });
+        } else {
+          // Si no existe, agregar el like
+          await Like.create({ user_id, post_id });
+          await Post.increment('likes_count', { where: { id: post_id } });
+        }
+    
+        // Obtener el estado actualizado del post
+        const updatedPost = await Post.findByPk(post_id, {
+          attributes: ['id', 'likes_count'],
+          include: [
+            {
+              model: Like,
+              as: 'likes',
+              where: { user_id },
+              required: false // Esto asegura que no falle si no hay likes
+            }
+          ]
+        });
+    
+        res.json({
+          id: updatedPost.id,
+          likes_count: updatedPost.likes_count,
+          liked: updatedPost.likes.length > 0 // Si hay likes, el usuario ha dado like
+        });
+      } catch (error) {
+        console.error('Error en likePost:', error);
+        res.status(500).json({ error: 'Error al gestionar el like' });
+      }
     }
 
     // static async subirImagens(req, res) {

@@ -1,4 +1,4 @@
-import { Post, User, Image, Follower } from '../models/models.js';
+import { Post, User, Image, Follower, Like } from '../models/models.js';
 import { Op , sequelize } from "../config/db.js";
 
 // Función para obtener posts recomendados
@@ -15,8 +15,20 @@ export const getRecommendedPosts = async (user_id) => {
         // Buscar posts recomendados usando los criterios definidos
         const posts = await Post.findAll({
             include: [
+                { model: Like, as: "likes", attributes: ['user_id'] },
                 { model: User, as: "user", attributes: ['username'], include: { model: Image, as: 'profileImage', attributes: ['url'] } },
                 { model: Image, as: "image", attributes: ['url'] }
+            ],
+            attributes: [
+                'id',
+                'user_id',
+                'description',
+                'likes_count',
+                'comments_count',
+                'created_at',
+                'allow_comments',
+                'allow_likes',
+                'allow_saving',
             ],
             where: {
                 created_at: { [Op.gte]: sequelize.literal('NOW() - INTERVAL 6 MONTH') } 
@@ -30,7 +42,10 @@ export const getRecommendedPosts = async (user_id) => {
             limit: 20
         });
         
-        return posts;
+        return posts.map(post => ({
+            ...post.toJSON(),
+            liked: post.likes.some(like => like.user_id === user_id)
+          }));
     } catch (error) {
         console.error('Error en getRecommendedPosts:', error);
         return error;
