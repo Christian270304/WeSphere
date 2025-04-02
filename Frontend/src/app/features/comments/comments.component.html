@@ -6,10 +6,10 @@
                 <div class="post-header">
                     <div class="post-author">
                         <div class="profile-pic">
-                            <img src="/api/placeholder/40/40" alt="María García">
+                            <img [src]="post.user?.profileImage?.url" alt="Foto de perfil de {{ post.user?.username }}">
                         </div>
                         <div class="author-info">
-                            <div class="author-name">María García</div>
+                            <div class="author-name">{{ post.user.username }}</div>
                             <div class="post-time">Hace 2 horas · <i class="fas fa-globe-americas"></i></div>
                         </div>
                     </div>
@@ -19,13 +19,13 @@
                 </div>
                 <div class="post-content">
                     <div class="post-text">
-                        ¡Por fin terminé mi nuevo proyecto fotográfico! Después de meses de trabajo, estoy muy contenta de compartir estas imágenes con la comunidad de fotógrafos de WeSphere. Gracias a todos por sus consejos y apoyo constante.
+                        {{ post.description }}
                     </div>
                     <div class="post-image">
-                        <img src="/api/placeholder/600/400" alt="Proyecto fotográfico">
+                        <img [src]="post.image.url" alt="Proyecto fotográfico">
                     </div>
                 </div>
-                <div class="post-stats">
+                <!-- <div class="post-stats">
                     <div class="likes-comments">
                         <span class="stat-item"><i class="fas fa-thumbs-up"></i> 128</span>
                         <span class="stat-item">24 comentarios</span>
@@ -47,63 +47,33 @@
                         <i class="far fa-share-square"></i>
                         <span>Compartir</span>
                     </div>
-                </div>
+                </div> -->
             </div>
             <!-- Comments Section -->
             <div class="comments-section">
                 <div class="comments-header">
-                    Comentarios (24)
+                    {{ post.comments_count }} Comentarios
                 </div>
                 <div class="comments-list">
-                    <div class="comment-item">
-                        <div class="comment-avatar">
-                            <img src="/api/placeholder/40/40" alt="Carlos Mendoza">
-                        </div>
-                        <div class="comment-content">
-                            <div class="comment-author">Carlos Mendoza</div>
-                            <div class="comment-text">
-                                ¡Qué increíble trabajo, María! Las fotos tienen una calidad impresionante. Felicidades por el logro.
+                    @for (comment of post.comments; track post.comments.id) {
+                        <div class="comment-item">
+                            <div class="comment-avatar">
+                                <img [src]="comment?.user?.profileImage.url" alt="Foto de perfil de {{ comment.user?.username }}">
                             </div>
-                            <div class="comment-time">Hace 1 hora</div>
-                            <div class="comment-actions">
-                                <span><i class="far fa-thumbs-up"></i> Me gusta</span>
-                                <span>Responder</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="comment-item">
-                        <div class="comment-avatar">
-                            <img src="/api/placeholder/40/40" alt="Ana Rodríguez">
-                        </div>
-                        <div class="comment-content">
-                            <div class="comment-author">Ana Rodríguez</div>
-                            <div class="comment-text">
-                                Estoy impresionada con tu nivel de detalle en cada foto. ¿Qué equipo utilizaste?
-                            </div>
-                            <div class="comment-time">Hace 2 horas</div>
-                            <div class="comment-actions">
-                                <span><i class="far fa-thumbs-up"></i> Me gusta</span>
-                                <span>Responder</span>
+                            <div class="comment-content">
+                                <div class="comment-author">{{ comment?.user?.username }}</div>
+                                <div class="comment-text">
+                                    {{ comment.content}}
+                                </div>
+                                <div class="comment-time">Hace 1 hora</div>
+                                <!-- <div class="comment-actions">
+                                    <span><i class="far fa-thumbs-up"></i> Me gusta</span>
+                                    <span>Responder</span>
+                                </div> -->
                             </div>
                         </div>
-                    </div>
-                    <div class="comment-item">
-                        <div class="comment-avatar">
-                            <img src="/api/placeholder/40/40" alt="Laura Gómez">
-                        </div>
-                        <div class="comment-content">
-                            <div class="comment-author">Laura Gómez</div>
-                            <div class="comment-text">
-                                Increíbles capturas. Me encanta cómo has jugado con las luces y sombras.
-                            </div>
-                            <div class="comment-time">Hace 3 horas</div>
-                            <div class="comment-actions">
-                                <span><i class="far fa-thumbs-up"></i> Me gusta</span>
-                                <span>Responder</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    }
+                </div> 
                 <div class="comment-footer">
                     <input type="text" class="comment-input" placeholder="Escribe un comentario...">
                     <button class="send-comment"><i class="fas fa-paper-plane"></i></button>

@@ -9,8 +9,9 @@ import { PostService } from '../../core/services/post.service';
 })
 export class CommentsComponent {
   postId: number | null = null;
+  public post: any = {};
 
-  constructor(private postDataService: PostService) {}
+  constructor(private postService: PostService) {}
 
   ngOnInit(): void {
     const postId = sessionStorage.getItem('postId');
@@ -25,6 +26,9 @@ export class CommentsComponent {
   }
 
   loadComments(postId: number): void {
-    console.log(`Cargando comentarios para el post con ID: ${postId}`);
+    this.postService.getComments(postId).subscribe((response) => {
+      this.post = response.Post; // Accede a la propiedad `Post` de la respuesta
+      console.log('Post cargado:', this.post);
+    });
   }
 }
