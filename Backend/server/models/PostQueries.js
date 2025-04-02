@@ -85,3 +85,18 @@ export const getRecommendedPosts = async (user_id) => {
         return error;
     }
   }
+
+  export const createComment = async (post_id, user_id, content) => {
+    try {
+        // Crear el comentario
+        const comment = await Comment.create({ post_id, user_id, content });
+    
+        // Incrementar el contador de comentarios en el post
+        await Post.increment('comments_count', { where: { id: post_id } });
+        
+        return comment;
+    } catch (error) {
+        console.error('Error en createComment:', error);
+        return error;
+    }
+  }

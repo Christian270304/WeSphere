@@ -10,10 +10,11 @@ const router = express.Router();
 
 router.get('/:id', PostController.getPosts);
 router.get('/user/:id', PostController.getPostsByUser);
+router.get('/comments/:post_id', PostController.getComments);
+
 router.post('/create', upload.single('image'), PostController.createPost);
 router.post('/like/:post_id', PostController.likePost);
-
-router.get('/comments/:id', PostController.getComments);
+router.post('/comment/:post_id', PostController.postComment);
 
 // router.post('/upload-image', upload.single('image'), PostController.subirImagens);
 // router.get('/:id', PostController.getPost);   

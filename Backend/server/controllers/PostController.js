@@ -1,5 +1,5 @@
 import { Post } from '../models/models.js';
-import { getRecommendedPosts, getComments } from '../models/PostQueries.js';
+import { getRecommendedPosts, getComments, createComment } from '../models/PostQueries.js';
 import { Image, User, Like } from '../models/models.js';
 import { v2 as cloudinary } from 'cloudinary';
 import sharp from 'sharp';
@@ -63,8 +63,8 @@ export class PostController {
 
     static async getComments(req, res) {
       try {
-        const { id } = req.params;
-        const Post = await getComments(id);
+        const { post_id } = req.params;
+        const Post = await getComments(post_id);
         if (!Post) return res.status(404).json({ msg: "Post no encontrado" });
         res.json({ Post });
       } catch (err) {
@@ -195,6 +195,25 @@ export class PostController {
       } catch (error) {
         console.error('Error en likePost:', error);
         res.status(500).json({ error: 'Error al gestionar el like' });
+      }
+    }
+
+    static async postComment(req, res) {
+      try {
+        const { user_id, content } = req.body;
+        const { post_id } = req.params;
+    
+        // Verificar si el contenido del comentario no está vacío
+        if (!content || content.trim() === '') {
+          return res.status(400).json({ error: 'El contenido del comentario no puede estar vacío' });
+        }
+
+        const comment = await createComment(post_id, user_id, content);
+
+        res.json({ msg: "Comentario creado", comment });
+      } catch (error) {
+        console.error('Error en postComment:', error);
+        res.status(500).json({ error: 'Error al gestionar el comentario' });
       }
     }
 
