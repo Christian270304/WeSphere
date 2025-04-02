@@ -10,7 +10,7 @@
                         </div>
                         <div class="author-info">
                             <div class="author-name">{{ post.user.username }}</div>
-                            <div class="post-time">Hace 2 horas · <i class="fas fa-globe-americas"></i></div>
+                            <div class="post-time">{{ calcularDiferenciaDeTiempo(post.created_at) }} · <i class="fas fa-globe-americas"></i></div>
                         </div>
                     </div>
                     <div class="post-menu">
@@ -54,7 +54,7 @@
                 <div class="comments-header">
                     {{ post.comments_count }} Comentarios
                 </div>
-                <div class="comments-list">
+                <div class="comments-list" #commentsContainer>
                     @for (comment of post.comments; track post.comments.id) {
                         <div class="comment-item">
                             <div class="comment-avatar">
@@ -65,7 +65,7 @@
                                 <div class="comment-text">
                                     {{ comment.content}}
                                 </div>
-                                <div class="comment-time">Hace 1 hora</div>
+                                <div class="comment-time">{{ calcularDiferenciaDeTiempo(comment.created_at) }}</div>
                                 <!-- <div class="comment-actions">
                                     <span><i class="far fa-thumbs-up"></i> Me gusta</span>
                                     <span>Responder</span>
@@ -74,9 +74,16 @@
                         </div>
                     }
                 </div> 
-                <div class="comment-footer">
-                    <input type="text" class="comment-input" placeholder="Escribe un comentario...">
-                    <button class="send-comment"><i class="fas fa-paper-plane"></i></button>
+                <div class="comment-footer" >
+                    <button class="emoji-button" (click)="toggleEmojiPicker()">
+                        <i class="far fa-smile"></i>
+                    </button>
+                    @if (showEmojiPicker) {
+                        <emoji-mart (emojiSelect)="addEmoji($event)" [style]="{ position: 'absolute', bottom: '130px', right: '80px' }"></emoji-mart>
+                    
+                    }
+                    <input autofocus="true" type="text" name="comment" class="comment-input" placeholder="Escribe un comentario..." [(ngModel)]="commentText" (keydown.enter)="createComment()"/>
+                    <button (click)="createComment()" class="send-comment"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
         </div>
