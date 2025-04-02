@@ -8,5 +8,7 @@ export const Comment = sequelize.define('comments', {
     content: { type: DataTypes.STRING, allowNull: false },
     created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
 }, {
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_general_ci',
     timestamps: false,
 });

@@ -59,6 +59,8 @@ export const getRecommendedPosts = async (user_id) => {
                 {
                     model: Comment,
                     as: 'comments',
+                    separate: true,
+                    order: [['created_at', 'DESC']],
                     include: [
                         {
                             model: User,
@@ -77,7 +79,7 @@ export const getRecommendedPosts = async (user_id) => {
                 'description',
                 'comments_count',
                 'created_at',
-                ]
+            ]
             });
         return post;
     } catch (error) {
