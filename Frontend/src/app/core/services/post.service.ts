@@ -54,4 +54,8 @@ export class PostService {
     return this.http.post<any>(`${this.apiUrl}/posts/like/${postId}`, { user_id: userId });
   }
 
+  getComments(postId: number) {
+    return this.http.get<any>(`${this.apiUrl}/posts/comments/${postId}`);
+  }
+
 }
