@@ -7,7 +7,7 @@
             <div class="sidebar">
                 <h3 style="font-weight: 600; margin-bottom: 20px;">Chats</h3>
                 <div class="chat-list">
-                    <div class="chat-item active">
+                    <div class="chat-item active" id="">
                         <div class="chat-avatar">
                             <img src="/api/placeholder/50/50" alt="María García">
                         </div>
@@ -43,10 +43,10 @@
             <div class="chat-window">
                 <div class="chat-header">
                     <div class="chat-header-avatar">
-                        <img [src]="user.profileImage.url" alt="María García">
+                        <img [src]="profileUser.profileImage.url" alt="María García">
                     </div>
                     <div class="chat-header-info">
-                        <div class="chat-header-name">{{ user.username }}</div>
+                        <div class="chat-header-name">{{ profileUser.username }}</div>
                         <div class="chat-header-status">En línea</div>
                     </div>
                 </div>

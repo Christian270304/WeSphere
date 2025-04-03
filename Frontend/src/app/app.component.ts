@@ -18,12 +18,4 @@ export class AppComponent {
       this.showHeader = !['/'].includes(currentRoute);
     });
   }
-
-  ngOnInit() {
-    if (this.authService.getToken()) {
-      console.log('Sesión activa');
-    } else {
-      console.log('No hay sesión iniciada');
-    }
-  }
 }

@@ -35,7 +35,6 @@ export class HeaderComponent {
 
   async logout() {
     await this.authService.logout();
-    this.router.navigate(['']);
   }
 
   toggleDropdown() {

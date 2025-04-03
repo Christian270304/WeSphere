@@ -16,7 +16,7 @@ export class PostService {
   getPosts(userArticles = false) {
     const userId = localStorage.getItem('userId');
     if (userArticles) {
-      this.http.get<any>(`${this.apiUrl}/posts/user/${userId}`).subscribe(
+      this.http.get<any>(`${this.apiUrl}/posts/user/${userId}`, {withCredentials: true}).subscribe(
         (data) => {
           if (Array.isArray(data.posts)) {
             this.postsSubject.next(data.posts);
@@ -31,7 +31,7 @@ export class PostService {
         }
       );
     } else {
-      this.http.get<any>(`${this.apiUrl}/posts/${userId}`).subscribe(
+      this.http.get<any>(`${this.apiUrl}/posts/${userId}`, {withCredentials: true}).subscribe(
         (data) => {
           if (Array.isArray(data.posts)) {
             this.postsSubject.next(data.posts);
@@ -51,11 +51,11 @@ export class PostService {
 
   toggleLike(postId: number) {
     const userId = localStorage.getItem('userId');
-    return this.http.post<any>(`${this.apiUrl}/posts/like/${postId}`, { user_id: userId });
+    return this.http.post<any>(`${this.apiUrl}/posts/like/${postId}`, { user_id: userId }, {withCredentials: true});
   }
 
   getComments(postId: number) {
-    return this.http.get<any>(`${this.apiUrl}/posts/comments/${postId}`);
+    return this.http.get<any>(`${this.apiUrl}/posts/comments/${postId}`, {withCredentials: true});
   }
 
 }

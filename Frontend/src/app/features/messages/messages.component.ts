@@ -8,11 +8,12 @@ import { UserService } from '../../core/services/user.service';
   styleUrl: './messages.component.scss'
 })
 export class MessagesComponent {
-  public user: any = {};
+  public profileUser: any = {};
 
   constructor(private userService: UserService) {
-    this.userService.getUser(1).subscribe((user) => {
-      this.user = user;
+    
+    this.userService.getAnotherUser(1).subscribe((user) => {
+      this.profileUser = user;
     });
   }
 }

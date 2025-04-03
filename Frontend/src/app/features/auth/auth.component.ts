@@ -14,24 +14,28 @@ import { HomeComponent } from '../home/home.component';
 })
 export class AuthComponent {
   isAuthenticated = false;
+  isLoading = false;
   username = '';
   password = '';
 
   constructor(private authService: AuthService, private router: Router, private errorService: ErrorService) {}
 
-  ngOnInit() {
-    this.authService.isAuthenticated$.subscribe(auth => {
-      this.isAuthenticated = auth;
-      if (auth) {
-        this.router.navigate(['/home']); 
-      }
-    });
+  ngOnInit(): void {
+    // this.authService.isLoading$.subscribe((loading) => {
+    //   this.isLoading = loading;
+    //   if (!loading) {
+    //     this.authService.isAuthenticated$.subscribe((isAuthenticated) => {
+    //       if (isAuthenticated) {
+    //         this.router.navigate(['/home']); // Redirige al home si está autenticado
+    //       }
+    //     });
+    //   }
+    // });
   }
 
   login() {
     this.authService.login({ username: this.username, password: this.password }).subscribe((res) => {
       localStorage.setItem('userId', res.user.id);
-      this.authService.setToken(res.token);
       this.isAuthenticated = true;
       this.router.navigate(['/home']);
   
@@ -45,7 +49,7 @@ export class AuthComponent {
   }
   
   loginWithGoogle() {
-    this.authService.loginWithGoogle();
+    // this.authService.loginWithGoogle();
   }
 
   toggleForm() {

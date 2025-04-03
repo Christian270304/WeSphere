@@ -6,6 +6,7 @@ import { AuthComponent } from './features/auth/auth.component';
 import { MessagesComponent } from './features/messages/messages.component';
 import { ExplorerComponent } from './features/explorer/explorer.component';
 import { CommentsComponent } from './features/comments/comments.component';
+import { SavedPostsComponent } from './features/saved-posts/saved-posts.component';
 
 export const routes: Routes = [
     { path: '', component: AuthComponent },
@@ -14,5 +15,6 @@ export const routes: Routes = [
     { path: 'messages', component: MessagesComponent, canActivate: [AuthGuard] },
     { path: 'explorer', component: ExplorerComponent, canActivate: [AuthGuard] },
     { path: 'comments', component: CommentsComponent, canActivate: [AuthGuard] },
+    { path: 'saved-posts', component: SavedPostsComponent, canActivate: [AuthGuard] },
     { path: '**', redirectTo: 'home' }
 ];

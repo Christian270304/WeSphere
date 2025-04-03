@@ -13,6 +13,5 @@ export class UserActionsComponent {
 
   async logout() {
     await this.authService.logout();
-    this.router.navigate(['']);
   }
 }
