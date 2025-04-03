@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { map, catchError, tap } from 'rxjs/operators';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
@@ -22,48 +23,54 @@ const authConfig: AuthConfig = {
   providedIn: 'root'
 })
 export class AuthService {
-    private apiUrl = environment.apiUrl;
-    private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.getToken() !== null);
-    isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+    private apiUrl = environment.apiUrl; 
+    private isAuthenticatedSubject = new BehaviorSubject<boolean | null>(null); 
+    isAuthenticated$ = this.isAuthenticatedSubject.asObservable(); 
+    
 
-    constructor(private http: HttpClient, private oauthService: OAuthService, private router: Router) {
-        this.configureOAuth();
+    constructor(private http: HttpClient, private router: Router) {
+      this.checkAuthentication(); 
     }
-
-    private configureOAuth() {
-        this.oauthService.configure(authConfig);
-        this.oauthService.loadDiscoveryDocumentAndTryLogin().catch((e) => {
-            console.warn('OAuth2 error',e);
-        });
-      }
-
+  
+    /**
+     * Inicia sesión con las credenciales proporcionadas.
+     */
     login(credentials: { username: string; password: string }): Observable<any> {
-        return this.http.post(`${this.apiUrl}/auth/login`, credentials);
+      return this.http.post(`${this.apiUrl}/auth/login`, credentials).pipe(
+        tap(() => this.isAuthenticatedSubject.next(true))
+      );
     }
-
-    loginWithGoogle(): void {
-        this.oauthService.initCodeFlow();
+  
+    /**
+     * Cierra la sesión del usuario.
+     */
+    logout() {
+        localStorage.removeItem('userId');
+            this.http.post(`${this.apiUrl}/auth/logout`, {}, { withCredentials: true }).subscribe(
+            (response) => {
+                this.isAuthenticatedSubject.next(false); 
+                this.router.navigate(['/']); 
+            }
+        );
     }
-
-    logout(): Promise<void> {
-        return new Promise((resolve) => {
-            localStorage.removeItem('token');
-            this.isAuthenticatedSubject.next(false);
-            this.oauthService.logOut();
-            resolve();
+  
+    /**
+     * Verifica si el usuario está autenticado llamando al backend.
+     */
+    private checkAuthentication(): void {
+      this.http.get<{ authenticated: boolean }>(`${this.apiUrl}/auth/check`, { withCredentials: true })
+        .subscribe((response) => {
+            console.log("Respuesta de autenticacion: ", response);
+            this.isAuthenticatedSubject.next(response.authenticated);
+     
         });
     }
-
-    setToken(token: string): void {
-        localStorage.setItem('token', token);
-        this.isAuthenticatedSubject.next(true);
-    }
-
-    getToken(): string | null {
-        return localStorage.getItem('token');
-    }
-
+  
+    /**
+     * Devuelve el estado actual de autenticación.
+     */
     isAuthenticated(): boolean {
-        return this.getToken() !== null;
+        return this.isAuthenticatedSubject.getValue() === true;
     }
-}
+
+  }
