@@ -1,6 +1,5 @@
-import { Post } from '../models/models.js';
+import { Post, Image, User, Like, Message } from '../models/models.js';
 import { getRecommendedPosts, getComments, createComment } from '../models/PostQueries.js';
-import { Image, User, Like } from '../models/models.js';
 import { v2 as cloudinary } from 'cloudinary';
 import sharp from 'sharp';
 import streamifier from 'streamifier';
@@ -153,6 +152,22 @@ export class PostController {
             console.error("❌ Error en `uploadImageAndGetId`:", err);
            
         }
+    }
+
+    static async getMessages(req, res) {
+      try {
+        const { chat_id } = req.params;
+        const messages = await Message.findAll({
+          where: { chat_id: chat_id },
+          order: [['created_at', 'ASC']], // Ordenar por fecha de creación
+      });
+    
+        if (!messages) return res.status(404).json({ msg: "Mensajes no encontrados" });
+    
+        res.json({ messages });
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      }
     }
 
 

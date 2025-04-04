@@ -4,6 +4,9 @@ import { Follower } from './FollowerModel.js';
 import { Image } from './ImageModel.js';
 import { Like } from './LikeModel.js';
 import { Comment } from './CommentsModel.js';
+import { Chat } from './ChatsModel.js';
+import { Message } from './MessagesModel.js';
+import { ChatMember } from './ChatMembersModel.js';
 
 // Relación: Un usuario tiene muchos posts
 User.hasMany(Post, { foreignKey: 'user_id', as: 'posts' });
@@ -37,3 +40,11 @@ Comment.belongsTo(Post, { foreignKey: 'post_id' });
 // Relación: Un comentario pertenece a un usuario
 Comment.belongsTo(User, { foreignKey: 'user_id' });
 User.hasMany(Comment, { foreignKey: 'user_id', as: 'userComments' });
+
+// Relación: Un chat tiene muchos mensajes
+Chat.hasMany(Message, { foreignKey: 'chat_id' });
+Message.belongsTo(Chat, { foreignKey: 'id' });
+
+// Relación: Un mensaje pertenece a un usuario
+Chat.hasMany(ChatMember, { foreignKey: 'chat_id' });
+ChatMember.belongsTo(Chat, { foreignKey: 'id' });
