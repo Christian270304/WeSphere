@@ -21,7 +21,7 @@ export class PostController {
     static async createPost(req, res) {
         try {
             
-        const { user_id, title = '', description = '', likes_count = 0, comments_count = 0, allow_comments = true, allow_likes = true, allow_save = true, created_at = new Date() } = req.body || {};
+        const { user_id, description = '', likes_count = 0, comments_count = 0, allow_comments = true, allow_likes = true, allow_save = true, created_at = new Date() } = req.body || {};
         const imageBuffer = req.file?.buffer;
 
         let imageId = null;
@@ -29,7 +29,7 @@ export class PostController {
             imageId = await PostController.uploadImage(imageBuffer);
         }
         
-        const newPost = await Post.create({ user_id, title, description, imageId, likes_count, comments_count, allow_comments, allow_likes, allow_save, created_at });
+        const newPost = await Post.create({ user_id, description, imageId, likes_count, comments_count, allow_comments, allow_likes, allow_save, created_at });
         
         res.json({ msg: "Post creado", post: newPost });
         } catch (err) {

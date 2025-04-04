@@ -13,7 +13,7 @@ const DEFAULT_PROFILE_BANNER_ID = 2;
 export class AuthController {
   static async register(req, res) {
     try {
-      const { username, email, password, profile_picture = null, banner = null, bio = null, is_private = false, created_at = new Date() } = req.body;
+      let { username, email, password, profile_picture = null, banner = null, bio = null, is_private = false, created_at = new Date() } = req.body;
       const hashedPassword = await bcrypt.hash(password, 10);
       if (!profile_picture) profile_picture = DEFAULT_PROFILE_IMAGE_ID;
       if (!banner) banner = DEFAULT_PROFILE_BANNER_ID;

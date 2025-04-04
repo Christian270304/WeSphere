@@ -1,9 +1,19 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/db.js";
+import { Chat } from "./ChatsModel.js";
+import { User } from "./UserModel.js";
 
 export const ChatMember = sequelize.define('chatMember', {
-    chat_id: { type: DataTypes.INTEGER, allowNull: false },
-    user_id: { type: DataTypes.INTEGER, allowNull: false },
+    chat_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: Chat, key: "id" }, onDelete: "CASCADE", onUpdate: "CASCADE" },
+    user_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: User, key: "id" }, onDelete: "CASCADE", onUpdate: "CASCADE" },
 },{
     timestamps: false,
+    primaryKey: ["chat_id", "user_id"],
+    tableName: "chatMember",
+});
+
+sequelize.sync({ force: true }).then(() => {
+    console.log("ChatMember table created successfully!");
+}).catch((error) => {
+    console.error("Error creating ChatMember table:", error);
 });

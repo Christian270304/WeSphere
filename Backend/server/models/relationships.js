@@ -41,10 +41,18 @@ Comment.belongsTo(Post, { foreignKey: 'post_id' });
 Comment.belongsTo(User, { foreignKey: 'user_id' });
 User.hasMany(Comment, { foreignKey: 'user_id', as: 'userComments' });
 
-// Relación: Un chat tiene muchos mensajes
-Chat.hasMany(Message, { foreignKey: 'chat_id' });
-Message.belongsTo(Chat, { foreignKey: 'id' });
+// Un Chat tiene muchos ChatMembers
+Chat.hasMany(ChatMember, { foreignKey: "chat_id" });
+ChatMember.belongsTo(Chat, { foreignKey: "chat_id" });
 
-// Relación: Un mensaje pertenece a un usuario
-Chat.hasMany(ChatMember, { foreignKey: 'chat_id' });
-ChatMember.belongsTo(Chat, { foreignKey: 'id' });
+// Un Chat tiene muchos Mensajes
+Chat.hasMany(Message, { foreignKey: "chat_id" });
+Message.belongsTo(Chat, { foreignKey: "id" });
+
+// Un Usuario puede pertenecer a muchos Chats
+User.hasMany(ChatMember, { foreignKey: "user_id" });
+ChatMember.belongsTo(User, { foreignKey: "user_id" });
+
+// Un Mensaje pertenece a un Usuario
+Message.belongsTo(User, { foreignKey: "user_id" });
+User.hasMany(Message, { foreignKey: "user_id", as: "userMessages" });
