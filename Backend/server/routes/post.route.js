@@ -11,7 +11,6 @@ const router = express.Router();
 router.get('/:id', PostController.getPosts);
 router.get('/user/:id', PostController.getPostsByUser);
 router.get('/comments/:post_id', PostController.getComments);
-router.get('/messages/:chat_id', PostController.getMessages);
 
 router.post('/create', upload.single('image'), PostController.createPost);
 router.post('/like/:post_id', PostController.likePost);

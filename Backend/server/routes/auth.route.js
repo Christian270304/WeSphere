@@ -25,6 +25,8 @@ const authMiddleware = (req, res, next) => {
 
 router.get('/check' ,AuthController.check);
 router.get("/user/:id", authMiddleware,  AuthController.getUser);
+router.get('/messages/:chat_id', PostController.getMessages);
+
 router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
 router.post('/logout', authMiddleware,  AuthController.logout);

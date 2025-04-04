@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
-import { User } from '../models/models.js';
+import { User, Message } from '../models/models.js';
 import { getUser } from '../models/UserQueries.js';
 
 dotenv.config();
@@ -91,4 +91,20 @@ export class AuthController {
       res.status(500).json({ error: err.message });
     }
   }
+
+  static async getMessages(req, res) {
+        try {
+          const { chat_id } = req.params;
+          const messages = await Message.findAll({
+            where: { chat_id: chat_id },
+            order: [['created_at', 'ASC']], // Ordenar por fecha de creación
+        });
+      
+          if (!messages) return res.status(404).json({ msg: "Mensajes no encontrados" });
+      
+          res.json({ messages });
+        } catch (err) {
+          res.status(500).json({ error: err.message });
+        }
+      }
 }
