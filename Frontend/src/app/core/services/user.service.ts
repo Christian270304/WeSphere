@@ -10,8 +10,10 @@ export class UserService {
   private apiUrl = environment.apiUrl;
   private userSubject = new BehaviorSubject<any>(null);
   private usersSubject = new BehaviorSubject<any>(null);
+  private messagesSubject = new BehaviorSubject<any>(null);
   user$ = this.userSubject.asObservable();
   users$ = this.usersSubject.asObservable();
+  messages$ = this.messagesSubject.asObservable();
 
   private anoterUserSubject = new BehaviorSubject<any>(null);
   anotherUser$ = this.anoterUserSubject.asObservable();
@@ -66,4 +68,16 @@ export class UserService {
     );
     return this.users$;
   }
+
+  getMessages (chatId: number) {
+    this.http.get<any>(`${this.apiUrl}/auth/messages/${chatId}`).subscribe(
+      (response) => {
+       console.log("Mensajes obtenidos: ", response.messages); 
+       this.messagesSubject.next(response.messages);
+      }
+    );
+    return this.messages$;
+  }
 }
+
+
