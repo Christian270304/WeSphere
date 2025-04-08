@@ -42,10 +42,17 @@ export const getRecommendedPosts = async (user_id) => {
             limit: 20
         });
         
-        return posts.map(post => ({
-            ...post.toJSON(),
-            liked: post.likes.some(like => like.user_id === user_id)
-          }));
+        const FinalsPosts = posts.map(post => {
+            const liked = post.likes.some(like => String(like.user_id) === String(user_id)); 
+            const postData = post.toJSON(); 
+            delete postData.likes; 
+            return {
+                ...postData,
+                liked 
+            };
+        });
+
+        return FinalsPosts;
     } catch (error) {
         console.error('Error en getRecommendedPosts:', error);
         return error;
