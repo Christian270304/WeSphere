@@ -10,7 +10,7 @@
                         </div>
                         <div class="author-info">
                             <div class="author-name">{{ post.user.username }}</div>
-                            <div class="post-time">{{ calcularDiferenciaDeTiempo(post.created_at) }} · <i class="fas fa-globe-americas"></i></div>
+                            <div class="post-time">{{ post.created_at | date:'shortTime' }} · <i class="fas fa-globe-americas"></i></div>
                         </div>
                     </div>
                     <div class="post-menu">
@@ -65,7 +65,7 @@
                                 <div class="comment-text">
                                     {{ comment.content}}
                                 </div>
-                                <div class="comment-time">{{ calcularDiferenciaDeTiempo(comment.created_at) }}</div>
+                                <div class="comment-time">{{ comment.created_at | date:'shortTime' }}</div>
                                 <!-- <div class="comment-actions">
                                     <span><i class="far fa-thumbs-up"></i> Me gusta</span>
                                     <span>Responder</span>

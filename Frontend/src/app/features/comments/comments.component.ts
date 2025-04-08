@@ -4,10 +4,11 @@ import { environment } from '../../../environments/environment';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-comments',
-  imports: [PickerComponent, FormsModule],
+  imports: [PickerComponent, FormsModule, CommonModule],
   templateUrl: './comments.component.html',
   styleUrl: './comments.component.scss'
 })
@@ -68,32 +69,4 @@ export class CommentsComponent {
     );
   }
   
-  calcularDiferenciaDeTiempo(fecha: any) {
-    const fechaActual = new Date();
-    const fechaPost = new Date(fecha);
-    const diferencia = fechaActual.getTime() - fechaPost.getTime();
-    const segundos = Math.floor(diferencia / 1000);
-    const minutos = Math.floor(segundos / 60);
-    const horas = Math.floor(minutos / 60);
-    const dias = Math.floor(horas / 24);
-    const semanas = Math.floor(dias / 7);
-    const meses = Math.floor(semanas / 4);
-    const años = Math.floor(meses / 12);
-
-    if (años > 0) {
-      return `hace ${años} año${años > 1 ? 's' : ''}`;
-    } else if (meses > 0) {
-      return `hace ${meses} mes${meses > 1 ? 'es' : ''}`;
-    } else if (semanas > 0) {
-      return `hace ${semanas} semana${semanas > 1 ? 's' : ''}`;
-    } else if (dias > 0) {
-      return `hace ${dias} día${dias > 1 ? 's' : ''}`;
-    } else if (horas > 0) {
-      return `hace ${horas} hora${horas > 1 ? 's' : ''}`;
-    } else if (minutos > 0) {
-      return `hace ${minutos} minuto${minutos > 1 ? 's' : ''}`;
-    } else {
-      return `hace ${segundos} segundo${segundos > 1 ? 's' : ''}`;
-    }
-  }
 }

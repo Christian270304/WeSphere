@@ -50,8 +50,12 @@
                         <div class="chat-header-status">En línea</div>
                     </div>
                 </div>
-                <div class="chat-body">
-                    <div class="message received">
+                <div id="messages" class="chat-body">
+                    <div *ngFor="let message of messages" [ngClass]="{'message': true, 'sent': message.sender_id === 3, 'received': message.sender_id !== 3}">
+                        {{ message.content }}
+                        <div class="message-time">{{ message.created_at | date:'shortTime' }}</div>
+                      </div>
+                    <!-- <div class="message received">
                         Hola, Carlos! ¿Cómo estás?
                         <div class="message-time">10:00 AM</div>
                     </div>
@@ -66,13 +70,13 @@
                     <div class="message sent">
                         Perfecto! ¿Nos vemos más tarde?
                         <div class="message-time">10:10 AM</div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="chat-footer">
                     <!-- Icono de emoji -->
                     <button><i class="far fa-smile"></i></button>
-                    <input type="text" class="chat-input" placeholder="Escribe un mensaje...">
-                    <button class="send-button"><i class="fas fa-paper-plane"></i></button>
+                    <input id="message" type="text" class="chat-input" placeholder="Escribe un mensaje...">
+                    <button id="send" class="send-button"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
         </div>

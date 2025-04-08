@@ -8,7 +8,7 @@
         </div>
         <div class="user-details">
           <div class="username">{{ post.user?.username }}</div>
-          <div class="timestamp">{{ calcularDiferenciaDeTiempo(post.created_at) }}</div>
+          <div class="timestamp">{{ post.created_at | date:'shortTime' }}</div>
         </div>
       </div>
       <div class="post-content">
