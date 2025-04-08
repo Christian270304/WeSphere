@@ -12,8 +12,3 @@ export const ChatMember = sequelize.define('chatMember', {
     tableName: "chatMember",
 });
 
-sequelize.sync({ force: true }).then(() => {
-    console.log("ChatMember table created successfully!");
-}).catch((error) => {
-    console.error("Error creating ChatMember table:", error);
-});

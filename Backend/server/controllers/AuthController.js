@@ -63,8 +63,8 @@ export class AuthController {
   }
 
   static async check(req, res) {
-    const token = req.cookies.auth_token; // Accede a la cookie desde el backend
-    console.log(token);
+    const token = req.cookies.auth_token; 
+
     if (!token) {
       return res.status(401).json({ authenticated: false });
     }
@@ -80,7 +80,6 @@ export class AuthController {
 
   static async logout(req, res) {
     try {
-      console.log("Dentro de logout");
       res.clearCookie('auth_token', {
         httpOnly: true,
         secure: true, // true en producción
@@ -97,7 +96,7 @@ export class AuthController {
           const { chat_id } = req.params;
           const messages = await Message.findAll({
             where: { chat_id: chat_id },
-            order: [['created_at', 'ASC']], // Ordenar por fecha de creación
+            order: [['created_at', 'ASC']], 
         });
       
           if (!messages) return res.status(404).json({ msg: "Mensajes no encontrados" });
