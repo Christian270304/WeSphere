@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.get('/check' ,AuthController.check);
 router.get("/user", authMiddleware,  AuthController.getUser);
+router.get("/user/:user_id", authMiddleware,  AuthController.getUserById);
 router.get('/messages/:chat_id', authMiddleware, AuthController.getMessages);
 router.get('/chats', authMiddleware,  AuthController.getChats);
 

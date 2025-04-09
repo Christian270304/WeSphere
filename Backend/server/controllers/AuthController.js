@@ -82,6 +82,20 @@ export class AuthController {
     }
   }
 
+  static async getUserById(req, res) {
+    try {
+      const { user_id } = req.params;
+      console.log("ID del usuario: ", user_id);
+      const user = await getUser(user_id);
+
+      if (!user) return res.status(404).json({ msg: "Usuario no encontrado" });
+
+      res.json({ user });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
   static async check(req, res) {
     const token = req.cookies.auth_token; 
 

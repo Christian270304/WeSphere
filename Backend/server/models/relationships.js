@@ -51,8 +51,11 @@ Message.belongsTo(Chat, { foreignKey: "chat_id" });
 
 // Un Usuario puede pertenecer a muchos Chats
 User.hasMany(ChatMember, { foreignKey: "user_id" });
-ChatMember.belongsTo(User, { foreignKey: "id" });
+ChatMember.belongsTo(User, { foreignKey: "user_id" });
 
 // Un Mensaje pertenece a un Usuario
 Message.belongsTo(User, { foreignKey: "sender_id" });
 User.hasMany(Message, { foreignKey: "sender_id", as: "userMessages" });
+
+
+

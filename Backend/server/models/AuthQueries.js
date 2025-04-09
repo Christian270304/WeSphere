@@ -1,4 +1,5 @@
 import { ChatMember, Message, User, Image, Chat } from "./models.js";
+import { Op } from "../config/db.js";
 
 
 export const verifyUser = async (username, email) => {
@@ -15,50 +16,76 @@ export const verifyUser = async (username, email) => {
 }
 
 export const getChatsModel = async (user_id) => {
-    const messages = await Message.findAll({
+  const userChats = await ChatMember.findAll({
+    attributes: ['chat_id'],
+    where: {
+      user_id: user_id, 
+    },
+  });
+  
+  const chatIds = userChats.map(chat => chat.chat_id);
+  
+  const lastMessages = await Message.findAll({
+    attributes: ['chat_id', 'content', 'sender_id', 'created_at'],
+    where: {
+      chat_id: { [Op.in]: chatIds },  
+    },
+    order: [['created_at', 'DESC']],  
+  });
+  
+  const chats = [];
+  
+  for (const chatId of chatIds) {
+    const lastMessage = lastMessages.find(msg => msg.chat_id === chatId);
+  
+    if (lastMessage) {
+      const otherMembers = await ChatMember.findAll({
+        attributes: ['user_id'],
+        where: {
+          chat_id: chatId,
+          user_id: { [Op.ne]: user_id },  
+        },
         include: [
           {
-            model: Chat,
+            model: User,
+            attributes: ['id', 'username'],  
             include: [
               {
-                model: ChatMember,
-                attributes: ['user_id'],
-                where: {}, // sin filtro aquí
-                include: [
-                  {
-                    model: User,
-                    attributes: ['id', 'username'],
-                    include: [
-                      {
-                        model: Image,
-                        as: 'profileImage',
-                        attributes: ['url'],
-                      },
-                    ],
-                  }
-                ]
-              }
+                model: Image,
+                as: 'profileImage',  
+                attributes: ['url'],
+              },
             ],
-            where: {
-              '$chat_members.user_id$': user_id, // filtras aquí que el usuario esté en el chat
-            },
           },
         ],
-        order: [['created_at', 'DESC']],
       });
+  
 
-      return messages;
-      // Agrupar los mensajes por chat_id y seleccionar el último mensaje
-      const chats = messages.map(msg => {
-        const members = msg.chat?.chat_members || [];
-        const other = members.find(m => m.user_id !== user_id);
+        const otherUserDetails = otherMembers.map(member => {
+        const user = member.user;  
+        
+        if (!user) {
+          console.log('User not found for member ID:', member.user_id);
+        }
+  
+        const profileImage = user && user.profileImage ? user.profileImage.url : null;
+  
         return {
-          lastMessage: msg.content,
-          chat_id: msg.chat_id,
-          otherUser: other?.user,
+          user_id: member.user_id,
+          username: user ? user.username : null,
+          profile_image: profileImage,
         };
       });
-      return chats;
+  
+      chats.push({
+        chat_id: chatId,
+        last_message: lastMessage.content,
+        other_users: otherUserDetails,  
+      });
+    }
+  }
+  
+  return chats;
 }
 
 export const getUser = async (id) => {
