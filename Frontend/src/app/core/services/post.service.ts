@@ -14,9 +14,8 @@ export class PostService {
   constructor(private http: HttpClient) {}
 
   getPosts(userArticles = false) {
-    const userId = localStorage.getItem('userId');
     if (userArticles) {
-      this.http.get<any>(`${this.apiUrl}/posts/user/${userId}`, {withCredentials: true}).subscribe(
+      this.http.get<any>(`${this.apiUrl}/posts/user/`, {withCredentials: true}).subscribe(
         (data) => {
           if (Array.isArray(data.posts)) {
             this.postsSubject.next(data.posts);
@@ -31,7 +30,7 @@ export class PostService {
         }
       );
     } else {
-      this.http.get<any>(`${this.apiUrl}/posts/${userId}`, {withCredentials: true}).subscribe(
+      this.http.get<any>(`${this.apiUrl}/posts/`, {withCredentials: true}).subscribe(
         (data) => {
           if (Array.isArray(data.posts)) {
             this.postsSubject.next(data.posts);

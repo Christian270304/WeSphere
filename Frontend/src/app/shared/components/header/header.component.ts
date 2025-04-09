@@ -19,18 +19,15 @@ export class HeaderComponent {
   constructor(private headerStateService: HeaderStateService, private userService: UserService, private authService: AuthService, private router: Router) {}
 
   ngOnInit() {
-    const userId = localStorage.getItem('userId');
+    
     this.headerStateService.hideElements$.subscribe((value) => {
       this.hideElements = value;
     });
-    if (userId !== null) {
-      const numericUserId = Number(userId);
-      this.userService.getUser(numericUserId).subscribe((user) => {
-        this.user = user;
-      });
-    } else {
-      console.error('User ID is null');
-    }
+    
+    this.userService.getUser().subscribe((user) => {
+      this.user = user;
+    });
+    
   }
 
   async logout() {

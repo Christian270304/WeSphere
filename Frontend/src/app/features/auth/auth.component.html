@@ -3,32 +3,66 @@
     <div class="body-container">
         <div class="wave"></div>
         <div class="container">
-            <form (submit)="login()">
-            <div class="form-section" id="loginSection">
-                
-                    <h2 class="form-title">Iniciar Sesión</h2>
-                    <div class="input-group">
-                        <input type="text" [(ngModel)]="username" name="username" placeholder="Username" required autofocus>
+            @if (isLoginFormVisible) {
+
+                <form (submit)="login()" id="loginForm">
+                    <div class="form-section" id="loginSection">
+                    
+                        <h2 class="form-title">Inicia Sessió</h2>
+                        <div class="input-group">
+                            <input type="text" [(ngModel)]="username" name="username" placeholder="Username" required autofocus>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" [(ngModel)]="password" name="password" placeholder="Contrasenya" required>
+                        </div>
+                        <app-error-message ></app-error-message>
+                        <button class="btn-submit">Inicia sessió</button>
+                        <div class="social-login">
+                            <i class="fab fa-facebook social-icon"></i>
+                            <i class="fab fa-google social-icon"></i>
+                            <i class="fab fa-twitter social-icon"></i>
+                        </div>
+                        <p class="mt-3">No tens compte? <a href="#" (click)="toggleRegisterForm()">Registra't</a></p>
+                    </div>   
+                    <div class="signup-section" id="signupSection">
+                        <h2 class="signup-title">¡Únete a WeSphere!</h2>
+                        <p class="signup-description">Conecta con amigos, comparte tus momentos y descubre nuevas experiencias en nuestra red social</p>
+                        <button class="btn-ghost" (click)="toggleRegisterForm(); $event.preventDefault()">Comenzar ahora</button>
                     </div>
-                    <div class="input-group">
-                        <input type="password" [(ngModel)]="password" name="password" placeholder="Contraseña" required>
+                </form> 
+            } @else if (!isLoginFormVisible) {
+                <form (submit)="register()" id="registerForm">
+                    <div class="signup-section" id="signupSection">
+                        <h2 class="signup-title">¡Únete a WeSphere!</h2>
+                        <p class="signup-description">Conecta con amigos, comparte tus momentos y descubre nuevas experiencias en nuestra red social</p>
+                        <button class="btn-ghost" (click)="toggleLoginForm(); $event.preventDefault()">Comenzar ahora</button>
                     </div>
-                    <app-error-message ></app-error-message>
-                    <button class="btn-submit">Ingresar</button>
-                    <div class="social-login">
-                        <i class="fab fa-facebook social-icon"></i>
-                        <i (click)="loginWithGoogle()" class="fab fa-google social-icon"></i>
-                        <i class="fab fa-twitter social-icon"></i>
-                    </div>
-                    <p class="mt-3">¿No tienes cuenta? <a href="#" (click)="toggleForm()">Regístrate</a></p>
-                </div>   
-            </form>
-            
-            <div class="signup-section" id="signupSection">
-                <h2 class="signup-title">¡Únete a WeSphere!</h2>
-                <p class="signup-description">Conecta con amigos, comparte tus momentos y descubre nuevas experiencias en nuestra red social</p>
-                <button class="btn-ghost" (click)="toggleForm()">Comenzar ahora</button>
-            </div>
+                    <div class="form-section" id="registerSection">
+                    
+                        <h2 class="form-title">Crear Compte</h2>
+                        <div class="input-group-register">
+                            <input type="text" [(ngModel)]="Reusername" name="username" placeholder="Username" required autofocus #usernameInput="ngModel">
+                        </div>
+                        <div class="input-group-register">
+                            <input type="email" [(ngModel)]="email" name="email" placeholder="Correu Electronic" required>
+                        </div>
+                        <div class="input-group-register">
+                            <input type="password" [(ngModel)]="Repassword" name="password" placeholder="Contrasenya" required>
+                        </div>
+                        <div class="input-group-register">
+                            <input type="password" [(ngModel)]="confirmPassword" name="confirm_password" placeholder="Repeteix la contrasenya" required>
+                        </div>
+                        <app-error-message ></app-error-message>
+                        <button class="btn-submit">Crear Compte</button>
+                        <div class="social-login">
+                            <i class="fab fa-facebook social-icon"></i>
+                            <i class="fab fa-google social-icon"></i>
+                            <i class="fab fa-twitter social-icon"></i>
+                        </div>
+                        <p class="mt-3">Ja tens compte? <a href="#" (click)="toggleLoginForm()">Inicia sessió</a></p>
+                    </div> 
+                </form>
+            }
         </div>
     </div>
 } @else if (isLoading) {

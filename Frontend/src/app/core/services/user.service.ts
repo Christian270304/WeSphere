@@ -11,17 +11,19 @@ export class UserService {
   private userSubject = new BehaviorSubject<any>(null);
   private usersSubject = new BehaviorSubject<any>(null);
   private messagesSubject = new BehaviorSubject<any>(null);
+  private chatsSubject = new BehaviorSubject<any>(null);
   user$ = this.userSubject.asObservable();
   users$ = this.usersSubject.asObservable();
   messages$ = this.messagesSubject.asObservable();
+  chats$ = this.chatsSubject.asObservable();
 
   private anoterUserSubject = new BehaviorSubject<any>(null);
   anotherUser$ = this.anoterUserSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
-  getUser (userId: number) {
-    this.http.get<any>(`${this.apiUrl}/auth/user/${userId}`, {withCredentials: true}).subscribe(
+  getUser () {
+    this.http.get<any>(`${this.apiUrl}/auth/user/`, {withCredentials: true}).subscribe(
       (data) => {
         if (data) {
           this.userSubject.next(data.user);
@@ -54,7 +56,7 @@ export class UserService {
   }
 
   getUsers () {
-    this.http.get<any>(`${this.apiUrl}/auth/users`, {withCredentials: true}).subscribe(
+    this.http.get<any>(`${this.apiUrl}/auth/users/`, {withCredentials: true}).subscribe(
       (data) => {
         if (data) {
           this.usersSubject.next(data.users);
@@ -77,6 +79,21 @@ export class UserService {
       }
     );
     return this.messages$;
+  }
+
+  getChats (userId: number) {
+    this.http.get<any>(`${this.apiUrl}/auth/chats/${userId}`, {withCredentials: true}).subscribe(
+      (data) => {
+        if (data) {
+          this.chatsSubject.next(data.chats);
+        } else {
+          console.error('Error: La API no devolvió un objeto', data);
+        }
+      },
+      (error) => {
+        console.error('Error al obtener usuarios:', error);
+      });
+      return this.chats$;
   }
 }
 

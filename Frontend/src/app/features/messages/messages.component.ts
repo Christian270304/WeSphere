@@ -14,6 +14,8 @@ export class MessagesComponent {
   public messagesRight: any = {};
   public messagesLeft: any = {};
   public messages: any = {};
+  public chats: any = {};
+  selectedChatId: number | null = null;
 
   constructor(private userService: UserService, private chatSocketService: ChatSocketService) {
     
@@ -23,6 +25,13 @@ export class MessagesComponent {
   }
 
   ngOnInit(): void {
+    const userId = localStorage.getItem('userId');
+    this.userService.getChats(Number(userId)).subscribe((chats) => {
+      this.chats = chats;
+    });
+
+
+
     this.chatSocketService.connect();
     const chats = [1]
     this.chatSocketService.joinChat(chats);
@@ -42,23 +51,27 @@ export class MessagesComponent {
       this.chatSocketService.sendMessage( 1, message, 3 );
       input.value = ''; // Limpiar el campo de entrada después de enviar el mensaje
     });
+    
+  }
 
-  
+  ngOnDestroy() {
+    this.chatSocketService.disconnect();
+  }
+
+  selectChat(chatId: number) {
+    this.selectedChatId = chatId;
+    console.log(chatId);
     const userId = localStorage.getItem('userId');
     const parsedUserId = Number(userId);
-    this.userService.getMessages(1).subscribe((messages) => {
-      console.log("Mensajes obtenidos: ", messages);
+    this.userService.getMessages(Number(chatId)).subscribe((messages) => {
+      
       this.messagesRight = messages.filter((message: any) => Number(message.sender_id) === parsedUserId);
       this.messagesLeft = messages.filter((message: any) => Number(message.sender_id) !== parsedUserId);
       // Combinar y ordenar los mensajes por tiempo
       this.messages = [...this.messagesRight, ...this.messagesLeft].sort((a: any, b: any) => {
         return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
       });
-      console.log("Mensajes intercalados: ", this.messages);
+     
     });
-  }
-
-  ngOnDestroy() {
-    this.chatSocketService.disconnect();
   }
 }

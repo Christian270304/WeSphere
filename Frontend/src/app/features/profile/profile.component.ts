@@ -22,16 +22,13 @@ export class ProfileComponent {
   constructor(private http: HttpClient, private headerStateService: HeaderStateService, private userService: UserService) {}
 
   ngOnInit() {
-    const userId = localStorage.getItem('userId');
+   
     this.headerStateService.setHideElements(true);
-    if (userId !== null) {
-      const numericUserId = Number(userId);
-      this.userService.getUser(numericUserId).subscribe((user) => {
-        this.user = user;
-      });
-    } else {
-      console.error('User ID is null');
-    }
+    
+    this.userService.getUser().subscribe((user) => {
+      this.user = user;
+    });
+    
   }
 
 }

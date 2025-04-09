@@ -32,11 +32,14 @@
     width: 90%;
     max-width: 1000px;
     overflow: hidden;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+}
+form {
+    display: flex;
+    width: 100%;    
 }
 
 .form-section {
+    width: 50%;
     padding: 60px 50px;
     display: flex;
     flex-direction: column;
@@ -89,6 +92,26 @@
     box-shadow: 0 0 0 2px rgba(33,150,243,0.2);
 }
 
+.input-group-register {
+    position: relative;
+    width: 100%;
+    margin: 15px 0;
+}
+.input-group-register input {
+    width: 100%;
+    padding: 15px 20px;
+    border: 2px solid #eee;
+    border-radius: 50px;
+    background: #f8f9fa;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+.input-group-register input:focus {
+    border-color: #2196F3;
+    background: white;
+    box-shadow: 0 0 0 2px rgba(33,150,243,0.2);
+}
+
 .btn-submit {
     background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
     border: none;
@@ -120,11 +143,26 @@
 .social-icon:hover {
     transform: scale(1.1);
 }
+.register-form {
+    display: none;
+}
 
 .signup-section {
     background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
     padding: 60px 50px;
     display: flex;
+    width: 50%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.login-section {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    padding: 60px 50px;
+    display: flex;
+    width: 50%;
     flex-direction: column;
     justify-content: center;
     align-items: center;

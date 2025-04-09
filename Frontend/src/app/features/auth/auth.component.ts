@@ -15,36 +15,56 @@ import { HomeComponent } from '../home/home.component';
 export class AuthComponent {
   isAuthenticated = false;
   isLoading = false;
-  username = '';
-  password = '';
+  isLoginFormVisible:boolean = true;
+  username: string = '';
+  password: string = '';
+  Reusername: string = '';
+  email: string = '';
+  Repassword: string = '';
+  confirmPassword: string = '';
 
   constructor(private authService: AuthService, private router: Router, private errorService: ErrorService) {}
 
   ngOnInit(): void {
-    // this.authService.isLoading$.subscribe((loading) => {
-    //   this.isLoading = loading;
-    //   if (!loading) {
-    //     this.authService.isAuthenticated$.subscribe((isAuthenticated) => {
-    //       if (isAuthenticated) {
-    //         this.router.navigate(['/home']); // Redirige al home si está autenticado
-    //       }
-    //     });
-    //   }
-    // });
+         
+      this.authService.isAuthenticated$.subscribe((isAuthenticated) => {
+        if (isAuthenticated) {
+          this.router.navigate(['/home']); // Redirige al home si está autenticado
+        }
+      });
+      
   }
 
   login() {
+    if (this.username === '' || this.password === '') {
+      this.errorService.setError('Por favor, completa todos los campos requeridos.'); 
+      return;
+    }
     this.authService.login({ username: this.username, password: this.password }).subscribe((res) => {
-      localStorage.setItem('userId', res.user.id);
       this.isAuthenticated = true;
       this.router.navigate(['/home']);
   
     }, error => {
-      console.log(error.status);
-      if (error.status === 400) {
-        this.errorService.setError(error.error.msg);
-      }
-      console.error('Error en login', error);
+      console.error('Error en el inicio de sesión:', error);
+      if (error.status === 400) this.errorService.setError(error.error.msg);
+    });
+  }
+
+  register () {
+    // Verificar los datos del formulario antes de enviar la solicitud
+    if (this.Reusername === '' || this.email === '' || this.Repassword === '' || this.confirmPassword === '') {
+      this.errorService.setError('Por favor, completa todos los campos requeridos.');
+      return;
+    }
+    if (this.Repassword !== this.confirmPassword) {
+      this.errorService.setError('Las contraseñas no coinciden.');
+      return;
+    }
+    this.authService.register({ username: this.Reusername, email: this.email, password: this.Repassword}).subscribe((res)=> {
+      this.isAuthenticated = true;
+      this.router.navigate(['/home']);
+    }, error => {
+      if (error.status === 400) this.errorService.setError(error.error.msg);
     });
   }
   
@@ -52,18 +72,14 @@ export class AuthComponent {
     // this.authService.loginWithGoogle();
   }
 
-  toggleForm() {
-    const loginSection = document.getElementById('loginSection');
-    const signupSection = document.getElementById('signupSection');
-    
-    loginSection!.style.transform = loginSection!.style.transform === 'translateX(-100%)' 
-        ? 'translateX(0)' 
-        : 'translateX(-100%)';
-        
-    signupSection!.style.transform = signupSection!.style.transform === 'translateX(-100%)' 
-        ? 'translateX(0)' 
-        : 'translateX(-100%)';
+  toggleRegisterForm(): void {
+    this.isLoginFormVisible = false;
   }
+
+  toggleLoginForm(): void {
+    this.isLoginFormVisible = true;
+  }
+
 
   
 }

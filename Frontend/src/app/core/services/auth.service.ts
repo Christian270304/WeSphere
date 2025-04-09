@@ -40,6 +40,12 @@ export class AuthService {
         tap(() => this.isAuthenticatedSubject.next(true))
       );
     }
+
+    register(credentials: { username: string; email: string; password: string}): Observable<any> {
+      return this.http.post(`${this.apiUrl}/auth/register`, credentials, {withCredentials: true}).pipe(
+        tap(() => this.isAuthenticatedSubject.next(true))
+      );
+    }
   
     /**
      * Cierra la sesión del usuario.
@@ -72,5 +78,7 @@ export class AuthService {
     isAuthenticated(): boolean {
         return this.isAuthenticatedSubject.getValue() === true;
     }
+
+
 
   }

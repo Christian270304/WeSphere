@@ -28,19 +28,12 @@ export class HomeComponent {
   
 
   ngOnInit() {
-    const userId = localStorage.getItem('userId');
     this.headerStateService.setHideElements(false);
-    if (userId !== null) {
-      const numericUserId = Number(userId);
-      this.userService.getUser(numericUserId).subscribe((user) => {
-        this.user = user;
-        this.placeholderText = `¿Qué estás pensando, ${user.username}?`;
-      });
-    } else {
-      console.error('User ID is null');
-    }
-
-    
+ 
+    this.userService.getUser().subscribe((user) => {
+      this.user = user;
+      this.placeholderText = `¿Qué estás pensando, ${user.username}?`;
+    });
   }
 
   onFileSelected(event: Event): void {
