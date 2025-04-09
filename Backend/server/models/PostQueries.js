@@ -1,4 +1,4 @@
-import { Post, User, Image, Follower, Like, Comment } from '../models/models.js';
+import { Post, User, Image, Follower, Like, Comment } from './models.js';
 import { Op , sequelize } from "../config/db.js";
 
 // Función para obtener posts recomendados

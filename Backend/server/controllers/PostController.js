@@ -39,7 +39,8 @@ export class PostController {
     
     static async getPosts(req, res) {
         try {
-        const posts = await getRecommendedPosts(req.params.id);
+          const { id } = req.user;
+        const posts = await getRecommendedPosts(id);
     
         res.json({ posts });
         } catch (err) {
@@ -255,14 +256,15 @@ export class PostController {
     //     }
     // }
 
-    static async getPostsByUser(req, res) {
+    static async getPostsById(req, res) {
         try {
+          const { id } = req.params;
         const posts = await Post.findAll({ 
           include: [
             { model: User, as: "user", attributes: ['username'], include: { model: Image, as: 'profileImage', attributes: ['url'] } },
             { model: Image, as: "image", attributes: ['url'] }
           ],
-          where: { user_id: req.params.id } });
+          where: { user_id: id } });
     
         res.json({ posts });
         } catch (err) {
