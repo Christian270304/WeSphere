@@ -9,7 +9,7 @@ const upload = multer({ storage });
 
 const router = express.Router();
 
-router.get('', authMiddleware, PostController.getPosts);
+router.get('/', authMiddleware, PostController.getPosts);
 router.get('/user/:id', authMiddleware, PostController.getPostsById);
 router.get('/comments/:post_id', authMiddleware, PostController.getComments);
 
