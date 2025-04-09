@@ -3,6 +3,16 @@ import { UserService } from '../../core/services/user.service';
 import { CommonModule } from '@angular/common';
 import { ChatSocketService } from '../../core/services/chat-socket.service';
 
+interface Chat {
+  chat_id: number;
+  last_message: string;
+  other_users: {
+    user_id: number;
+    username: string;
+    profile_image: string;
+  }[];
+}
+
 @Component({
   selector: 'app-messages',
   imports: [CommonModule],
@@ -14,19 +24,14 @@ export class MessagesComponent {
   public messagesRight: any = {};
   public messagesLeft: any = {};
   public messages: any = {};
-  public chats: any = {};
+  public chats: Chat[] = [];
   selectedChatId: number | null = null;
+  otherUser: any = null;
 
-  constructor(private userService: UserService, private chatSocketService: ChatSocketService) {
-    
-    this.userService.getAnotherUser(2).subscribe((user) => {
-      this.profileUser = user;
-    });
-  }
+  constructor(private userService: UserService, private chatSocketService: ChatSocketService) {}
 
   ngOnInit(): void {
-    const userId = localStorage.getItem('userId');
-    this.userService.getChats(Number(userId)).subscribe((chats) => {
+    this.userService.getChats().subscribe((chats) => {
       this.chats = chats;
     });
 
@@ -60,17 +65,21 @@ export class MessagesComponent {
 
   selectChat(chatId: number) {
     this.selectedChatId = chatId;
-    console.log(chatId);
-    const userId = localStorage.getItem('userId');
-    const parsedUserId = Number(userId);
+    this.otherUser = this.chats.find(chat => chat.chat_id === chatId);
+    console.log("Chat seleccionado: ", this.otherUser.other_users[0].user_id);
+    this.userService.getAnotherUser(this.otherUser.other_users[0].user_id).subscribe((user) => {
+      this.profileUser = user;
+      console.log("Usuario seleccionado: ", this.profileUser);
+    });
     this.userService.getMessages(Number(chatId)).subscribe((messages) => {
-      
-      this.messagesRight = messages.filter((message: any) => Number(message.sender_id) === parsedUserId);
-      this.messagesLeft = messages.filter((message: any) => Number(message.sender_id) !== parsedUserId);
-      // Combinar y ordenar los mensajes por tiempo
-      this.messages = [...this.messagesRight, ...this.messagesLeft].sort((a: any, b: any) => {
-        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-      });
+      console.log("Mensajes: ",messages);
+      this.messages = messages;
+      // this.messagesRight = messages.filter((message: any) => Number(message.sender_id) === parsedUserId);
+      // this.messagesLeft = messages.filter((message: any) => Number(message.sender_id) !== parsedUserId);
+      // // Combinar y ordenar los mensajes por tiempo
+      // this.messages = [...this.messagesRight, ...this.messagesLeft].sort((a: any, b: any) => {
+      //   return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      // });
      
     });
   }

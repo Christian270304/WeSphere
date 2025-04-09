@@ -7,16 +7,15 @@
             <div class="sidebar">
                 <h3 style="font-weight: 600; margin-bottom: 20px;">Chats</h3>
                 <div class="chat-list">
-                    @for (chat of chats; track $index ) {
+                    @for (chat of chats; track $index) {
                         <div [class.active]="chat.chat_id === selectedChatId" class="chat-item" id="{{ chat.chat_id }}" (click)="selectChat(chat.chat_id)">
                             <div class="chat-avatar">
-                                <img [src]="chat.user?.profileImage?.url" alt="Foto de perfil de {{ chat.user?.username }}">
+                                <img [src]="chat.other_users[0]?.profile_image" alt="Foto de perfil de {{ chat.other_users[0]?.username }}">
                             </div>
                             <div class="chat-info">
-                                <div class="chat-name">{{ chat.user?.username }}</div>
-                                <div class="chat-preview">{{ chat.content }}</div>
+                                <div class="chat-name">{{ chat.other_users[0]?.username }}</div>
+                                <div class="chat-preview">{{ chat.last_message }}</div>
                             </div>
-                            <div class="chat-time">{{ chat.created_at | date:'shortTime' }}</div>
                         </div>
                     }
                     

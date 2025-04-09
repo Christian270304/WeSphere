@@ -72,7 +72,7 @@ export class UserService {
   }
 
   getMessages (chatId: number) {
-    this.http.get<any>(`${this.apiUrl}/auth/messages/${chatId}`).subscribe(
+    this.http.get<any>(`${this.apiUrl}/auth/messages/${chatId}`, {withCredentials: true}).subscribe(
       (response) => {
        console.log("Mensajes obtenidos: ", response.messages); 
        this.messagesSubject.next(response.messages);
@@ -81,8 +81,8 @@ export class UserService {
     return this.messages$;
   }
 
-  getChats (userId: number) {
-    this.http.get<any>(`${this.apiUrl}/auth/chats/${userId}`, {withCredentials: true}).subscribe(
+  getChats () {
+    this.http.get<any>(`${this.apiUrl}/auth/chats`, {withCredentials: true}).subscribe(
       (data) => {
         if (data) {
           this.chatsSubject.next(data.chats);
