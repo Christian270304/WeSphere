@@ -16,21 +16,34 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
   console.log('Nuevo cliente conectado:', socket.id);
 
-  socket.on('joinChats', (chatIds) => {
-    chatIds.forEach(chatId => {
-      socket.join(chatId);
-      console.log(`Socket ${socket.id} se unió al chat ${chatId}`);
-    });
+  socket.on('join_user', (userId) => {
+    socket.join(`user:${userId}`);
+    console.log(`🧍‍♂️ Usuario ${userId} se unió a su sala personal`);
   });
 
-  socket.on('sendMessage', ({ chatId, sender_id, content }) => {
-    console.log(`Mensaje enviado al chat ${chatId} por ${sender_id}: ${content}`);
-    io.to(chatId).emit('newMessage', {
+  socket.on('join_chat', (chatId) => {
+    socket.join(`chat:${chatId}`);
+    console.log(`💬 Usuario se unió al chat ${chatId}`);
+  });
+
+  socket.on('leave_chat', (chatId) => {
+    socket.leave(`chat:${chatId}`);
+    console.log(`🚪 Usuario salió del chat ${chatId}`);
+  });
+
+  socket.on('send_message', ({ chatId, message, senderId }) => {
+
+    const fullMessage = {
       chatId,
-      sender_id,
-      content,
-      created_at: new Date().toISOString(),
-    });
+      sender_id: senderId,
+      content: message,
+      created_at: new Date()
+    };
+
+    io.to(`chat:${chatId}`).emit('receive_message', fullMessage);
+
+    // const otherUserId = message.receiverId;
+    // io.to(`user:${otherUserId}`).emit('new_message_notification', { chatId, message });
   });
 
   socket.on('disconnect', () => {
@@ -41,3 +54,5 @@ io.on('connection', (socket) => {
 server.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
+
+export { io };

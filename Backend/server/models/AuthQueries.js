@@ -110,3 +110,18 @@ export const getUser = async (id) => {
       throw new Error(err);
     }
   }
+
+  export const newMessageModel = async (user_id, chat_id, content) => {
+    try {
+      const message = await Message.create({
+        chat_id,
+        sender_id: user_id,
+        content,
+        created_at: new Date(),
+      });
+      
+      return message;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }

@@ -2,9 +2,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
-import { User, Message, ChatMember } from '../models/models.js';
-import { getUser, getChatsModel, verifyUser } from '../models/AuthQueries.js';
-import e from 'express';
+import { User, Message } from '../models/models.js';
+import { getUser, getChatsModel, verifyUser, newMessageModel } from '../models/AuthQueries.js';
+import { io } from '../server.js'
 
 dotenv.config();
 
@@ -106,7 +106,7 @@ export class AuthController {
     try {
       // Verifica el token (por ejemplo, usando JWT)
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      return res.status(200).json({ authenticated: true, user: decoded });
+      return res.status(200).json({ authenticated: true, user: decoded.id });
     } catch (err) {
       return res.status(401).json({ authenticated: false });
     }
@@ -139,17 +139,33 @@ export class AuthController {
       } catch (err) {
         res.status(500).json({ error: err.message });
       }
-    }
+  }
 
-    static async getChats(req, res) {
-      try {
-        const { id } = req.user;
+  static async getChats(req, res) {
+    try {
+      const { id } = req.user;
 
-        const chats = await getChatsModel(id); 
-        
-        return res.status(200).json({ chats });
-      } catch (err) {
-        res.status(500).json({ error: err.message });
-      }
+      const chats = await getChatsModel(id); 
+      
+      return res.status(200).json({ chats });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
+  }
+
+  static async newMessage(req, res) {
+    try {
+      const { id } = req.user;
+      const { chat_id, content } = req.body;
+
+      const newMessage = await newMessageModel(id, chat_id, content); 
+      if (!newMessage) return res.status(404).json({ msg: "Mensaje no creado" });
+
+      io.to(`chat:${chat_id}`).emit('receive_message', newMessage);
+
+      return res.status(200).json({ newMessage });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
 }
