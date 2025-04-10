@@ -42,7 +42,6 @@ export class UserService {
     this.http.get<any>(`${this.apiUrl}/auth/user/${userId}`, {withCredentials: true}).subscribe(
       (data) => {
         if (data) {
-          console.log("Usuario obtenido: ", data.user);
           this.anoterUserSubject.next(data.user);
         } else {
           console.error('Error: La API no devolvió un objeto', data);
@@ -73,8 +72,7 @@ export class UserService {
 
   getMessages (chatId: number) {
     this.http.get<any>(`${this.apiUrl}/auth/messages/${chatId}`, {withCredentials: true}).subscribe(
-      (response) => {
-       console.log("Mensajes obtenidos: ", response.messages); 
+      (response) => { 
        this.messagesSubject.next(response.messages);
       }
     );
@@ -94,6 +92,19 @@ export class UserService {
         console.error('Error al obtener usuarios:', error);
       });
       return this.chats$;
+  }
+
+  sendMessage (content: {chat_id: number, content: string, userId: number}) {
+    this.http.post<any>(`${this.apiUrl}/auth/newMessage`, content, {withCredentials: true}).subscribe({
+      next: (response) => {
+        const currentMessages = this.messagesSubject.value || [];
+        this.messagesSubject.next([...currentMessages, ...response.messages]);
+      },
+      error: (error) => {
+        console.error('Error al enviar el mensaje:', error);
+      }
+    });
+    return this.messages$;
   }
 }
 

@@ -21,16 +21,24 @@ export class ChatSocketService {
     }
   }
 
-  joinChat(chatIds: number[]): void {
-    this.socket.emit('joinChats', chatIds);
+  joinUserRoom(userId: number) {
+    this.socket.emit('join_user', userId)
   }
 
-  sendMessage(chatId: number, content: string, sender_id: number): void {
-    this.socket.emit('sendMessage', { chatId, sender_id, content });
+  joinChat(chatId: number): void {
+    this.socket.emit('join_chat', chatId);
+  }
+
+  leaveChat(chatId: number) {
+    this.socket.emit('leave_chat', chatId);
+  }
+
+  sendMessage(data: any) {
+    this.socket.emit('send_message', data);
   }
 
   onMessage(callback: (msg: any) => void) {
-    this.socket.on('newMessage', callback);
+    this.socket.on('receive_message', callback);
   }
 
   disconnect() {
@@ -39,6 +47,4 @@ export class ChatSocketService {
       console.log("Desconectado del socket: ", this.socket.id);
     }
   }
-
-
 }

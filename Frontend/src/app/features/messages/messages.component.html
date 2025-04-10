@@ -1,6 +1,4 @@
 <div class="body-container">
-    
-    <!-- Main Content -->
     <div class="container">
         <div class="main-content">
             <!-- Sidebar -->
@@ -18,80 +16,41 @@
                             </div>
                         </div>
                     }
-                    
-
-
-                    <!-- <div class="chat-item active">
-                        <div class="chat-avatar">
-                            <img src="/api/placeholder/50/50" alt="María García">
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-name">María García</div>
-                            <div class="chat-preview">¡Hola, cómo estás?</div>
-                        </div>
-                        <div class="chat-time">10m</div>
-                    </div>
-                    <div class="chat-item">
-                        <div class="chat-avatar">
-                            <img src="/api/placeholder/50/50" alt="Juan Pérez">
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-name">Juan Pérez</div>
-                            <div class="chat-preview">Revisemos el proyecto mañana.</div>
-                        </div>
-                        <div class="chat-time">2h</div>
-                    </div>
-                    <div class="chat-item">
-                        <div class="chat-avatar">
-                            <img src="/api/placeholder/50/50" alt="Ana Rodríguez">
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-name">Ana Rodríguez</div>
-                            <div class="chat-preview">Gracias por la ayuda!</div>
-                        </div>
-                        <div class="chat-time">5h</div>
-                    </div> -->
                 </div>
             </div>
             <!-- Chat Window -->
             <div class="chat-window">
-                <div class="chat-header">
-                    <div class="chat-header-avatar">
-                        <img [src]="profileUser.profileImage.url" alt="María García">
+                @if (selectedChatId) {
+                    <div class="chat-header">
+                        <div class="chat-header-avatar">
+                            <img [src]="profileUser.profileImage.url" alt="María García">
+                        </div>
+                        <div class="chat-header-info">
+                            <div class="chat-header-name">{{ profileUser.username }}</div>
+                            <div class="chat-header-status">En línea</div>
+                        </div>
                     </div>
-                    <div class="chat-header-info">
-                        <div class="chat-header-name">{{ profileUser.username }}</div>
-                        <div class="chat-header-status">En línea</div>
+                    <div id="messages" class="chat-body">
+                        <div *ngFor="let message of messages" [ngClass]="{'message': true, 'sent': message.sender_id === userId, 'received': message.sender_id !== userId}">
+                            {{ message.content }}
+                            <div class="message-time">{{ message.created_at | date:'shortTime' }}</div>
+                          </div>
                     </div>
-                </div>
-                <div id="messages" class="chat-body">
-                    <div *ngFor="let message of messages" [ngClass]="{'message': true, 'sent': message.sender_id === 3, 'received': message.sender_id !== 3}">
-                        {{ message.content }}
-                        <div class="message-time">{{ message.created_at | date:'shortTime' }}</div>
-                      </div>
-                    <!-- <div class="message received">
-                        Hola, Carlos! ¿Cómo estás?
-                        <div class="message-time">10:00 AM</div>
+                    <div class="chat-footer">
+                        @if (!isMobileDevice()) {
+                            <button class="emoji-button" (click)="toggleEmojiPicker()">
+                                <i class="far fa-smile"></i>
+                            </button>
+                            @if (showEmojiPicker) {
+                                <div #emojiPicker class="emoji-picker-container">
+                                    <emoji-mart (emojiSelect)="addEmoji($event)"></emoji-mart>
+                                </div>
+                            }
+                        }
+                        <input [(ngModel)]="newMessage" (keydown.enter)="sendMessage()" id="message" type="text" class="chat-input" placeholder="Escribe un mensaje...">
+                        <button (click)="sendMessage()" id="send" class="send-button"><i class="fas fa-paper-plane"></i></button>
                     </div>
-                    <div class="message sent">
-                        ¡Hola, María! Estoy bien, gracias. ¿Y tú?
-                        <div class="message-time">10:02 AM</div>
-                    </div>
-                    <div class="message received">
-                        También estoy bien, gracias por preguntar.
-                        <div class="message-time">10:05 AM</div>
-                    </div>
-                    <div class="message sent">
-                        Perfecto! ¿Nos vemos más tarde?
-                        <div class="message-time">10:10 AM</div>
-                    </div> -->
-                </div>
-                <div class="chat-footer">
-                    <!-- Icono de emoji -->
-                    <button><i class="far fa-smile"></i></button>
-                    <input id="message" type="text" class="chat-input" placeholder="Escribe un mensaje...">
-                    <button id="send" class="send-button"><i class="fas fa-paper-plane"></i></button>
-                </div>
+                }
             </div>
         </div>
     </div>

@@ -79,6 +79,10 @@ export class AuthService {
         return this.isAuthenticatedSubject.getValue() === true;
     }
 
-
+    getUserIdFromToken(): Observable<number> {
+      return this.http.get<{ user: number }>(`${this.apiUrl}/auth/check`, {
+        withCredentials: true
+      }).pipe(map(res => res.user));
+    }
 
   }
