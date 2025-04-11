@@ -9,7 +9,7 @@
                     <img [src]="user.bannerImage.url" alt="Foto de portada">
                 </div>
                 <div class="profile-pic">
-                    <img [src]="user.profileImage.url" alt="Foto de perfil">
+                    <img [src]="user.profileImage?.url" alt="Foto de perfil de {{ user.username }}">
                 </div>
                 <div class="profile-info">
                     <div class="username">{{ user.username }}</div>

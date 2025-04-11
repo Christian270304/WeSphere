@@ -83,8 +83,12 @@ export class AuthComponent {
     });
   }
   
-  loginWithGoogle() {
+  loginWithGoogle () {
     this.authService.loginWithGoogle();
+  }
+
+  loginWithReddit () {
+
   }
 
   toggleRegisterForm(): void {

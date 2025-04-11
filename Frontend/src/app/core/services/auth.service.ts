@@ -48,9 +48,28 @@ export class AuthService {
     }
 
     loginWithGoogle() {
-      window.location.href = `${this.apiUrl}/auth/google`;  // Redirige al backend
-   }
-  
+      const popup = window.open(
+        `${this.apiUrl}/auth/google`,
+        '_blank',
+        'width=600,height=700'
+      );
+    
+      const listener = (event: MessageEvent) => {
+        // Seguridad: verifica origen
+        if (event.origin !== 'http://localhost:3000') return;
+    
+        if (event.data.success) {
+          this.isAuthenticatedSubject.next(true); // o lo que uses
+          this.router.navigate(['/home']);
+          window.removeEventListener('message', listener); // limpia listener
+        }
+      };
+    
+      window.addEventListener('message', listener);
+    }
+    
+
+
     /**
      * Cierra la sesión del usuario.
      */
