@@ -84,11 +84,11 @@ export class AuthComponent {
   }
   
   loginWithGoogle () {
-    this.authService.loginWithGoogle();
+    this.authService.loginWithOAuth('google');
   }
 
   loginWithReddit () {
-
+    this.authService.loginWithOAuth('reddit');
   }
 
   toggleRegisterForm(): void {

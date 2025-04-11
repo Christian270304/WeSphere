@@ -47,11 +47,24 @@ export class AuthService {
       );
     }
 
-    loginWithGoogle() {
+    loginWithOAuth (oauth = '') {
+      const width = 500;
+      const height = 600;
+
+      const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        window.location.href = `${this.apiUrl}/auth/${oauth}`;
+        return;
+      }
+
+      const left = window.screenX + (window.innerWidth - width) / 2;
+      const top = window.screenY + (window.innerHeight - height);
+
       const popup = window.open(
-        `${this.apiUrl}/auth/google`,
+        `${this.apiUrl}/auth/${oauth}`,
         '_blank',
-        'width=600,height=700'
+        `width=${width},height=${height},top=${top},left=${left}`
       );
     
       const listener = (event: MessageEvent) => {
@@ -59,16 +72,14 @@ export class AuthService {
         if (event.origin !== 'http://localhost:3000') return;
     
         if (event.data.success) {
-          this.isAuthenticatedSubject.next(true); // o lo que uses
+          this.isAuthenticatedSubject.next(true); 
           this.router.navigate(['/home']);
-          window.removeEventListener('message', listener); // limpia listener
+          window.removeEventListener('message', listener); 
         }
       };
     
       window.addEventListener('message', listener);
     }
-    
-
 
     /**
      * Cierra la sesión del usuario.
