@@ -1,9 +1,7 @@
 import passport from "passport";
 import GoogleStrategy from "passport-google-oauth20";
 import { PostController } from "../controllers/PostController.js";
-import { Op } from "./db.js";
 import { User, AuthProvider } from "../models/models.js";
-import jwt from "jsonwebtoken";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
 
@@ -63,7 +61,7 @@ passport.use(new GoogleStrategy({
   }));
 
   passport.serializeUser((user, done) => {
-    done(null, user.id); // puedes usar user.googleId si prefieres
+    done(null, user.id); 
   });
   
   passport.deserializeUser(async (id, done) => {
@@ -75,4 +73,4 @@ passport.use(new GoogleStrategy({
     }
   });
 
-export default passport;
+  export default passport; 

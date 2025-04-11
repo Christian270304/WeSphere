@@ -1,5 +1,7 @@
 import express from "express";
-import passport from "../config/passport-google.js";
+// import passport from "../config/passport-google.js"; 
+import passport from "../config/passport-reddit.js";
+
 import { AuthController } from "../controllers/AuthController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 
@@ -18,14 +20,24 @@ router.post('/newMessage', authMiddleware, AuthController.newMessage);
 
 // Rutas google
 router.get('/google',
-    passport.authenticate('google', {
-      scope: ['profile', 'email'],
-    })
-  );
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+  })
+);
 
-  router.get('/google/callback',
-    passport.authenticate('google', { failureRedirect: '/' }),
-    AuthController.googleCallback
-  );
+router.get('/google/callback',
+  passport.authenticate('google', { failureRedirect: '/' }),
+  AuthController.googleCallback
+);
+
+// Rutas Reddit
+router.get('/reddit', 
+  passport.authenticate('reddit')
+);
+
+router.get('/reddit/callback',
+  passport.authenticate('reddit', { failureRedirect: '/' }),
+  AuthController.redditCallback
+);
 
 export default router;
