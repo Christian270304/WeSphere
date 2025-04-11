@@ -56,6 +56,21 @@ export class AuthComponent {
       this.errorService.setError('Por favor, completa todos los campos requeridos.');
       return;
     }
+
+    // Verificar que el username no contenga espacios
+    if (/\s/.test(this.Reusername)) {
+      this.errorService.setError('El nombre de usuario no puede contener espacios.');
+      return;
+    }
+
+    // Verificar que el email tenga un formato válido
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(this.email)) {
+      this.errorService.setError('El correo electrónico no es válido.');
+      return;
+    }
+
+    // Verificar que las contraseñas coincidan
     if (this.Repassword !== this.confirmPassword) {
       this.errorService.setError('Las contraseñas no coinciden.');
       return;
@@ -69,7 +84,7 @@ export class AuthComponent {
   }
   
   loginWithGoogle() {
-    // this.authService.loginWithGoogle();
+    this.authService.loginWithGoogle();
   }
 
   toggleRegisterForm(): void {

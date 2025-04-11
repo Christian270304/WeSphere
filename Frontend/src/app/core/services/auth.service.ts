@@ -46,6 +46,10 @@ export class AuthService {
         tap(() => this.isAuthenticatedSubject.next(true))
       );
     }
+
+    loginWithGoogle() {
+      window.location.href = `${this.apiUrl}/auth/google`;  // Redirige al backend
+   }
   
     /**
      * Cierra la sesión del usuario.
