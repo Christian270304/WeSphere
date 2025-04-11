@@ -176,14 +176,26 @@ export class AuthController {
     }
 
     const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    
     // Enviar la cookie al cliente
     res.cookie('auth_token', token, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: 'none',
       maxAge: 3600000,
     });
 
-    res.status(200).json({ user: { id: req.user.id, username: req.user.username, email: req.user.email } });
+    // res.status(200).json({ user: { id: req.user.id, username: req.user.username, email: req.user.email } });
+    // res.redirect("http://localhost:4200/home"); 
+    res.send(`
+      <html>
+        <body>
+          <script>
+            window.opener.postMessage({ success: true }, "http://localhost:4200");
+            window.close();
+          </script>
+        </body>
+      </html>
+    `);
   }
 }

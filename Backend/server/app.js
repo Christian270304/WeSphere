@@ -5,6 +5,8 @@ import { DB, sequelize } from './config/db.js';
 import authRoutes from './routes/auth.route.js';
 import postRoutes from './routes/post.route.js';
 import cookieParser from 'cookie-parser';
+import passport from './config/passport-google.js';
+import session from 'express-session';
 
 
 dotenv.config();
@@ -24,6 +26,16 @@ app.use((req, res, next) => {
   console.log("CORS headers applied: ", req.headers.origin);
   next();
 });
+
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);

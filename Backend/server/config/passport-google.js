@@ -47,6 +47,7 @@ passport.use(new GoogleStrategy({
         username,
         email,
         profile_picture: imageId,
+        banner: 2,
       });
   
       await AuthProvider.create({
@@ -60,5 +61,18 @@ passport.use(new GoogleStrategy({
       return done(error, false);
     }
   }));
+
+  passport.serializeUser((user, done) => {
+    done(null, user.id); // puedes usar user.googleId si prefieres
+  });
+  
+  passport.deserializeUser(async (id, done) => {
+    try {
+      const user = await User.findByPk(id);
+      done(null, user);
+    } catch (err) {
+      done(err);
+    }
+  });
 
 export default passport;
