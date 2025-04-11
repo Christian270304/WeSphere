@@ -106,7 +106,7 @@ export class PostController {
         }
     }
 
-    static async uploadImage(imageBuffer) {
+    static async uploadImage(imageBuffer, folder = 'posts') {
         try {
             // 1️⃣ Generar hash de la imagen
             const imageHash = await getImageHash(imageBuffer);
@@ -128,7 +128,7 @@ export class PostController {
             // 4️⃣ Subir imagen a Cloudinary
             return new Promise((resolve, reject) => {
               const uploadStream = cloudinary.uploader.upload_stream(
-                { folder: 'uploads/posts', format: 'webp' },
+                { folder: `uploads/${folder}`, format: 'webp' },
                 async (error, result) => {
                   if (error) {
                     console.error("❌ Error al subir a Cloudinary:", error);

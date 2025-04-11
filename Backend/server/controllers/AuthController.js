@@ -168,4 +168,22 @@ export class AuthController {
       res.status(500).json({ error: err.message });
     }
   }
+
+  static async googleCallback(req, res) {
+
+    if (!req.user) {
+      return res.status(401).json({ msg: "Error al autenticar con Google" });
+    }
+
+    const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    // Enviar la cookie al cliente
+    res.cookie('auth_token', token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'none',
+      maxAge: 3600000,
+    });
+
+    res.status(200).json({ user: { id: req.user.id, username: req.user.username, email: req.user.email } });
+  }
 }

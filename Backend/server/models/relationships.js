@@ -7,6 +7,7 @@ import { Comment } from './CommentsModel.js';
 import { Chat } from './ChatsModel.js';
 import { Message } from './MessagesModel.js';
 import { ChatMember } from './ChatMembersModel.js';
+import { AuthProvider } from './AuthProvidersModel.js';
 
 // Relación: Un usuario tiene muchos posts
 User.hasMany(Post, { foreignKey: 'user_id', as: 'posts' });
@@ -56,6 +57,9 @@ ChatMember.belongsTo(User, { foreignKey: "user_id" });
 // Un Mensaje pertenece a un Usuario
 Message.belongsTo(User, { foreignKey: "sender_id" });
 User.hasMany(Message, { foreignKey: "sender_id", as: "userMessages" });
+
+User.hasMany(AuthProvider, { foreignKey: 'user_id', as: 'authProviders' });
+AuthProvider.belongsTo(User, { foreignKey: 'user_id', as: 'userProvider' });
 
 
 

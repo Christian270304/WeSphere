@@ -1,4 +1,5 @@
 import express from "express";
+import passport from "../config/passport-google.js";
 import { AuthController } from "../controllers/AuthController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 
@@ -14,5 +15,17 @@ router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
 router.post('/logout', authMiddleware,  AuthController.logout);
 router.post('/newMessage', authMiddleware, AuthController.newMessage);
+
+// Rutas google
+router.get('/google',
+    passport.authenticate('google', {
+      scope: ['profile', 'email'],
+    })
+  );
+
+  router.get('/google/callback',
+    passport.authenticate('google', { failureRedirect: '/' }),
+    AuthController.googleCallback
+  );
 
 export default router;
