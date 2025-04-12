@@ -82,7 +82,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
     this.otherUser = chat.other_users[0].user_id;
 
-    this.userService.getAnotherUser(this.otherUser).subscribe((user) => {
+    this.userService.getUserById(this.otherUser).subscribe((user) => {
       this.profileUser = user;
     });
 
