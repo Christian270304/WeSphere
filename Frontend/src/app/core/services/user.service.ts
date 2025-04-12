@@ -12,6 +12,7 @@ export class UserService {
   private usersSubject = new BehaviorSubject<any>(null);
   private messagesSubject = new BehaviorSubject<any>(null);
   private chatsSubject = new BehaviorSubject<any>(null);
+  private profileId: number | null = null;
   user$ = this.userSubject.asObservable();
   users$ = this.usersSubject.asObservable();
   messages$ = this.messagesSubject.asObservable();
@@ -19,6 +20,9 @@ export class UserService {
 
   private anoterUserSubject = new BehaviorSubject<any>(null);
   anotherUser$ = this.anoterUserSubject.asObservable();
+
+  private userByUsernameSubject = new BehaviorSubject<any>(null);
+  userByUsername$ = this.userByUsernameSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -38,7 +42,7 @@ export class UserService {
     return this.user$;
   }
 
-  getAnotherUser (userId: number) {
+  getUserById (userId: number) {
     this.http.get<any>(`${this.apiUrl}/auth/user/${userId}`, {withCredentials: true}).subscribe(
       (data) => {
         if (data) {
@@ -54,8 +58,24 @@ export class UserService {
     return this.anotherUser$;
   }
 
-  getUsers () {
-    this.http.get<any>(`${this.apiUrl}/auth/users/`, {withCredentials: true}).subscribe(
+  getUserByUsername (username: string) {
+    this.http.get<any>(`${this.apiUrl}/auth/profile/${username}`, {withCredentials: true}).subscribe(
+      (data) => {
+        if (data) {
+          this.userByUsernameSubject.next(data);
+        } else {
+          console.error('Error: La API no devolvió un objeto', data);
+        }
+      },
+      (error) => {
+        console.error('Error al obtener usuario:', error);
+      }
+    );
+    return this.userByUsername$;
+  }
+
+  getUsers (userId: number) {
+    this.http.get<any>(`${this.apiUrl}/auth/user/${userId}`, {withCredentials: true}).subscribe(
       (data) => {
         if (data) {
           this.usersSubject.next(data.users);
@@ -89,7 +109,7 @@ export class UserService {
         }
       },
       (error) => {
-        console.error('Error al obtener usuarios:', error);
+        console.error('Error al obtener chats:', error);
       });
       return this.chats$;
   }
@@ -106,6 +126,7 @@ export class UserService {
     });
     return this.messages$;
   }
+
 }
 
 
