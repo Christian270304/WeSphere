@@ -13,9 +13,9 @@ export class PostService {
 
   constructor(private http: HttpClient) {}
 
-  getPosts(userArticles = false) {
+  getPosts(userArticles = false, userId: number | null = null) {
     if (userArticles) {
-      this.http.get<any>(`${this.apiUrl}/posts/user/`, {withCredentials: true}).subscribe(
+      this.http.get<any>(`${this.apiUrl}/posts/user/${userId}`, {withCredentials: true}).subscribe(
         (data) => {
           if (Array.isArray(data.posts)) {
             this.postsSubject.next(data.posts);

@@ -2,15 +2,17 @@
   @if (posts.length != 0 && !isLoading) {
     @for (post of posts; track post.id) {
     <div class="post-card" [ngClass]="{'no-image': post.image == null, 'no-description': post.description == ''}" [id]="post.id">
-      <div class="user-info">
-        <div class="avatar">
-          <img [src]="post.user?.profileImage?.url" alt="User avatar" />
+      @if (!userArticles) {
+        <div class="user-info" [id]="post.user_id">
+          <div class="avatar" (click)="goToProfile(post.user?.username)">
+            <img [src]="post.user?.profileImage?.url" alt="User avatar" />
+          </div>
+          <div class="user-details">
+            <div class="username" >{{ post.user?.username }}</div>
+            <div class="timestamp">{{ post.created_at | date:'shortTime' }}</div>
+          </div>
         </div>
-        <div class="user-details">
-          <div class="username">{{ post.user?.username }}</div>
-          <div class="timestamp">{{ post.created_at | date:'shortTime' }}</div>
-        </div>
-      </div>
+      }
       <div class="post-content">
         {{ post.description }}
       </div>
@@ -20,17 +22,17 @@
         </div>
       <!-- } -->
       <div class="action-buttons">
-        @if (post.allow_likes == true) {
+        @if (post.allow_likes == true && !userArticles) {
           <button class="action-btn like-btn" (click)="toggleLike(post)">
             <i [class]="post.liked ? 'fas fa-heart' : 'far fa-heart'"></i> {{ post.likes_count }}
           </button>
         } 
-        @if (post.allow_comments == true) {
+        @if (post.allow_comments == true && !userArticles) {
           <button class="action-btn comment-btn" (click)="goToComments(post)">
             <i class="far fa-comment"></i> {{ post.comments_count }}
           </button>
         }
-        @if (post.allow_saving == true) {
+        @if (post.allow_saving == true && !userArticles) {
           <button class="action-btn save-btn">
             <i class="far fa-bookmark"></i>
           </button>
