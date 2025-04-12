@@ -59,7 +59,7 @@ export class AuthService {
       }
 
       const left = window.screenX + (window.innerWidth - width) / 2;
-      const top = window.screenY + (window.innerHeight - height);
+      const top = window.screenY + (window.innerHeight - height) / 2;
 
       const popup = window.open(
         `${this.apiUrl}/auth/${oauth}`,

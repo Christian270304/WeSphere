@@ -91,6 +91,10 @@ export class AuthComponent {
     this.authService.loginWithOAuth('reddit');
   }
 
+  loginWithDiscord () {
+    this.authService.loginWithOAuth('discord');
+  }
+
   toggleRegisterForm(): void {
     this.isLoginFormVisible = false;
   }
