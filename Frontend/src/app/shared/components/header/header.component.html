@@ -34,11 +34,48 @@
                     <div class="user-name">{{ user?.username }}</div>
                 </div>
                 <!-- Dropdown de opciones -->
-                <div class="profile-dropdown" [class.show]="dropdownOpen">
+                <div class="profile-dropdown" [class.show]="dropdownOpen" (click)="$event.stopPropagation()">
                     <a [routerLink]="['/profile']">Perfil</a>
                     <a [routerLink]="['/settings']">Configuración</a>
-                    <a (click)="logout()">Cerrar sesión</a>
-                </div>
+                  
+                    <div class="dropdown-divider"></div>
+                  
+                    <div class="bottom-actions">
+                        <!-- Botón Logout -->
+                        <button class="Btn" (click)="logout()" title="Cerrar sesión">
+                          <div class="sign">
+                            <svg viewBox="0 0 512 512">
+                              <path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path>
+                            </svg>
+                          </div>
+                        </button>
+                      
+                        <!-- Separador visual -->
+                        <span class="divider">|</span>
+                      
+                        <!-- Toggle modo oscuro -->
+                        <label for="themeToggle" class="themeToggle st-sunMoonThemeToggleBtn" type="checkbox">
+                          <input type="checkbox" id="themeToggle" class="themeToggleInput" (click)="toggleTheme()" />
+                          <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" stroke="none">
+                            <mask id="moon-mask">
+                              <rect x="0" y="0" width="20" height="20" fill="white"></rect>
+                              <circle cx="11" cy="3" r="8" fill="black"></circle>
+                            </mask>
+                            <circle class="sunMoon" cx="10" cy="10" r="8" mask="url(#moon-mask)"></circle>
+                            <g>
+                              <circle class="sunRay sunRay1" cx="18" cy="10" r="1.5"></circle>
+                              <circle class="sunRay sunRay2" cx="14" cy="16.928" r="1.5"></circle>
+                              <circle class="sunRay sunRay3" cx="6" cy="16.928" r="1.5"></circle>
+                              <circle class="sunRay sunRay4" cx="2" cy="10" r="1.5"></circle>
+                              <circle class="sunRay sunRay5" cx="6" cy="3.1718" r="1.5"></circle>
+                              <circle class="sunRay sunRay6" cx="14" cy="3.1718" r="1.5"></circle>
+                            </g>
+                          </svg>
+                        </label>
+                      </div>
+                  </div>
+                  
+                  
             }
         </div>
     </div>

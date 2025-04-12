@@ -17,3 +17,30 @@
     box-sizing: border-box;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
+
+.dark-mode {
+    --primary: #4a6bff;
+    --primary-dark: #3a56d9;
+    --secondary: #ff6b6b;
+    --dark: #1a1a2e;
+    --light: #1a1a2e;
+    --gray: #8a8a9e;
+    --light-gray: #ecedf2;
+    --border-radius: 12px;
+    background-color: #1a1a2e;
+    color: white;
+}  
+
+.dark-mode .app.header {
+    background-color: #1a1a2e;
+    color: white;
+}
+
+.dark-mode .user-name {
+    color: white;
+}
+
+.dark-mode i {
+    color: white;
+}

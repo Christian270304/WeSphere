@@ -15,10 +15,32 @@ export class HeaderComponent {
   hideElements: boolean = false;
   dropdownOpen: boolean = false;
   user: any = {};
+  theme: string = 'light'; // Tema por defecto
+
+  // Cambiar el tema
+  toggleTheme(): void {
+    this.theme = this.theme === 'dark' ? 'light' : 'dark';
+    this.setTheme(this.theme);
+    // Guardar el tema en localStorage
+    localStorage.setItem('theme', this.theme);
+  }
+
+  // Aplicar el tema al body
+  private setTheme(theme: string): void {
+    if (theme === 'dark') {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  }
+
 
   constructor(private headerStateService: HeaderStateService, private userService: UserService, private authService: AuthService, private router: Router) {}
 
   ngOnInit() {
+    // Cargar el tema guardado desde localStorage
+    this.theme = localStorage.getItem('theme') || 'light';
+    this.setTheme(this.theme);
     
     this.headerStateService.hideElements$.subscribe((value) => {
       this.hideElements = value;
