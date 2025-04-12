@@ -102,6 +102,21 @@ export const getUser = async (id) => {
       throw new Error(err);
     }
   }
+
+  export const getUserByUsername = async (username) => {
+    try {
+      const user = await User.findOne({
+        where: { username },
+        include: [
+          { model: Image, as: 'profileImage', attributes: ['url'], required: false },
+          { model: Image, as: 'bannerImage', attributes: ['url'], required: false }
+        ]
+      });
+      return user;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
   
   export const getUsers = async () => {
     try {
@@ -110,6 +125,8 @@ export const getUser = async (id) => {
       throw new Error(err);
     }
   }
+
+  
 
   export const newMessageModel = async (user_id, chat_id, content) => {
     try {

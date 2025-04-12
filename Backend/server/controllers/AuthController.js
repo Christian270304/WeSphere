@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 import { User, Message } from '../models/models.js';
-import { getUser, getChatsModel, verifyUser, newMessageModel } from '../models/AuthQueries.js';
+import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername } from '../models/AuthQueries.js';
 import { io } from '../server.js'
 
 dotenv.config();
@@ -85,12 +85,27 @@ export class AuthController {
   static async getUserById(req, res) {
     try {
       const { user_id } = req.params;
-      console.log("ID del usuario: ", user_id);
+
       const user = await getUser(user_id);
 
       if (!user) return res.status(404).json({ msg: "Usuario no encontrado" });
 
       res.json({ user });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  static async getUserByUsername(req, res) {
+    try {
+      const { id } = req.user;
+      const { username } = req.params;
+
+      const user = await getUserByUsername(username);
+
+      if (!user) return res.status(404).json({ msg: "Usuario no encontrado" });
+
+      res.status(200).json({ current_user_id: id, user });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
@@ -144,6 +159,8 @@ export class AuthController {
   static async getChats(req, res) {
     try {
       const { id } = req.user;
+
+      console.log("ID del usuario: ", id);
 
       const chats = await getChatsModel(id); 
       
@@ -202,6 +219,35 @@ export class AuthController {
   static async redditCallback(req, res) {
     if (!req.user) {
       return res.status(401).json({ msg: "Error al autenticar con Reddit" });
+    }
+
+    const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    
+    // Enviar la cookie al cliente
+    res.cookie('auth_token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 3600000,
+    });
+
+    // res.status(200).json({ user: { id: req.user.id, username: req.user.username, email: req.user.email } });
+    // res.redirect("http://localhost:4200/home"); 
+    res.send(`
+      <html>
+        <body>
+          <script>
+            window.opener.postMessage({ success: true }, "http://localhost:4200");
+            window.close();
+          </script>
+        </body>
+      </html>
+    `);
+  }
+
+  static async discordCallback(req, res) {
+    if (!req.user) {
+      return res.status(401).json({ msg: "Error al autenticar con Discord" });
     }
 
     const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
