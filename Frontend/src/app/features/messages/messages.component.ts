@@ -5,6 +5,8 @@ import { AuthService } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
+import { ActivatedRoute } from '@angular/router';
+import { SocketService } from '../../core/services/socket.service';
 
 interface Chat {
   chat_id: number;
@@ -22,7 +24,7 @@ interface Chat {
   templateUrl: './messages.component.html',
   styleUrl: './messages.component.scss'
 })
-export class MessagesComponent implements OnInit, OnDestroy {
+export class MessagesComponent implements OnInit {
   @ViewChild('emojiPicker') emojiPicker!: ElementRef;
 
   public profileUser: any = {};
@@ -34,61 +36,87 @@ export class MessagesComponent implements OnInit, OnDestroy {
   public userId: number | null = null;
   public newMessage: string = '';
 
+  private pendingUserId: number | null = null;
+
   constructor(
     private userService: UserService,
     private chatSocketService: ChatSocketService,
-    private authService: AuthService
+    private authService: AuthService,
+    private route: ActivatedRoute,
+    private socketService: SocketService,
   ) {}
 
   ngOnInit(): void {
-    this.initializeSocketConnection();
-    this.loadUserAndChats();
+    // this.initializeSocketConnection();
     this.listenForIncomingMessages();
+  
+    this.route.queryParams.subscribe(params => {
+      const userId = params['userId'];
+      if (userId) {
+        this.pendingUserId = userId; 
+      }
+    });
+  
+    this.loadUserAndChats(); 
   }
 
   ngOnDestroy(): void {
-    this.chatSocketService.disconnect();
+    this.chatSocketService.leaveChat(this.selectedChatId!);
   }
 
-  private initializeSocketConnection(): void {
-    this.chatSocketService.connect();
-  }
+  // private initializeSocketConnection(): void {
+  //   this.chatSocketService.connect();
+  // }
 
   private loadUserAndChats(): void {
     this.authService.getUserIdFromToken().subscribe((id) => {
       this.userId = id;
       this.chatSocketService.joinUserRoom(id);
-
+  
       this.userService.getChats().subscribe((chats) => {
         this.chats = chats;
+  
+        if (this.pendingUserId) {
+          this.selectChat(0, Number(this.pendingUserId));
+          this.pendingUserId = null; 
+          }
       });
     });
   }
 
   private listenForIncomingMessages(): void {
-    this.chatSocketService.onMessage((msg) => {
-      if (msg && msg.chat_id === this.selectedChatId) {
+    this.socketService.on('receive_message',(msg) => {
+      console.log("Mensaje recibido: ", msg);
+      if (msg && msg.chat_id === this.selectedChatId && msg.userId !== this.userId) {
         this.messages.push(msg);
         this.scrollToBottom();
       }
     });
   }
 
-  public selectChat(chatId: number): void {
-    this.selectedChatId = chatId;
+  public selectChat(chatId: number, userId?: number): void {
 
-    const chat = this.chats.find((chat) => chat.chat_id === chatId);
+    if (userId) {
+      const chat = this.chats.find((chat) => chat.other_users[0].user_id === userId);
+      if(!chat) return;
+      this.otherUser = chat.other_users[0].user_id;
+      this.selectedChatId = chat.chat_id;
+    } else {
+      this.selectedChatId = chatId;
+      const chat = this.chats.find((chat) => chat.chat_id === chatId);
+    console.log("Prueba chats: ",chat);
     if (!chat) return;
 
     this.otherUser = chat.other_users[0].user_id;
+    }
 
     this.userService.getUserById(this.otherUser).subscribe((user) => {
       this.profileUser = user;
     });
-
+    
     this.chatSocketService.joinChat(this.selectedChatId);
 
-    this.userService.getMessages(chatId).subscribe((messages) => {
+    this.userService.getMessages(this.selectedChatId).subscribe((messages) => {
       this.messages = messages;
       this.scrollToBottom();
     });
@@ -100,12 +128,19 @@ export class MessagesComponent implements OnInit, OnDestroy {
     const messageData = {
       chat_id: this.selectedChatId,
       userId: this.userId,
-      content: this.newMessage
+      content: this.newMessage,
     };
 
-    this.userService.sendMessage(messageData).subscribe(() => {
+    this.userService.sendMessage(messageData).subscribe((msg) => {
+      console.log("Mensaje enviado user: ", msg);
       this.newMessage = '';
       this.scrollToBottom();
+
+      const message = {
+        type: 'message',
+        content: msg.content,
+      }
+      this.chatSocketService.sendNotification(this.otherUser, message);
     });
   }
 
