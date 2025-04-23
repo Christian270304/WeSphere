@@ -1,8 +1,20 @@
 <div class="profile-actions">
-    <button class="action-button edit-profile">Editar perfil</button>
-    @if (!isOwn) {
-        <button class="action-button message-button">Enviar mensaje</button>
+    @if (isOwn) {
+        <button class="action-button edit-profile" (click)="toggleEditProfile()">
+            {{ isEditing ? 'Cancelar' : 'Editar perfil' }}
+        </button>
+        @if (isEditing) {
+            <button class="action-button save-profile" >Guardar</button>
+        }
     }
+    @if (!isOwn) {
+        <button class="action-button message-button" (click)="sendMessage()">Enviar mensaje</button>
+    }
+    @if (!isOwn) {
+        <button class="action-button follow-button" (click)="toggleFollow()">
+          {{ isFollowing ? 'Deixar de seguir' : 'Seguir' }}
+        </button>
+      }
     @if (isOwn) {
         <button class="action-button logout-button" (click)="logout()">Cerrar Sesion</button>
     }

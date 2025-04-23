@@ -2,8 +2,8 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
-import { User, Message } from '../models/models.js';
-import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername } from '../models/AuthQueries.js';
+import { User, Message, Follower } from '../models/models.js';
+import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, getNotificationsModel } from '../models/AuthQueries.js';
 import { io } from '../server.js'
 
 dotenv.config();
@@ -111,6 +111,20 @@ export class AuthController {
     }
   }
 
+  static async getNotifications(req, res) {
+    try {
+      const { id } = req.user;
+
+      const notifications = await getNotificationsModel(id); 
+      
+      if (!notifications) return res.status(404).json({ msg: "Notificaciones no encontradas" });
+
+      res.json({ notifications });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
   static async check(req, res) {
     const token = req.cookies.auth_token; 
 
@@ -177,6 +191,8 @@ export class AuthController {
 
       const newMessage = await newMessageModel(id, chat_id, content); 
       if (!newMessage) return res.status(404).json({ msg: "Mensaje no creado" });
+
+      // console.log("Nuevo mensaje: ", newMessage);
 
       io.to(`chat:${chat_id}`).emit('receive_message', newMessage);
 
@@ -273,4 +289,47 @@ export class AuthController {
       </html>
     `);
   }
+
+  static async toggleFollow(req, res) {
+    try {
+      const { id: follower_id } = req.user; // ID del usuario actual
+      const { user_id: following_id } = req.params; // ID del usuario a seguir/dejar de seguir
+  
+      // Verificar si ya sigue al usuario
+      const existingFollow = await Follower.findOne({
+        where: { follower_id, following_id }
+      });
+  
+      if (existingFollow) {
+        // Si ya lo sigue, eliminar la relación
+        await existingFollow.destroy();
+        return res.json({ following: false });
+      } else {
+        // Si no lo sigue, crear la relación
+        await Follower.create({ follower_id, following_id });
+        return res.json({ following: true });
+      }
+    } catch (error) {
+      console.error('Error en toggleFollow:', error);
+      res.status(500).json({ error: 'Error al gestionar el seguimiento' });
+    }
+  }
+
+  static async getFollowStatus(req, res) {
+    try {
+      const { id: follower_id } = req.user; // ID del usuario actual
+      const { user_id: following_id } = req.params; // ID del usuario del perfil
+  
+      const isFollowing = await Follower.findOne({
+        where: { follower_id, following_id }
+      });
+  
+      res.json({ isFollowing: !!isFollowing });
+    } catch (error) {
+      console.error('Error en getFollowStatus:', error);
+      res.status(500).json({ error: 'Error al obtener el estado de seguimiento' });
+    }
+  }
+
+
 }
