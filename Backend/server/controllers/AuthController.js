@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
-import { User, Message, Follower } from '../models/models.js';
+import { User, Message, Follower, Image } from '../models/models.js';
 import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, getNotificationsModel } from '../models/AuthQueries.js';
 import { io } from '../server.js'
 
@@ -328,6 +328,38 @@ export class AuthController {
     } catch (error) {
       console.error('Error en getFollowStatus:', error);
       res.status(500).json({ error: 'Error al obtener el estado de seguimiento' });
+    }
+  }
+
+  static async getFriends(req, res) {
+    try {
+      const { id: follower_id } = req.user; 
+  
+      const followingRecords = await Follower.findAll({
+        where: { follower_id },
+        attributes: ['following_id']
+      });
+  
+      const followingIds = followingRecords.map(record => record.following_id);
+  
+      if (followingIds.length === 0) {
+        return res.json({ friends: [] }); 
+      }
+  
+      const friends = await User.findAll({
+        where: { id: followingIds },
+        attributes: ['id', 'username'], 
+        include: {
+          model: Image,
+          as: 'profileImage',
+          attributes: ['url'] 
+        }
+      });
+  
+      res.json({ friends });
+    } catch (error) {
+      console.error('Error en getFriends:', error);
+      res.status(500).json({ error: 'Error al obtener los amigos' });
     }
   }
 
