@@ -24,7 +24,7 @@ const authConfig: AuthConfig = {
 })
 export class AuthService {
     private apiUrl = environment.apiUrl; 
-    private isAuthenticatedSubject = new BehaviorSubject<boolean | null>(null); 
+    private isAuthenticatedSubject = new BehaviorSubject<boolean>(false); 
     isAuthenticated$ = this.isAuthenticatedSubject.asObservable(); 
     
 
@@ -109,8 +109,8 @@ export class AuthService {
     /**
      * Devuelve el estado actual de autenticación.
      */
-    isAuthenticated(): boolean {
-        return this.isAuthenticatedSubject.getValue() === true;
+    isAuthenticated(): Observable<boolean> {
+        return of(this.isAuthenticatedSubject.getValue() );
     }
 
     getUserIdFromToken(): Observable<number> {

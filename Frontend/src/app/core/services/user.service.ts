@@ -12,11 +12,14 @@ export class UserService {
   private usersSubject = new BehaviorSubject<any>(null);
   private messagesSubject = new BehaviorSubject<any>(null);
   private chatsSubject = new BehaviorSubject<any>(null);
+  private newMessageSubject = new BehaviorSubject<any>(null);
   private profileId: number | null = null;
   user$ = this.userSubject.asObservable();
   users$ = this.usersSubject.asObservable();
   messages$ = this.messagesSubject.asObservable();
   chats$ = this.chatsSubject.asObservable();
+
+  newMessage$ = this.newMessageSubject.asObservable();
 
   private anoterUserSubject = new BehaviorSubject<any>(null);
   anotherUser$ = this.anoterUserSubject.asObservable();
@@ -115,16 +118,25 @@ export class UserService {
   }
 
   sendMessage (content: {chat_id: number, content: string, userId: number}) {
-    this.http.post<any>(`${this.apiUrl}/auth/newMessage`, content, {withCredentials: true}).subscribe({
-      next: (response) => {
-        const currentMessages = this.messagesSubject.value || [];
-        this.messagesSubject.next([...currentMessages, ...response.messages]);
+    this.http.post<any>(`${this.apiUrl}/auth/newMessage`, content, {withCredentials: true}).subscribe(
+       (response) => {
+        this.newMessageSubject.next(response.newMessage);
+        // const currentMessages = this.messagesSubject.value || [];
+        // this.messagesSubject.next([...currentMessages]);
       },
-      error: (error) => {
+       (error) => {
         console.error('Error al enviar el mensaje:', error);
       }
-    });
-    return this.messages$;
+    );
+    return this.newMessage$;
+  }
+
+  getFollowStatus(userId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/users/${userId}/follow-status`, { withCredentials: true });
+  }
+
+  toggleFollow(userId: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/users/${userId}/follow`, {}, { withCredentials: true });
   }
 
 }

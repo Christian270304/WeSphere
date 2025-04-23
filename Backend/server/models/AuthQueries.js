@@ -126,7 +126,19 @@ export const getUser = async (id) => {
     }
   }
 
+  export const getNotificationsModel = async (user_id) => {
+    try {
+      const user = await User.findOne({ where: { id: user_id } });
+
+      if (!user) return null; 
   
+      const notifications = await user.getNotifications(); 
+      
+      return notifications;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
 
   export const newMessageModel = async (user_id, chat_id, content) => {
     try {
