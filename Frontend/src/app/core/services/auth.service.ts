@@ -9,7 +9,6 @@ import { Router } from '@angular/router';
 const authConfig: AuthConfig = {
     issuer: 'https://accounts.google.com', 
     redirectUri: 'http://localhost:4200/home', 
-    clientId: environment.clientId, 
     responseType: 'code',
     scope: 'openid profile email',
     strictDiscoveryDocumentValidation: false,
