@@ -8,6 +8,8 @@ import { Chat } from './ChatsModel.js';
 import { Message } from './MessagesModel.js';
 import { ChatMember } from './ChatMembersModel.js';
 import { AuthProvider } from './AuthProvidersModel.js';
+import { Notificacion } from './NotificacionesModel.js';
+import { SavedPosts } from './SavedPostsModel.js';
 
 // Relación: Un usuario tiene muchos posts
 User.hasMany(Post, { foreignKey: 'user_id', as: 'posts' });
@@ -61,5 +63,15 @@ User.hasMany(Message, { foreignKey: "sender_id", as: "userMessages" });
 User.hasMany(AuthProvider, { foreignKey: 'user_id', as: 'authProviders' });
 AuthProvider.belongsTo(User, { foreignKey: 'user_id', as: 'userProvider' });
 
+// Un Usuario tiene muchas Notificaciones
+User.hasMany(Notificacion, { foreignKey: 'user_id', as: 'notifications' });
+Notificacion.belongsTo(User, { foreignKey: 'user_id', as: 'userNotification' });
 
+// Relación: Un usuario puede guardar muchos posts
+User.hasMany(SavedPosts, { foreignKey: 'user_id', as: 'savedPosts' });
+SavedPosts.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+// Relación: Un post puede ser guardado por muchos usuarios
+Post.hasMany(SavedPosts, { foreignKey: 'post_id', as: 'savedByUsers' });
+SavedPosts.belongsTo(Post, { foreignKey: 'post_id', as: 'post' });
 

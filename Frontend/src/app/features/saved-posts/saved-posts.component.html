@@ -3,12 +3,12 @@
         <!-- Header -->
         <div class="section-header">
             <div class="section-title">Posts Guardados</div>
-            <div class="filter-buttons">
+            <!-- <div class="filter-buttons">
                 <div class="filter-button active">Todos</div>
                 <div class="filter-button">Imágenes</div>
                 <div class="filter-button">Vídeos</div>
                 <div class="filter-button">Artículos</div>
-            </div>
+            </div> -->
         </div>
         <div class="main-content">
             <div class="sidebar">
@@ -44,7 +44,24 @@
             <div class="saved-posts">
                 
                 <!-- Post Card -->
-                <div class="post-card">
+                 @if (!noSavedPosts) {
+                    
+                    <app-posts [isGrid]="true" [saved]="true"></app-posts>
+                 } @else {
+                    <!-- Empty State -->
+                    <div class="empty-state" >
+                        <div class="empty-icon">
+                            <i class="far fa-bookmark"></i>
+                        </div>
+                        <div class="empty-title">No hay posts guardados</div>
+                        <div class="empty-description">
+                            Comienza a guardar tus posts favoritos para acceder a ellos más tarde.
+                        </div>
+                        <button class="empty-action">Explorar ahora</button>
+                    </div>
+                 }
+                 
+                <!-- <div class="post-card">
                     <div class="post-header">
                         <div class="post-author">
                             <div class="profile-pic">
@@ -92,7 +109,7 @@
                     </div>
                 </div>
     
-                <!-- Post Card -->
+          
                 <div class="post-card">
                     <div class="post-header">
                         <div class="post-author">
@@ -424,22 +441,12 @@
                             <span>Compartir</span>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
     
             
     
-            <!-- Empty State -->
-            <div class="empty-state" style="display: none;">
-                <div class="empty-icon">
-                    <i class="far fa-bookmark"></i>
-                </div>
-                <div class="empty-title">No hay posts guardados</div>
-                <div class="empty-description">
-                    Comienza a guardar tus posts favoritos para acceder a ellos más tarde.
-                </div>
-                <button class="empty-action">Explorar ahora</button>
-            </div>
+            
         </div>
     </div>
 </div>

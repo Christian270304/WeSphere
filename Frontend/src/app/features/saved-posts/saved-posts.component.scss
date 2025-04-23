@@ -131,9 +131,6 @@ object-fit: cover;
 }
 /* Saved Posts */
 .saved-posts {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
     padding-bottom: 20px
 }
 .post-card {
