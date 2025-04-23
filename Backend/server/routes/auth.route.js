@@ -10,17 +10,20 @@ import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
+router.get('/', authMiddleware, AuthController.getNotifications);
 router.get('/check' ,AuthController.check);
 router.get("/user", authMiddleware,  AuthController.getUser);
 router.get("/user/:user_id", authMiddleware,  AuthController.getUserById);
 router.get("/profile/:username", authMiddleware,  AuthController.getUserByUsername);
 router.get('/messages/:chat_id', authMiddleware, AuthController.getMessages);
 router.get('/chats', authMiddleware,  AuthController.getChats);
+router.get('/users/:user_id/follow-status', authMiddleware, AuthController.getFollowStatus);
 
 router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
 router.post('/logout', authMiddleware,  AuthController.logout);
 router.post('/newMessage', authMiddleware, AuthController.newMessage);
+router.post('/users/:user_id/follow', authMiddleware, AuthController.toggleFollow);
 
 // Rutas google
 router.get('/google',
