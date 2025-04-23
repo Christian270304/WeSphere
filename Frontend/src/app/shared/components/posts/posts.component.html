@@ -33,8 +33,8 @@
           </button>
         }
         @if (post.allow_saving == true && !userArticles) {
-          <button class="action-btn save-btn">
-            <i class="far fa-bookmark"></i>
+          <button class="action-btn save-btn" (click)="toggleSave(post)">
+            <i [class]="post.saved ? 'fas fa-bookmark' : 'far fa-bookmark'" ></i>
           </button>
         }
       </div>

@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { PostService } from '../../../core/services/post.service';
@@ -16,6 +16,8 @@ export class PostsComponent implements OnChanges {
   @Input() isGrid: boolean = false;
   @Input() userArticles: boolean = false;
   @Input() userId: number | null = null;
+  @Input() saved: boolean = false;
+  @Output() noPosts = new EventEmitter<boolean>();
   liked = false; 
   isLoading = true;
   posts: any[] = [];  
@@ -49,6 +51,17 @@ export class PostsComponent implements OnChanges {
     });
   }
 
+  toggleSave(post: any): void {
+    this.postsService.toggleSave(post.id).subscribe({
+      next: (updatedPost) => {
+        post.saved = updatedPost.saved;
+      },
+      error: (err) => {
+        console.error('Error al actualizar el guardado:', err);
+      }
+    });
+  }
+
   goToComments(post: any): void {
     sessionStorage.setItem('postId', post.id.toString()); 
     this.router.navigate(['/comments']);
@@ -59,10 +72,22 @@ export class PostsComponent implements OnChanges {
   }
 
   private loadPosts() {
-    this.postsService.getPosts(this.userArticles, this.userId).subscribe((posts) => {
-      this.posts = posts;
+    this.postsService.getPosts(this.userArticles, this.userId, this.saved).subscribe((posts) => {
+      
+      if (posts.length === 0) {
+        this.noPosts.emit(true); // Emitir que no hay posts
+      } else {
+        this.noPosts.emit(false);
+        this.posts = posts; // Emitir que hay posts
+        setTimeout(() => { this.isLoading = false; }, 2000);
+      }
+      console.log('Posts:', this.posts);
     });
-    setTimeout(() => { this.isLoading = false; }, 2000);
+    
+  }
+
+  savePost(post: any): void {
+
   }
 
 }
