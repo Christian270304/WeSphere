@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ErrorService } from '../../core/services/error.service';
 import { ErrorMessageComponent } from '../../shared/components/error-message/error-message.component';
 import { HomeComponent } from '../home/home.component';
+import { SocketService } from '../../core/services/socket.service';
 
 @Component({
   selector: 'app-auth',
@@ -23,7 +24,7 @@ export class AuthComponent {
   Repassword: string = '';
   confirmPassword: string = '';
 
-  constructor(private authService: AuthService, private router: Router, private errorService: ErrorService) {}
+  constructor(private authService: AuthService, private router: Router, private errorService: ErrorService, private socketService: SocketService) {}
 
   ngOnInit(): void {
          
@@ -42,6 +43,7 @@ export class AuthComponent {
     }
     this.authService.login({ username: this.username, password: this.password }).subscribe((res) => {
       this.isAuthenticated = true;
+      this.socketService.connect(); 
       this.router.navigate(['/home']);
   
     }, error => {
@@ -77,6 +79,7 @@ export class AuthComponent {
     }
     this.authService.register({ username: this.Reusername, email: this.email, password: this.Repassword}).subscribe((res)=> {
       this.isAuthenticated = true;
+      this.socketService.connect(); 
       this.router.navigate(['/home']);
     }, error => {
       if (error.status === 400) this.errorService.setError(error.error.msg);

@@ -1,50 +1,36 @@
 import { Injectable } from '@angular/core';
-import { io, Socket } from 'socket.io-client';
+import { SocketService } from './socket.service';
+import { Socket } from 'socket.io-client';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatSocketService {
-  private socket!: Socket;
 
-  constructor() { }
-
-  connect(): void {
-    if (!this.socket) {
-      this.socket = io('http://localhost:3000', {
-        withCredentials: true,
-      });
-
-      this.socket.on('connect', () => {
-        console.log("Conectado al socket: ", this.socket.id);
-      })
-    }
-  }
+  constructor(private socketService: SocketService) {}
 
   joinUserRoom(userId: number) {
-    this.socket.emit('join_user', userId)
+    this.socketService.emit('join_user', userId)
   }
 
   joinChat(chatId: number): void {
-    this.socket.emit('join_chat', chatId);
+    this.socketService.emit('join_chat', chatId);
   }
 
   leaveChat(chatId: number) {
-    this.socket.emit('leave_chat', chatId);
+    this.socketService.emit('leave_chat', chatId);
   }
 
   sendMessage(data: any) {
-    this.socket.emit('send_message', data);
+    this.socketService.emit('send_message', data);
+  }
+
+  sendNotification(userId: number, notification: { type: string; content: string; referenceId?: number }) {
+    this.socketService.emit('send_notification', { userId, notification });
   }
 
   onMessage(callback: (msg: any) => void) {
-    this.socket.on('receive_message', callback);
+    this.socketService.on('receive_message', callback);
   }
 
-  disconnect() {
-    if (this.socket) {
-      this.socket.disconnect();
-      console.log("Desconectado del socket: ", this.socket.id);
-    }
-  }
 }
