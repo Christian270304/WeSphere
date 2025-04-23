@@ -1,5 +1,5 @@
-import { Post, Image, User, Like } from '../models/models.js';
-import { getRecommendedPosts, getComments, createComment } from '../models/PostQueries.js';
+import { Post, Image, User, Like, SavedPosts } from '../models/models.js';
+import { getRecommendedPosts, getComments, createComment, getPostSaved, savePost } from '../models/PostQueries.js';
 import { v2 as cloudinary } from 'cloudinary';
 import sharp from 'sharp';
 import streamifier from 'streamifier';
@@ -40,7 +40,8 @@ export class PostController {
     static async getPosts(req, res) {
         try {
           const { id } = req.user;
-        const posts = await getRecommendedPosts(id);
+          const { type } = req.params;
+        const posts = await getRecommendedPosts(type,id);
     
         res.json({ posts });
         } catch (err) {
@@ -157,11 +158,11 @@ export class PostController {
 
     static async likePost(req, res) {
       try {
-        const { user_id } = req.body;
+        const { id } = req.user;
         const { post_id } = req.params;
     
         // Verificar si el usuario ya dio like al post
-        const existingLike = await Like.findOne({ where: { user_id, post_id } });
+        const existingLike = await Like.findOne({ where: { user_id: id, post_id } });
     
         if (existingLike) {
           // Si ya existe, eliminar el like
@@ -169,7 +170,7 @@ export class PostController {
           await Post.decrement('likes_count', { where: { id: post_id } });
         } else {
           // Si no existe, agregar el like
-          await Like.create({ user_id, post_id });
+          await Like.create({ user_id: id, post_id });
           await Post.increment('likes_count', { where: { id: post_id } });
         }
     
@@ -180,7 +181,7 @@ export class PostController {
             {
               model: Like,
               as: 'likes',
-              where: { user_id },
+              where: { user_id: id },
               required: false // Esto asegura que no falle si no hay likes
             }
           ]
@@ -194,6 +195,29 @@ export class PostController {
       } catch (error) {
         console.error('Error en likePost:', error);
         res.status(500).json({ error: 'Error al gestionar el like' });
+      }
+    }
+
+    static async savePost(req, res) {
+      try {
+        const { id } = req.user;
+        const { post_id } = req.params;
+
+        // Verificar si el post ya está guardado por el usuario
+        const existingSavedPost = await SavedPosts.findOne({ where: { user_id: id, post_id } });
+
+        if (existingSavedPost) {
+          // Si ya está guardado, eliminarlo
+          await existingSavedPost.destroy();
+          return res.json({ saved: false });
+        } else {
+          // Si no está guardado, agregarlo
+          await SavedPosts.create({ user_id: id, post_id });
+          return res.json({ saved: true });
+        }
+      } catch (error) {
+        console.error('Error en savePost:', error);
+        res.status(500).json({ error: 'Error al gestionar el guardado del post' });
       }
     }
 
@@ -216,6 +240,24 @@ export class PostController {
       }
     }
 
+    static async getPostSaved(req, res) {
+      try {
+        const { id } = req.user;
+
+        const posts = await getPostSaved(id);
+
+         if (!posts) return res.status(200).json({ msg: "Encara no has desat cap publicació" });
+
+        return res.json({ posts });
+      } catch (error) {
+        res.status(500).json({ error: 'Error al guardar el post' });
+      }
+    }
+
+    
+
+
+    // Funcion para hacer pruebas de subir imagenes a cloudinary
     // static async subirImagens(req, res) {
     //     try {
     //         console.log(req.file);
