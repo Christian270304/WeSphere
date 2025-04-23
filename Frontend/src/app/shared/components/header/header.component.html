@@ -17,10 +17,20 @@
                 <div class="nav-icon">
                     <i class="fas fa-users"></i>
                 </div>
-                <div class="nav-icon">
-                    <i class="fas fa-bell"></i>
-                    <span class="notification-badge">3</span>
+                <div class="nav-icon" (click)="toggleDropdownNot()">
+                  <i class="fas fa-bell"></i>
+                  <span class="notification-badge">3</span>
                 </div>
+                
+                <div class="dropdown" *ngIf="showDropdown">
+                  <span>{{ unreadCount }} Notificaciones</span>
+                  <ul>
+                    <li *ngFor="let notif of notifications">
+                      {{ notif.message }}
+                    </li>
+                  </ul>
+                </div>
+                
                 <div class="nav-icon" [routerLink]="['/messages']" style="cursor: pointer;">
                     <i class="fas fa-envelope"></i>
                     <span class="notification-badge">5</span>

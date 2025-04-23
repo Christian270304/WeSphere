@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-header',
@@ -12,10 +13,13 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
+  notifications: any[] = [];
   hideElements: boolean = false;
   dropdownOpen: boolean = false;
   user: any = {};
-  theme: string = 'light'; // Tema por defecto
+  theme: string = 'light'; 
+  unreadCount: number = 0;
+  showDropdown = false;
 
   // Cambiar el tema
   toggleTheme(): void {
@@ -35,9 +39,16 @@ export class HeaderComponent {
   }
 
 
-  constructor(private headerStateService: HeaderStateService, private userService: UserService, private authService: AuthService, private router: Router) {}
+  constructor(
+    private headerStateService: HeaderStateService, 
+    private userService: UserService, 
+    private authService: AuthService, 
+    private router: Router,
+    private notificationService: NotificationService
+  ) {}
 
   ngOnInit() {
+    this.listenForIncomingNotifications();
     // Cargar el tema guardado desde localStorage
     this.theme = localStorage.getItem('theme') || 'light';
     this.setTheme(this.theme);
@@ -52,8 +63,20 @@ export class HeaderComponent {
     
   }
 
+  ngOnDestroy() {
+    this.notificationService.disconnect(this.user.id); 
+  }
+
   async logout() {
     await this.authService.logout();
+  }
+
+  listenForIncomingNotifications() {
+    this.notificationService.onNotification((notification) => {
+      console.log('Nueva notificación recibida:', notification);
+      this.notifications.unshift(notification);
+      this.unreadCount++;
+    });
   }
 
   toggleDropdown() {
@@ -67,7 +90,16 @@ export class HeaderComponent {
       }
   }
 
+  markAsRead(notification: any): void {
+    notification.isRead = true;
+    this.unreadCount--;
+  }
+
   scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+  toggleDropdownNot() {
+  this.showDropdown = !this.showDropdown;
+}
+
 }

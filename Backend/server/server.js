@@ -46,6 +46,11 @@ io.on('connection', (socket) => {
     // io.to(`user:${otherUserId}`).emit('new_message_notification', { chatId, message });
   });
 
+  socket.on('send_notification', ({ userId, notification }) => {
+    console.log(`🔔 Enviando notificación al usuario ${userId}:`, notification);
+    io.to(`user:${userId}`).emit('receive_notification', notification);
+  });
+
   socket.on('disconnect', () => {
     console.log('Cliente desconectado:', socket.id);
   });
