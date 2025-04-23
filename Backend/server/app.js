@@ -23,7 +23,6 @@ app.use(cors({
 }));
 
 app.use((req, res, next) => {
-  console.log("CORS headers applied: ", req.headers.origin);
   next();
 });
 
