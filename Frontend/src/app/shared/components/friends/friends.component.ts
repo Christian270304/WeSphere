@@ -23,16 +23,4 @@ export class FriendsComponent {
       }
     });
   }
-
-  acceptRequest(requestId: number) {
-    // Lógica para aceptar una solicitud de amistad
-  }
-
-  rejectRequest(requestId: number) {
-    // Lógica para rechazar una solicitud de amistad
-  }
-
-  cancelRequest(requestId: number) {
-    // Lógica para cancelar una solicitud de amistad enviada
-  }
 }
