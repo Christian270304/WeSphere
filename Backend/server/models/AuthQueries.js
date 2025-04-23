@@ -1,5 +1,5 @@
-import { ChatMember, Message, User, Image, Chat } from "./models.js";
-import { Op } from "../config/db.js";
+import { ChatMember, Message, User, Image, Chat, Follower } from "./models.js";
+import { Op, sequelize } from "../config/db.js";
 
 
 export const verifyUser = async (username, email) => {
@@ -150,6 +150,37 @@ export const getUser = async (id) => {
       });
       
       return message;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+
+  export const getSugerenciasModel = async (user_id) => {
+    try {
+      const followingRecords = await Follower.findAll({
+        where: { follower_id: user_id },
+        attributes: ['following_id']
+      });
+  
+      const followingIds = followingRecords.map(record => record.following_id);
+  
+      const suggestions = await User.findAll({
+        where: {
+          id: {
+            [Op.notIn]: [...followingIds, user_id] 
+          }
+        },
+        attributes: ['id', 'username'], 
+        include: {
+          model: Image,
+          as: 'profileImage',
+          attributes: ['url'] 
+        },
+        order: sequelize.literal('RAND()'),
+        limit: 3 
+      });
+
+      return suggestions;
     } catch (err) {
       throw new Error(err);
     }

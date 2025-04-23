@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 import { User, Message, Follower, Image } from '../models/models.js';
-import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, getNotificationsModel } from '../models/AuthQueries.js';
+import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, getNotificationsModel, getSugerenciasModel } from '../models/AuthQueries.js';
 import { io } from '../server.js'
 
 dotenv.config();
@@ -360,6 +360,21 @@ export class AuthController {
     } catch (error) {
       console.error('Error en getFriends:', error);
       res.status(500).json({ error: 'Error al obtener los amigos' });
+    }
+  }
+
+  static async getSugerencias(req, res) {
+    try {
+      const { id: user_id } = req.user; 
+  
+      const sugerencias = await getSugerenciasModel(user_id);
+
+      if (!sugerencias) return res.status(404).json({ msg: "Sugerencias no encontradas" });
+  
+      res.json({ sugerencias });
+    } catch (error) {
+      console.error('Error en getSugerencias:', error);
+      res.status(500).json({ error: 'Error al obtener las sugerencias' });
     }
   }
 
