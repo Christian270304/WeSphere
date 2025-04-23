@@ -143,6 +143,10 @@ export class UserService {
     return this.http.get<any>(`${this.apiUrl}/auth/friends`, { withCredentials: true });
   }
 
+  getSuggestions(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/sugerencias`, { withCredentials: true });
+  }
+
 }
 
 

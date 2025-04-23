@@ -6,10 +6,11 @@ import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { HeaderStateService } from '../../core/services/header-state.service';
 import { UserService } from '../../core/services/user.service';
+import { SuggestionComponent } from '../../shared/components/suggestion/suggestion.component';
 
 @Component({
   selector: 'app-home',
-  imports: [PostsComponent, RouterModule],
+  imports: [PostsComponent, RouterModule, SuggestionComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
