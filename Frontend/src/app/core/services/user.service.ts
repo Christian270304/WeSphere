@@ -139,6 +139,10 @@ export class UserService {
     return this.http.post<any>(`${this.apiUrl}/auth/users/${userId}/follow`, {}, { withCredentials: true });
   }
 
+  getFriends(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/friends`, { withCredentials: true });
+  }
+
 }
 
 
