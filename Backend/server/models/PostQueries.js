@@ -1,4 +1,4 @@
-import { Post, User, Image, Follower, Like, Comment, SavedPosts } from './models.js';
+import { Post, User, Media, Follower, Like, Comment, SavedPosts } from './models.js';
 import { Op , sequelize } from "../config/db.js";
 
 // Función para obtener posts recomendados
@@ -21,9 +21,9 @@ const followedUsers = await Follower.findAll({
         model: User, 
         as: "user", 
         attributes: ['username'], 
-        include: { model: Image, as: 'profileImage', attributes: ['url'] } 
+        include: { model: Media, as: 'profileImage', attributes: ['url'] } 
       },
-      { model: Image, as: "image", attributes: ['url'] },
+      { model: Media, as: "media", attributes: ['url', 'type'] },
       { model: SavedPosts, as: "savedByUsers", attributes: ['user_id'], where: { user_id }, required: false } // Usar el alias correcto
     ],
     attributes: [
@@ -139,12 +139,12 @@ const followedUsers = await Follower.findAll({
                             model: User,
                             as: 'user',
                             attributes: ['username'],
-                            include: { model: Image, as: 'profileImage', attributes: ['url'] }
+                            include: { model: Media, as: 'profileImage', attributes: ['url'] }
                         }
                     ]
                 },
-                { model: User, as: "user", attributes: ['username'], include: { model: Image, as: 'profileImage', attributes: ['url'] } },
-                { model: Image, as: "image", attributes: ['url'] }
+                { model: User, as: "user", attributes: ['username'], include: { model: Media, as: 'profileImage', attributes: ['url'] } },
+                { model: Media, as: "media", attributes: ['url', 'type'] }
             ],
             attributes: [
                 'id',
@@ -188,8 +188,8 @@ const followedUsers = await Follower.findAll({
         const posts = await Post.findAll({
             where: { id: postIds },
             include: [
-                { model: User, as: "user", attributes: ['username'], include: { model: Image, as: 'profileImage', attributes: ['url'] } },
-                { model: Image, as: "image", attributes: ['url'] }
+                { model: User, as: "user", attributes: ['username'], include: { model: Media, as: 'profileImage', attributes: ['url'] } },
+                { model: Media, as: "media", attributes: ['url', 'type'] }
             ]
         });
     

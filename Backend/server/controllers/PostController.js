@@ -1,10 +1,11 @@
-import { Post, Image, User, Like, SavedPosts } from '../models/models.js';
+import { Post, Media, User, Like, SavedPosts } from '../models/models.js';
 import { getRecommendedPosts, getComments, createComment, getPostSaved, savePost } from '../models/PostQueries.js';
 import { v2 as cloudinary } from 'cloudinary';
 import sharp from 'sharp';
 import streamifier from 'streamifier';
 import dontenv from 'dotenv';
 import crypto from 'crypto';
+import { type } from 'os';
 
 dontenv.config();
 
@@ -20,16 +21,31 @@ cloudinary.config({
 export class PostController {
     static async createPost(req, res) {
         try {
-            
-        const { user_id, description = '', likes_count = 0, comments_count = 0, allow_comments = true, allow_likes = true, allow_save = true, created_at = new Date() } = req.body || {};
-        const imageBuffer = req.file?.buffer;
+        const { id: user_id } = req.user;    
+        const { description = '', likes_count = 0, comments_count = 0, allow_comments = true, allow_likes = true, allow_save = true, created_at = new Date() } = req.body || {};
+        const videoFile = req.files?.video?.[0];
+        const imageFile = req.files?.image?.[0];
 
-        let imageId = null;
-        if (imageBuffer) {
-            imageId = await PostController.uploadImage(imageBuffer);
+        if (!videoFile && !imageFile) {
+          return res.status(400).json({ error: 'No se ha enviado ningún archivo.' });
+        }
+
+        const fileBuffer = videoFile ? videoFile.buffer : imageFile.buffer;
+        const fileType = videoFile ? videoFile.mimetype : imageFile.mimetype;
+
+        let mediaId = null;
+
+        if (fileBuffer && fileType) {
+            if (fileType.startsWith('image/')) {
+              mediaId = await PostController.uploadImage(fileBuffer);
+            } else if (fileType.startsWith('video/')) {
+              mediaId = await PostController.uploadVideo(fileBuffer);
+            } else {
+                return res.status(400).json({ error: 'El archivo debe ser una imagen o un video.' });
+            }
         }
         
-        const newPost = await Post.create({ user_id, description, imageId, likes_count, comments_count, allow_comments, allow_likes, allow_save, created_at });
+        const newPost = await Post.create({ user_id, description, mediaId, likes_count, comments_count, allow_comments, allow_likes, allow_save, created_at });
         
         res.json({ msg: "Post creado", post: newPost });
         } catch (err) {
@@ -113,7 +129,7 @@ export class PostController {
             const imageHash = await getImageHash(imageBuffer);
         
             // 2️⃣ Buscar si ya existe en la base de datos
-            const existingImage = await Image.findOne({ where: { hash: imageHash } });
+            const existingImage = await Media.findOne({ where: { hash: imageHash } });
         
             if (existingImage) {
               console.log("📌 Imagen ya existente, usando cache.");
@@ -136,7 +152,7 @@ export class PostController {
                     return reject(error);
                   }
                   try {
-                    const image = await Image.create({ hash: imageHash, url: result.secure_url });
+                    const image = await Media.create({ hash: imageHash, url: result.secure_url, type: 'image' });
                             
                     resolve(image.id);
                   } catch (error) {
@@ -155,6 +171,46 @@ export class PostController {
            
         }
     }
+
+    static async uploadVideo(videoBuffer, folder = 'posts') {
+      try {
+          const videoHash = await getVideoHash(videoBuffer);
+  
+          // 2️⃣ Buscar si ya existe en la base de datos
+          const existingVideo = await Media.findOne({ attributes: ['id', 'hash', 'url'], where: { hash: videoHash } });
+  
+          if (existingVideo) {
+              console.log("📌 Video ya existente, usando cache.");
+              return existingVideo.id; // 🔁 Retorna el ID del video ya guardado
+          }
+  
+          // 3️⃣ Subir video a Cloudinary
+          return new Promise((resolve, reject) => {
+              const uploadStream = cloudinary.uploader.upload_stream(
+                  { folder: `uploads/${folder}`, resource_type: 'video' }, // Especifica que es un video
+                  async (error, result) => {
+                      if (error) {
+                          console.error("❌ Error al subir a Cloudinary:", error);
+                          return reject(error);
+                      }
+                      try {
+                          // 4️⃣ Guardar el video en la base de datos
+                          const video = await Media.create({ hash: videoHash, url: result.secure_url, type: 'video' });
+                          resolve(video.id);
+                      } catch (error) {
+                          console.error("❌ Error al guardar en la base de datos:", error);
+                          reject(error);
+                      }
+                  }
+              );
+  
+              streamifier.createReadStream(videoBuffer).pipe(uploadStream);
+          });
+      } catch (err) {
+          console.error("❌ Error en `uploadVideo`:", err);
+          throw err;
+      }
+  }
 
     static async likePost(req, res) {
       try {
@@ -303,8 +359,8 @@ export class PostController {
           const { id } = req.params;
         const posts = await Post.findAll({ 
           include: [
-            { model: User, as: "user", attributes: ['username'], include: { model: Image, as: 'profileImage', attributes: ['url'] } },
-            { model: Image, as: "image", attributes: ['url'] }
+            { model: User, as: "user", attributes: ['username'], include: { model: Media, as: 'profileImage', attributes: ['url'] } },
+            { model: Media, as: "media", attributes: ['url', 'type'] }
           ],
           where: { user_id: id } });
     
@@ -323,4 +379,12 @@ function getImageHash(buffer) {
         hash.update(buffer);
         resolve(hash.digest('hex'));
     });
+}
+
+function getVideoHash(buffer) {
+  return new Promise((resolve, reject) => {
+      const hash = crypto.createHash('sha256');
+      hash.update(buffer);
+      resolve(hash.digest('hex'));
+  });
 }

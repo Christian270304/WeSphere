@@ -2,7 +2,7 @@ import { sequelize } from '../config/db.js';
 import { User } from './UserModel.js';
 import { Post } from './PostModel.js';
 import { Follower } from './FollowerModel.js';
-import { Image } from './ImageModel.js';
+import { Media } from './MediaModel.js';
 import { Like } from './LikeModel.js';
 import { Comment } from './CommentsModel.js';
 import { Chat } from './ChatsModel.js';
@@ -16,4 +16,4 @@ import { SavedPosts } from './SavedPostsModel.js';
 import './relationships.js';
 
 // Exportar todos los modelos y la conexión
-export { sequelize, User, Post, Follower, Image, Like, Comment, Chat, Message, ChatMember, AuthProvider, Notificacion, SavedPosts };
+export { sequelize, User, Post, Follower, Media, Like, Comment, Chat, Message, ChatMember, AuthProvider, Notificacion, SavedPosts };

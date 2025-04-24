@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
-import { User, Message, Follower, Image } from '../models/models.js';
+import { User, Message, Follower, Media } from '../models/models.js';
 import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, getNotificationsModel, getSugerenciasModel } from '../models/AuthQueries.js';
 import { io } from '../server.js'
 
@@ -71,7 +71,6 @@ export class AuthController {
   static async getUser(req, res) {
     try {
       const { id } = req.user;
-      console.log("ID del usuario: ", id);
       const user = await getUser(id);
 
       if (!user) return res.status(404).json({ msg: "Usuario no encontrado" });
@@ -173,8 +172,6 @@ export class AuthController {
   static async getChats(req, res) {
     try {
       const { id } = req.user;
-
-      console.log("ID del usuario: ", id);
 
       const chats = await getChatsModel(id); 
       
@@ -350,7 +347,7 @@ export class AuthController {
         where: { id: followingIds },
         attributes: ['id', 'username'], 
         include: {
-          model: Image,
+          model: Media,
           as: 'profileImage',
           attributes: ['url'] 
         }

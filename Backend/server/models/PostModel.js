@@ -5,7 +5,7 @@ export const Post = sequelize.define('posts', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   user_id: { type: DataTypes.INTEGER, allowNull: false },
   description: { type: DataTypes.STRING, allowNull: false },
-  imageId: { type: DataTypes.INTEGER, allowNull: true },
+  mediaId: { type: DataTypes.INTEGER, allowNull: true },
   likes_count: { type: DataTypes.INTEGER, defaultValue: 0 },
   comments_count: { type: DataTypes.INTEGER, defaultValue: 0 },
   allow_likes: { type: DataTypes.BOOLEAN, defaultValue: true },

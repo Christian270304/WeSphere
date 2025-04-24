@@ -1,4 +1,4 @@
-import { ChatMember, Message, User, Image, Chat, Follower } from "./models.js";
+import { ChatMember, Message, User, Media, Chat, Follower } from "./models.js";
 import { Op, sequelize } from "../config/db.js";
 
 
@@ -51,7 +51,7 @@ export const getChatsModel = async (user_id) => {
             attributes: ['id', 'username'],  
             include: [
               {
-                model: Image,
+                model: Media,
                 as: 'profileImage',  
                 attributes: ['url'],
               },
@@ -93,8 +93,8 @@ export const getUser = async (id) => {
       const user = await User.findOne({
         where: { id },
         include: [
-          { model: Image, as: 'profileImage', attributes: ['url'], required: false },
-          { model: Image, as: 'bannerImage', attributes: ['url'], required: false }
+          { model: Media, as: 'profileImage', attributes: ['url'], required: false },
+          { model: Media, as: 'bannerImage', attributes: ['url'], required: false }
         ]
       });
       return user;
@@ -108,8 +108,8 @@ export const getUser = async (id) => {
       const user = await User.findOne({
         where: { username },
         include: [
-          { model: Image, as: 'profileImage', attributes: ['url'], required: false },
-          { model: Image, as: 'bannerImage', attributes: ['url'], required: false }
+          { model: Media, as: 'profileImage', attributes: ['url'], required: false },
+          { model: Media, as: 'bannerImage', attributes: ['url'], required: false }
         ]
       });
       return user;
@@ -172,7 +172,7 @@ export const getUser = async (id) => {
         },
         attributes: ['id', 'username'], 
         include: {
-          model: Image,
+          model: Media,
           as: 'profileImage',
           attributes: ['url'] 
         },
