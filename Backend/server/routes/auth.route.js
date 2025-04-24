@@ -26,6 +26,7 @@ router.post("/login", AuthController.login);
 router.post('/logout', authMiddleware,  AuthController.logout);
 router.post('/newMessage', authMiddleware, AuthController.newMessage);
 router.post('/users/:user_id/follow', authMiddleware, AuthController.toggleFollow);
+router.post('/chat/create', authMiddleware, AuthController.createChat);
 
 // Rutas google
 router.get('/google',

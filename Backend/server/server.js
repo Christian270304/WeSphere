@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://wesphere.vercel.app",
+    origin: "http://localhost:4200",
     methods: ["GET", "POST"],
     credentials: true,
   },

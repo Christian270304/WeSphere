@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
-import { User, Message, Follower, Media } from '../models/models.js';
+import { User, Message, Follower, Media, Chat, ChatMember } from '../models/models.js';
 import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, getNotificationsModel, getSugerenciasModel } from '../models/AuthQueries.js';
 import { io } from '../server.js'
 
@@ -372,6 +372,71 @@ export class AuthController {
     } catch (error) {
       console.error('Error en getSugerencias:', error);
       res.status(500).json({ error: 'Error al obtener las sugerencias' });
+    }
+  }
+
+  static async createChat(req, res) {
+    try {
+      const { userId: otherUserId } = req.body;
+      const { id: userId } = req.user;
+
+      console.log("Crear chat: ", userId, otherUserId);
+  
+      // Verificar si el chat ya existe
+      const existingChat = await ChatMember.findOne({
+        where: { user_id: userId },
+        include: {
+          model: Chat,
+          include: {
+            model: ChatMember,
+            where: { user_id: otherUserId }
+          }
+        }
+      });
+  
+      if (existingChat) {
+        // Si ya existe, devolver el chat_id y el id del otro usuario
+        return res.json({
+          chat_id: existingChat.chat_id,
+          other_user_id: otherUserId
+        });
+      }
+  
+      // Crear el nuevo chat
+      const newChat = await Chat.create({
+        is_group: false,
+        created_at: new Date(),
+      });
+
+      // Crear el chat memebers
+      const chatMembers = await ChatMember.create({
+        chat_id: newChat.id,
+        user_id: userId,
+      })
+  
+      const otherUser = await User.findOne({
+        where: { id: otherUserId },
+        attributes: ['id', 'username'],
+        include: {
+          model: Media,
+          as: 'profileImage',
+          attributes: ['url']
+        }
+      });
+  
+      res.json(
+        {
+          chat_id: newChat.id,
+          other_user: {
+            user_id: otherUser.id,
+            username: otherUser.username,
+            profile_image: otherUser.profileImage ? otherUser.profileImage.url : null
+          }
+        }
+      );
+    } catch (error) {
+      console.error('Error al crear el chat:', error);
+      res.status(500).json({ error: 'Error al crear el chat' });
     }
   }
 
