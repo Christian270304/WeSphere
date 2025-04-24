@@ -7,10 +7,11 @@ import { PostsComponent } from '../../shared/components/posts/posts.component';
 import { HeaderStateService } from '../../core/services/header-state.service';
 import { UserService } from '../../core/services/user.service';
 import { FormsModule } from '@angular/forms';
+import { FriendsComponent } from '../../shared/components/friends/friends.component';
 
 @Component({
   selector: 'app-profile',
-  imports: [CommonModule, UserStatsComponent, UserActionsComponent, RouterModule, PostsComponent, FormsModule],
+  imports: [CommonModule, UserStatsComponent, UserActionsComponent, RouterModule, PostsComponent, FormsModule, FriendsComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })

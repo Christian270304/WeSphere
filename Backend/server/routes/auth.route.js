@@ -18,6 +18,8 @@ router.get("/profile/:username", authMiddleware,  AuthController.getUserByUserna
 router.get('/messages/:chat_id', authMiddleware, AuthController.getMessages);
 router.get('/chats', authMiddleware,  AuthController.getChats);
 router.get('/users/:user_id/follow-status', authMiddleware, AuthController.getFollowStatus);
+router.get('/friends', authMiddleware, AuthController.getFriends);
+router.get('/sugerencias', authMiddleware, AuthController.getSugerencias);
 
 router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);

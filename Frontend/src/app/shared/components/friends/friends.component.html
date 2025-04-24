@@ -1,0 +1,15 @@
+<div class="sidebar-card">
+    <div class="sidebar-header">
+        Amics als que segueixes
+    </div>
+    <div class="friends-list">
+        @for (friend of friends; track $index) {
+            <div class="friend-item">
+                <div class="friend-pic">
+                    <img [src]="friend.profileImage?.url" alt="Amic {{friend.username}}">
+                </div>
+                <div class="friend-name">{{friend.username}}</div>
+            </div>
+        }
+    </div>
+</div>
