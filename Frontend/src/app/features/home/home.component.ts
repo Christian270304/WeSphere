@@ -131,11 +131,10 @@ fullscreenBtn.addEventListener("click", toggleFullScreen);
   }
 
   createPost(): void {
-    const user_id = localStorage.getItem('userId');
-    const inputElement = document.querySelector('div.create-post-input') as HTMLDivElement;
+    const inputElement = document.querySelector('div.description input') as HTMLInputElement;
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     const file = fileInput.files?.[0]; 
-    let description = inputElement.innerText.trim(); 
+    let description = inputElement.value.trim();
 
     if ((!description || description == this.placeholderText) && !file) { 
       alert('No puedes enviar un post vacío.');
@@ -148,14 +147,17 @@ fullscreenBtn.addEventListener("click", toggleFullScreen);
     alert(`Post creado exitosamente ${description} ${file}`);
 
   const formData = new FormData();
-  formData.append('user_id', user_id || '');
   formData.append('description', description);
   if (file) {
-    formData.append('image', file); 
+    if (file.type.startsWith('image/')) {
+      formData.append('image', file); 
+    } else if (file.type.startsWith('video/')) {
+      formData.append('video', file); 
+    }
   }
 
 
-  this.http.post(`${this.apiUrl}/posts/create`, formData).subscribe(
+  this.http.post(`${this.apiUrl}/posts/create`, formData, {withCredentials: true}).subscribe(
     (response) => {
       console.log('Post creado exitosamente:', response);
       inputElement.innerText = this.placeholderText; 
@@ -165,6 +167,15 @@ fullscreenBtn.addEventListener("click", toggleFullScreen);
       const previewImage = document.querySelector('img[class="post-image-preview"]') as HTMLImageElement;
       if (previewImage) {
         previewImage.src = '';
+      }
+      const previewVideo = document.querySelector('video[class="post-video-preview"]') as HTMLVideoElement;
+      const divVideo = document.querySelector('div.video-container') as HTMLDivElement;
+      if (previewVideo) {
+        previewVideo.src = '';
+        previewVideo.style.display = 'none';
+      }
+      if (divVideo) {
+        divVideo.style.display = 'none';
       }
     },
     (error) => {

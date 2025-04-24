@@ -193,9 +193,9 @@ header {
 .sidebar {
     grid-area: sidebar;
     max-height: 100%;
-    // position: sticky;
-    // top: 80px;
-    // height: calc(100vh - 100px);
+    position: sticky;
+    top: 80px;
+    height: calc(100vh - 100px);
 }
 
 
