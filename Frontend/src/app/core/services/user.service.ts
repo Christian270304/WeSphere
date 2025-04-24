@@ -147,6 +147,10 @@ export class UserService {
     return this.http.get<any>(`${this.apiUrl}/auth/sugerencias`, { withCredentials: true });
   }
 
+  createChat(userId: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/chat/create`, { userId }, { withCredentials: true });
+  }
+
 }
 
 

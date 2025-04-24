@@ -98,25 +98,37 @@ export class MessagesComponent implements OnInit {
 
     if (userId) {
       const chat = this.chats.find((chat) => chat.other_users[0].user_id === userId);
-      if(!chat) return;
-      this.otherUser = chat.other_users[0].user_id;
-      this.selectedChatId = chat.chat_id;
+      if (!chat) {
+        // Si el chat no existe, crearlo
+        this.userService.createChat(userId).subscribe((newChat) => {
+          // Agregar el nuevo chat a la lista de chats
+          this.chats.push(newChat);
+  
+          // Seleccionar el nuevo chat
+          this.selectedChatId = newChat.chat_id;
+          this.otherUser = newChat.other_users[0].user_id;
+        });
+      } else {
+        this.otherUser = chat.other_users[0].user_id;
+        this.selectedChatId = chat.chat_id;
+      }
+      
     } else {
       this.selectedChatId = chatId;
       const chat = this.chats.find((chat) => chat.chat_id === chatId);
-    console.log("Prueba chats: ",chat);
-    if (!chat) return;
+      console.log("Prueba chats: ",chat);
+      if (!chat) return;
 
-    this.otherUser = chat.other_users[0].user_id;
+      this.otherUser = chat.other_users[0].user_id;
     }
 
     this.userService.getUserById(this.otherUser).subscribe((user) => {
       this.profileUser = user;
     });
     
-    this.chatSocketService.joinChat(this.selectedChatId);
+    this.chatSocketService.joinChat(this.selectedChatId!);
 
-    this.userService.getMessages(this.selectedChatId).subscribe((messages) => {
+    this.userService.getMessages(this.selectedChatId!).subscribe((messages) => {
       this.messages = messages;
       this.scrollToBottom();
     });
