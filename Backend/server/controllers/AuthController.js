@@ -224,7 +224,7 @@ export class AuthController {
       <html>
         <body>
           <script>
-            window.opener.postMessage({ success: true }, "http://localhost:4200");
+            window.opener.postMessage({ success: true }, "https://wesphere.vercel.app/");
             window.close();
           </script>
         </body>
@@ -253,7 +253,7 @@ export class AuthController {
       <html>
         <body>
           <script>
-            window.opener.postMessage({ success: true }, "http://localhost:4200");
+            window.opener.postMessage({ success: true }, "https://wesphere.vercel.app/");
             window.close();
           </script>
         </body>
@@ -282,7 +282,7 @@ export class AuthController {
       <html>
         <body>
           <script>
-            window.opener.postMessage({ success: true }, "http://localhost:4200");
+            window.opener.postMessage({ success: true }, "https://wesphere.vercel.app/");
             window.close();
           </script>
         </body>

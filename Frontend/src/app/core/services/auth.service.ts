@@ -6,19 +6,6 @@ import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
 
-const authConfig: AuthConfig = {
-    issuer: 'https://accounts.google.com', 
-    redirectUri: 'http://localhost:4200/home', 
-    clientId: environment.clientId, 
-    responseType: 'code',
-    scope: 'openid profile email',
-    strictDiscoveryDocumentValidation: false,
-    showDebugInformation: true,
-    useHttpBasicAuth: false,
-    disablePKCE: false,
-    requestAccessToken: true
-  };
-
 @Injectable({
   providedIn: 'root'
 })
@@ -69,7 +56,7 @@ export class AuthService {
     
       const listener = (event: MessageEvent) => {
         // Seguridad: verifica origen
-        if (event.origin !== 'http://localhost:3000') return;
+        if (event.origin !== 'https://wesphere-production.up.railway.app') return;
     
         if (event.data.success) {
           this.isAuthenticatedSubject.next(true); 
