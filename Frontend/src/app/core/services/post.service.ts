@@ -71,11 +71,11 @@ export class PostService {
   }
 
   toggleLike(postId: number) {
-    return this.http.post<any>(`${this.apiUrl}/posts/like/${postId}`, {withCredentials: true});
+    return this.http.post<any>(`${this.apiUrl}/posts/like/${postId}`, {}, {withCredentials: true});
   }
 
   toggleSave(postId: number) {
-    return this.http.post<any>(`${this.apiUrl}/posts/save/${postId}`, {withCredentials: true}).pipe(
+    return this.http.post<any>(`${this.apiUrl}/posts/save/${postId}`, {}, {withCredentials: true}).pipe(
       tap(response => console.log('Respuesta del backend:', response)));
   }
 
