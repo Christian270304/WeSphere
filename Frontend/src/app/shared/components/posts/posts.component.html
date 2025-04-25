@@ -16,11 +16,15 @@
       <div class="post-content">
         {{ post.description }}
       </div>
-      <!-- @if (post.image != null) { -->
-        <div class="post-image" [ngClass]="{ 'no-image': post.image == null }">
-          <img [src]="post.image?.url" alt="Post image" />
+      @if (post.media.type == 'image') { 
+        <div class="post-image" [ngClass]="{ 'no-image': post.media == null }">
+          <img [src]="post.media?.url" alt="Post image" />
         </div>
-      <!-- } -->
+      } @else if (post.media.type == 'video') {
+        <div class="post-video" [ngClass]="{ 'no-image': post.media == null }">
+          <video controls [src]="post.media?.url" alt="Post video"></video>
+        </div>
+      }
       <div class="action-buttons">
         @if (post.allow_likes == true && !userArticles) {
           <button class="action-btn like-btn" (click)="toggleLike(post)">
@@ -41,10 +45,9 @@
     </div>
     }
   } @else {
-  <!-- Mostrar mensaje si no hay posts -->
 
   <!-- Simulación de carga -->
-  <div class="loading-container">
+  
     <div class="loading-card">
       <div style="display: flex; align-items: center; gap: 15px;">
         <div class="loading-avatar"></div>
@@ -80,7 +83,7 @@
         <div class="loading-action"></div>
       </div>
     </div>
-  </div>
+
 
   <!-- Mensaje cuando no hay posts -->
   <div class="no-posts" style="display: none;">No hay publicaciones disponibles.</div>

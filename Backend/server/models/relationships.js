@@ -1,7 +1,7 @@
 import { User } from './UserModel.js';
 import { Post } from './PostModel.js';
 import { Follower } from './FollowerModel.js';
-import { Image } from './ImageModel.js';
+import { Media } from './MediaModel.js';
 import { Like } from './LikeModel.js';
 import { Comment } from './CommentsModel.js';
 import { Chat } from './ChatsModel.js';
@@ -16,11 +16,11 @@ User.hasMany(Post, { foreignKey: 'user_id', as: 'posts' });
 Post.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
 // Relación: Un usuario tiene una imagen de perfil y un banner
-User.belongsTo(Image, { foreignKey: 'profile_picture', as: 'profileImage' });
-User.belongsTo(Image, { foreignKey: 'banner', as: 'bannerImage' });
+User.belongsTo(Media, { foreignKey: 'profile_picture', as: 'profileImage' });
+User.belongsTo(Media, { foreignKey: 'banner', as: 'bannerImage' });
 
 // Relación: Un post tiene una imagen
-Post.belongsTo(Image, { foreignKey: 'imageId', as: 'image' });
+Post.belongsTo(Media, { foreignKey: 'mediaId', as: 'media' });
 
 // Relación: Seguidores
 Follower.belongsTo(User, { foreignKey: 'follower_id', as: 'FollowerUser' });

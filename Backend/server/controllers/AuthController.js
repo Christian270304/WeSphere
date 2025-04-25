@@ -2,8 +2,8 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
-import { User, Message, Follower } from '../models/models.js';
-import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, getNotificationsModel } from '../models/AuthQueries.js';
+import { User, Message, Follower, Media } from '../models/models.js';
+import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, getNotificationsModel, getSugerenciasModel } from '../models/AuthQueries.js';
 import { io } from '../server.js'
 
 dotenv.config();
@@ -71,7 +71,6 @@ export class AuthController {
   static async getUser(req, res) {
     try {
       const { id } = req.user;
-      console.log("ID del usuario: ", id);
       const user = await getUser(id);
 
       if (!user) return res.status(404).json({ msg: "Usuario no encontrado" });
@@ -173,8 +172,6 @@ export class AuthController {
   static async getChats(req, res) {
     try {
       const { id } = req.user;
-
-      console.log("ID del usuario: ", id);
 
       const chats = await getChatsModel(id); 
       
@@ -328,6 +325,53 @@ export class AuthController {
     } catch (error) {
       console.error('Error en getFollowStatus:', error);
       res.status(500).json({ error: 'Error al obtener el estado de seguimiento' });
+    }
+  }
+
+  static async getFriends(req, res) {
+    try {
+      const { id: follower_id } = req.user; 
+  
+      const followingRecords = await Follower.findAll({
+        where: { follower_id },
+        attributes: ['following_id']
+      });
+  
+      const followingIds = followingRecords.map(record => record.following_id);
+  
+      if (followingIds.length === 0) {
+        return res.json({ friends: [] }); 
+      }
+  
+      const friends = await User.findAll({
+        where: { id: followingIds },
+        attributes: ['id', 'username'], 
+        include: {
+          model: Media,
+          as: 'profileImage',
+          attributes: ['url'] 
+        }
+      });
+  
+      res.json({ friends });
+    } catch (error) {
+      console.error('Error en getFriends:', error);
+      res.status(500).json({ error: 'Error al obtener los amigos' });
+    }
+  }
+
+  static async getSugerencias(req, res) {
+    try {
+      const { id: user_id } = req.user; 
+  
+      const sugerencias = await getSugerenciasModel(user_id);
+
+      if (!sugerencias) return res.status(404).json({ msg: "Sugerencias no encontradas" });
+  
+      res.json({ sugerencias });
+    } catch (error) {
+      console.error('Error en getSugerencias:', error);
+      res.status(500).json({ error: 'Error al obtener las sugerencias' });
     }
   }
 
