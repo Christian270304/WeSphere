@@ -73,10 +73,12 @@ export class PostsComponent implements OnChanges {
 
   private loadPosts() {
     this.postsService.getPosts(this.userArticles, this.userId, this.saved).subscribe((posts) => {
-      
+      console.log('Posts obtenidos as:', posts);
       if (posts.length === 0) {
+        console.log('No hay publicaciones');
         this.noPosts.emit(true); // Emitir que no hay posts
       } else {
+        console.log('Hay publicaciones');
         this.noPosts.emit(false);
         this.posts = posts; // Emitir que hay posts
         setTimeout(() => { this.isLoading = false; }, 2000);

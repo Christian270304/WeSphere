@@ -26,7 +26,9 @@ export class ProfileComponent {
   public mostrarConfirmacion = false;
 
   public originalUser: any;
+  noPosts: boolean = false; 
 
+  
   
 
   constructor(private route: ActivatedRoute, private headerStateService: HeaderStateService, private userService: UserService,  private cdr: ChangeDetectorRef) {}
@@ -81,7 +83,9 @@ export class ProfileComponent {
 
 
 
-
+  handleNoPosts(event: boolean): void {
+    this.noPosts = event; 
+  }
 
 
 public editableUser: any = {

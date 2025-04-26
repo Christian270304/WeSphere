@@ -93,3 +93,18 @@
 .follow-button:hover {
     background-color: var(--primary-dark);
 }
+
+.unfollow-button {
+    padding: 6px 12px;
+    border-radius: 30px;
+    background-color: rgb(231, 85, 85);
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.unfollow-button:hover {
+    background-color: var(--secondary);
+}

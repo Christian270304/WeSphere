@@ -273,3 +273,39 @@ header {
     text-align: center;
   }
   
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+.empty-icon {
+    font-size: 3rem;
+    color: var(--gray);
+    margin-bottom: 20px;
+}
+.empty-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 10px;
+}
+.empty-description {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 20px;
+}
+.empty-action {
+    padding: 10px 20px;
+    border-radius: 30px;
+    background-color: var(--primary);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.empty-action:hover {
+    background-color: var(--primary-dark);
+}

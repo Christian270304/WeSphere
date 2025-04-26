@@ -81,8 +81,21 @@
                     </div>
                 }
                 <!-- Posts Section -->
-            
-                <app-posts class="profile-posts" [isGrid]="true" [userArticles]="true" [userId]="userId"></app-posts>
+                @if (!noPosts) {
+
+                  <app-posts class="profile-posts" [isGrid]="true" [userArticles]="true" [userId]="userId" [saved]="false" (noPosts)="handleNoPosts($event)"></app-posts>
+                } @else {
+                    <div class="empty-state">
+                      <div class="empty-icon">
+                      <i class="fas fa-times-circle"></i>
+                      </div>
+                      <div class="empty-title">No hi ha publicacions creades</div>
+                      <div class="empty-description">
+                      Comença a crear les teves pròpies publicacions per compartir amb els altres.
+                      </div>
+                      <button class="empty-action" [routerLink]="['/home']">Crear ara</button>
+                    </div>
+                }
             </div>
         </div>
     </div>

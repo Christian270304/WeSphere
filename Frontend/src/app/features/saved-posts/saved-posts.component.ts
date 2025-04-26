@@ -13,5 +13,6 @@ export class SavedPostsComponent {
 
   handleNoPosts(event: boolean): void {
     this.noSavedPosts = event; 
+    console.log("No hay publicaciones guardadas: ", this.noSavedPosts);
   }
 }

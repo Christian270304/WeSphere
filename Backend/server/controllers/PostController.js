@@ -279,7 +279,8 @@ export class PostController {
 
     static async postComment(req, res) {
       try {
-        const { user_id, content } = req.body;
+        const { id: user_id } = req.user;
+        const { content } = req.body;
         const { post_id } = req.params;
     
         // Verificar si el contenido del comentario no está vacío
