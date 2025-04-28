@@ -11,6 +11,7 @@ import { UserService } from '../../../core/services/user.service';
 })
 export class UserActionsComponent {
   @Output() editProfile: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() save: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() userId: number | null = null;
   @Input() isOwn: boolean = false;
   isEditing: boolean = false;
@@ -44,6 +45,12 @@ export class UserActionsComponent {
   toggleEditProfile(): void {
     this.isEditing = !this.isEditing; // Cambiar el estado
     this.editProfile.emit(this.isEditing); // Emitir el estado al padre
+  }
+
+  saveChanges(): void {
+    this.isEditing = false; // Cambiar el estado
+    this.editProfile.emit(this.isEditing);
+    this.save.emit(true); // Emitir el evento de guardado al padre
   }
 
   toggleFollow(): void {

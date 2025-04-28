@@ -4,7 +4,7 @@
             {{ isEditing ? 'Cancelar' : 'Editar perfil' }}
         </button>
         @if (isEditing) {
-            <button class="action-button save-profile" >Guardar</button>
+            <button class="action-button save-profile" (click)="saveChanges()">Guardar</button>
         }
     }
     @if (!isOwn) {

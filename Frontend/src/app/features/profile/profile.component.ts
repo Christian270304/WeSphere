@@ -29,45 +29,20 @@ export class ProfileComponent {
   noPosts: boolean = false; 
 
   
-  
+  cambiosRealizados: boolean = false;
+
+  // Propiedades temporales para los datos editados
+  datosEditados = {
+    username: '',
+    bio: ''
+  };
 
   constructor(private route: ActivatedRoute, private headerStateService: HeaderStateService, private userService: UserService,  private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.headerStateService.setHideElements(true);
 
-    this.route.paramMap.subscribe(params => {
-      const usernameFromUrl = params.get('username');
-      this.userId = null;  
-
-      if (!usernameFromUrl) {
-        this.userService.getUser().subscribe(user => {
-        this.originalUser = structuredClone(user); // copia original para restaurar
-          
-          
-          this.user = structuredClone(user);
-          this.userId = user.id;
-          this.isOwnProfile = true;
-          this.noExists = false; 
-          this.cdr.detectChanges(); 
-          console.log(this.user);
-        });
-      } else {
-        this.userService.getUserByUsername(usernameFromUrl).subscribe((profileUser) => {
-          if (profileUser) {
-            this.user = profileUser.user;
-            this.userId = profileUser.user.id;
-            this.isOwnProfile = profileUser.current_user_id === profileUser.user.id;
-            this.noExists = false; 
-            this.cdr.detectChanges();
-            console.log(this.user); 
-          } else {
-            this.noExists = true;  
-            this.cdr.detectChanges(); 
-          }
-        });
-      }
-    });
+    this.loadProfile();
   }
 
   ngOnDestroy() {
@@ -81,7 +56,42 @@ export class ProfileComponent {
 
 
 
+private loadProfile() {
+  this.route.paramMap.subscribe(params => {
+    const usernameFromUrl = params.get('username');
+    this.userId = null;  
 
+    if (!usernameFromUrl) {
+      this.userService.getUser().subscribe(user => {
+        if (user) {
+          this.originalUser = structuredClone(user); 
+          this.user = user;
+          this.userId = user.id;
+          this.isOwnProfile = true;
+          this.noExists = false;
+        } else {
+          this.noExists = true;  
+        }
+      });
+    } else {
+      this.userService.getUserByUsername(usernameFromUrl).subscribe((profileUser) => {
+        if (profileUser) {
+          
+
+          this.user = profileUser.user;
+          this.userId = profileUser.user.id;
+          this.isOwnProfile = profileUser.current_user_id === profileUser.user.id;
+          this.noExists = false; 
+          this.cdr.detectChanges();
+          console.log(this.user); 
+        } else {
+          this.noExists = true;  
+          this.cdr.detectChanges(); 
+        }
+      });
+    }
+  });
+}
 
   handleNoPosts(event: boolean): void {
     this.noPosts = event; 
@@ -95,7 +105,7 @@ public editableUser: any = {
   bannerImage: 0
 };
 
-public handleChildEvent(event: boolean) {
+public handleEditProfile(event: boolean) {
   if (event) {
     this.editandoPerfil = true;
     this.editableUser = {
@@ -108,6 +118,26 @@ public handleChildEvent(event: boolean) {
     this.cancelarEdicion();
   }
 }
+
+public handleSave(event: boolean) {
+  // Verifica si hay cambios antes de guardar
+  if (this.hayCambios()) {
+    // this.userService.updateUser(this.editableUser).subscribe({
+    //   next: (response) => {
+    //     this.user = { ...this.user, ...this.editableUser };
+    //     this.originalUser = structuredClone(this.user); 
+    //     this.editandoPerfil = false;
+    //     this.cambiosRealizados = false; // Resetea el estado de cambios realizados
+    //     console.log('Cambios guardados:', response);
+    //   },
+    //   error: (err) => {
+    //     console.error('Error al guardar cambios:', err);
+    //   }
+    // });
+  }
+  console.log('Guardando cambios...');
+}
+
 
 seleccionarNuevaImagen(tipo: 'banner' | 'profile') {
   // Aquí podrías abrir un input tipo file o lanzar un modal para seleccionar imagen

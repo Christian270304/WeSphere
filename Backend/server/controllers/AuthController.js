@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import crypto from 'crypto';
+import { PostController } from './PostController.js';
 
 import { User, Message, Follower, Media, Chat, ChatMember } from '../models/models.js';
 import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, getNotificationsModel, getSugerenciasModel } from '../models/AuthQueries.js';
@@ -439,6 +441,47 @@ export class AuthController {
       res.status(500).json({ error: 'Error al crear el chat' });
     }
   }
+
+  static async updateUser(req, res) {
+    try {
+      const { id: userId } = req.user; 
+      const { username, bio } = req.body;
+  
+      // Verificar si el username ya existe (excepto para el usuario actual)
+      const existingUser = await User.findOne({ where: { username, id: { [Op.ne]: userId } } });
+      if (existingUser) {
+        return res.status(400).json({ error: 'El nombre de usuario ya existe.' });
+      }
+
+      const profileImage = req.files?.profileImage?.[0];
+      const bannerImage = req.files?.bannerImage?.[0];
+
+      let profileImageId = null;
+      let bannerImageId = null;
+
+      if (profileImage) {
+        const profileImageBuffer = profileImage.buffer;
+        profileImageId = await PostController.uploadImage(profileImageBuffer, 'profile')
+      }
+
+      if (bannerImage){
+        const bannerImageBuffer = bannerImage.buffer;
+        bannerImageId = await PostController.uploadImage(bannerImageBuffer, 'profile')
+      }
+
+  
+      const updatedUser = await User.update(
+        { username, bio, profileImageId, bannerImageId },
+        { where: { id: userId }, returning: true }
+      );
+  
+      res.status(200).json({ message: 'Perfil actualizado correctamente.', user: updatedUser[1][0] });
+    } catch (error) {
+      console.error('Error al actualizar el perfil:', error);
+      res.status(500).json({ error: 'Error al actualizar el perfil.' });
+    }
+  };
+
 
 
 }

@@ -6,73 +6,45 @@
             <div class="profile-section">
                 <!-- Profile Header -->
                 <div class="profile-header">
-                    <div class="cover-photo">
-                        @if (!editandoPerfil) {
-                            <img [src]="user.bannerImage.url" alt="Foto de portada">
-                        } @else {
-                            <button style="position: absolute;" class="edit-banner-btn" (click)="seleccionarNuevaImagen('banner')">Cambiar portada</button>
-                        }
-                        
-                    </div>
-                    <div class="profile-pic">
-                        <img [src]="user.profileImage?.url" alt="Foto de perfil de {{ user.username }}">
-                    </div>
-                    <div class="profile-info">
-                        <div class="username" [attr.contenteditable]="editandoPerfil" (input)="limitarTexto($event, 55)">{{ user.username }}</div><i *ngIf="editandoPerfil" class="edit-icon">✏️</i>
-                        <div class="bio" [attr.contenteditable]="editandoPerfil" (input)="limitarTexto($event, 300)">{{ user.bio }}</div><i *ngIf="editandoPerfil" class="edit-icon">✏️</i>
-                        <app-user-stats></app-user-stats>
-                        <app-user-actions [isOwn]="isOwnProfile" [userId]="userId" (editProfile)="handleChildEvent($event)"></app-user-actions>
-                    </div>
-                </div>
-
-                
-
-                <!-- <div class="profile-header">
-                    <div class="cover-photo">
-                      <img [src]="user.bannerImage?.url" alt="Foto de portada">
-                      <button *ngIf="editandoPerfil" class="edit-banner-btn" (click)="seleccionarNuevaImagen('banner')">Cambiar portada</button>
-                    </div>
-                  
-                    <div class="profile-pic">
+                  <!-- Cover Photo Section -->
+                  <div class="cover-photo">
+                      <img [src]="user.bannerImage.url" alt="Foto de portada">
+                        <button *ngIf="editandoPerfil" class="edit-banner-btn">Canviar portada</button>
+                  </div>
+              
+                  <!-- Profile Picture Section -->
+                  <div class="profile-pic">
                       <img [src]="user.profileImage?.url" alt="Foto de perfil de {{ user.username }}">
-                      <button *ngIf="editandoPerfil" class="edit-profile-btn" (click)="seleccionarNuevaImagen('profile')">Cambiar foto</button>
-                    </div>
-                  
-                    <div class="profile-info">
-                      <div
-                        class="username editable"
-                        [attr.contenteditable]="editandoPerfil"
-                        (input)="user.username = $event.target.textContent"
+                        <button *ngIf="editandoPerfil" class="edit-profile-pic-btn">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                  </div>
+              
+                  <!-- Profile Info Section -->
+                  <div class="profile-info">
+                      <div 
+                          class="username" 
+                          [attr.contenteditable]="editandoPerfil" 
+                          (input)="limitarTexto($event, 55)"
                       >
-                        {{ user.username }}
-                        <i *ngIf="editandoPerfil" class="edit-icon">✏️</i>
+                          {{ user.username }}
                       </div>
-                  
-                      <div
-                        class="bio editable"
-                        [attr.contenteditable]="editandoPerfil"
-                        (input)="user.bio = $event.target.textContent"
+                      <div 
+                          class="bio" 
+                          [attr.contenteditable]="editandoPerfil" 
+                          (input)="limitarTexto($event, 300)"
                       >
-                        {{ user.bio }}
-                        <i *ngIf="editandoPerfil" class="edit-icon">✏️</i>
+                          {{ user.bio }}
                       </div>
-                  
                       <app-user-stats></app-user-stats>
-                  
-                      <app-user-actions
-                        [isOwn]="isOwnProfile"
-                        [userId]="userId"
-                        (editProfile)="handleChildEvent($event)">
-                      </app-user-actions>
-                  
-                      <div *ngIf="editandoPerfil" class="edit-actions">
-                        <button (click)="guardarCambios()">Guardar</button>
-                        <button (click)="cancelarEdicion()">Cancelar</button>
-                      </div>
-                    </div>
-                  </div> -->
-                  
-                  
+                      <app-user-actions 
+                          [isOwn]="isOwnProfile" 
+                          [userId]="userId" 
+                          (editProfile)="handleEditProfile($event)"
+                          (save)="handleSave($event)"
+                      ></app-user-actions>
+                  </div>
+              </div>
                   
                 <!-- Sidebar -->
                 @if (isOwnProfile) {
@@ -113,10 +85,6 @@
                         <p>Ho sentim, no hem pogut trobar l'usuari que estàs buscant.</p>
                     </div>
                 </div>
-                
-                <!-- Posts Section -->
-            
-                
             </div>
         </div>
     </div>
