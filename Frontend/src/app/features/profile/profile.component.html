@@ -8,33 +8,41 @@
                 <div class="profile-header">
                   <!-- Cover Photo Section -->
                   <div class="cover-photo">
-                      <img [src]="user.bannerImage.url" alt="Foto de portada">
-                        <button *ngIf="editandoPerfil" class="edit-banner-btn">Canviar portada</button>
+                      <img id="banner" [src]="user.bannerImage.url" alt="Foto de portada">
+                        <button *ngIf="editandoPerfil" class="edit-banner-btn"  (click)="bannerInput.click()">Canviar portada</button>
+                        <input hidden type="file" name="bannerImage" id="bannerImage" #bannerInput>
                   </div>
               
                   <!-- Profile Picture Section -->
                   <div class="profile-pic">
                       <img [src]="user.profileImage?.url" alt="Foto de perfil de {{ user.username }}">
-                        <button *ngIf="editandoPerfil" class="edit-profile-pic-btn">
+                        <button *ngIf="editandoPerfil" class="edit-profile-pic-btn" (click)="profileInput.click()">
                           <i class="fas fa-edit"></i>
                         </button>
+                        <input hidden type="file" name="profileImage" id="profileImage" #profileInput>
                   </div>
               
                   <!-- Profile Info Section -->
                   <div class="profile-info">
-                      <div 
-                          class="username" 
+                      <div class="profile-username">
+                        <div
+                        [ngClass]="{'edit-username': editandoPerfil, 'username': !editandoPerfil}" 
                           [attr.contenteditable]="editandoPerfil" 
                           (input)="limitarTexto($event, 55)"
-                      >
+                        >
                           {{ user.username }}
                       </div>
-                      <div 
-                          class="bio" 
+                      <i [ngClass]="{'fas fa-pencil': editandoPerfil, '': !editandoPerfil}"></i>
+                      </div>
+                      <div class="profile-bio">
+                        <div 
+                          [ngClass]="{'edit-bio': editandoPerfil, 'bio': !editandoPerfil}"
                           [attr.contenteditable]="editandoPerfil" 
-                          (input)="limitarTexto($event, 300)"
-                      >
-                          {{ user.bio }}
+                          (input)="limitarTexto($event, 150)"
+                        >
+                            {{ user.bio }}
+                        </div>
+                        <i [ngClass]="{'fas fa-pencil': editandoPerfil, '': !editandoPerfil}"></i>
                       </div>
                       <app-user-stats></app-user-stats>
                       <app-user-actions 
@@ -42,6 +50,7 @@
                           [userId]="userId" 
                           (editProfile)="handleEditProfile($event)"
                           (save)="handleSave($event)"
+                          [cancelarEdicion]="cancelar"
                       ></app-user-actions>
                   </div>
               </div>

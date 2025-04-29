@@ -8,6 +8,7 @@ import { HeaderStateService } from '../../core/services/header-state.service';
 import { UserService } from '../../core/services/user.service';
 import { FormsModule } from '@angular/forms';
 import { FriendsComponent } from '../../shared/components/friends/friends.component';
+import { urlencoded } from 'express';
 
 @Component({
   selector: 'app-profile',
@@ -25,6 +26,8 @@ export class ProfileComponent {
   public username: string | null = null;
   public mostrarConfirmacion = false;
 
+  public cancelar: boolean = false;
+
   public originalUser: any;
   noPosts: boolean = false; 
 
@@ -34,7 +37,9 @@ export class ProfileComponent {
   // Propiedades temporales para los datos editados
   datosEditados = {
     username: '',
-    bio: ''
+    bio: '',
+    profileImage: null as  File | null,
+    bannerImage: null as File | null 
   };
 
   constructor(private route: ActivatedRoute, private headerStateService: HeaderStateService, private userService: UserService,  private cdr: ChangeDetectorRef) {}
@@ -48,13 +53,6 @@ export class ProfileComponent {
   ngOnDestroy() {
     this.userId = null;
   }
-
-  // public handleChildEvent(value: boolean): void {
-  //   console.log('Valor recibido del hijo:', value);
-  //   this.editandoPerfil = value; // Actualiza el estado local
-  // }
-
-
 
 private loadProfile() {
   this.route.paramMap.subscribe(params => {
@@ -106,6 +104,7 @@ public editableUser: any = {
 };
 
 public handleEditProfile(event: boolean) {
+  console.log(event);
   if (event) {
     this.editandoPerfil = true;
     this.editableUser = {
@@ -115,34 +114,57 @@ public handleEditProfile(event: boolean) {
       bannerImage: { url: this.user.bannerImage?.url || '' }
     };
   } else {
-    this.cancelarEdicion();
+    this.editableUser = {
+      username: this.user.username,
+      bio: this.user.bio,
+      profileImage: { url: this.user.profileImage?.url || ''},
+      bannerImage: { url: this.user.bannerImage?.url || ''}
+    };
+    // Capturar los nuevos valores de los inputs
+    const newUsername = document.querySelector('div.edit-username') as HTMLDivElement;
+    const username = newUsername.innerText;
+    if (this.editableUser.username === username) {
+      this.editandoPerfil = false;
+      
+
+        this.cancelar = true;
+        setTimeout(() => {
+          this.cancelar = false;
+        }, 100);
+      
+    } else if (this.editableUser.username != username) {
+      this.mostrarConfirmacion = true;
+    }
+   
   }
 }
 
 public handleSave(event: boolean) {
-  // Verifica si hay cambios antes de guardar
+  this.editandoPerfil = false;
   if (this.hayCambios()) {
-    // this.userService.updateUser(this.editableUser).subscribe({
-    //   next: (response) => {
-    //     this.user = { ...this.user, ...this.editableUser };
-    //     this.originalUser = structuredClone(this.user); 
-    //     this.editandoPerfil = false;
-    //     this.cambiosRealizados = false; // Resetea el estado de cambios realizados
-    //     console.log('Cambios guardados:', response);
-    //   },
-    //   error: (err) => {
-    //     console.error('Error al guardar cambios:', err);
-    //   }
-    // });
+    const formData = new FormData();
+    formData.append('username', this.datosEditados.username);
+    formData.append('bio', this.datosEditados.bio);
+    if (this.datosEditados.profileImage) {
+      formData.append('profileImage', this.datosEditados.profileImage);
+    }
+    if (this.datosEditados.bannerImage) {
+      formData.append('bannerImage', this.datosEditados.bannerImage);
+    }
+  
+    this.userService.updateUser(formData).subscribe({
+      next: (response) => {
+        window.location.reload();
+      },
+      error: (err) => {
+        console.error('Error al guardar cambios:', err);
+      }
+    });
   }
-  console.log('Guardando cambios...');
 }
 
 
 seleccionarNuevaImagen(tipo: 'banner' | 'profile') {
-  // Aquí podrías abrir un input tipo file o lanzar un modal para seleccionar imagen
-  console.log(`Seleccionar nueva imagen para: ${tipo}`);
-  // Seleccionar el input de file 
   const input = document.querySelector(`#image`) as HTMLInputElement;
   if (input) {
     input.click();
@@ -150,39 +172,54 @@ seleccionarNuevaImagen(tipo: 'banner' | 'profile') {
 }
 
 
-
-
-
-
-
-guardarCambios() {
-  this.user = { ...this.user, ...this.editableUser };
-  this.editandoPerfil = false;
-}
-
-cancelarEdicion() {
-  if (this.hayCambios()) {
-    this.mostrarConfirmacion = true;
-  } else {
-    this.editandoPerfil = false;
-  }
-}
-
-
-
 confirmarCancelar() {
-  this.user = structuredClone(this.originalUser);
-  this.editandoPerfil = false;
+  const username = document.querySelector('div.edit-username') as HTMLDivElement;
+  username.innerHTML = this.editableUser.username;
   this.mostrarConfirmacion = false;
+  this.editandoPerfil = false;
+  this.cancelar = true;
+
+  setTimeout(() => {
+    this.cancelar = false;
+  }, 100);
+  
+  // this.user = structuredClone(this.originalUser);
+  // this.editandoPerfil = false;
+  // this.mostrarConfirmacion = false;
 }
 
 
 hayCambios(): boolean {
+  // Captura los nuevos valores de los inputs
+  const newUsername = document.querySelector('div.edit-username') as HTMLDivElement;
+  const newBio = document.querySelector('div.edit-bio') as HTMLDivElement;
+  const newProfileImageInput = document.querySelector('#profileImage') as HTMLInputElement;
+  
+  const newBannerImageInput = document.querySelector('#bannerImage') as HTMLInputElement;
+  const username = newUsername.innerText;
+  const bio = newBio.innerText;
+  const newProfileImage = newProfileImageInput?.files?.[0] || null;
+  const newBannerImage = newBannerImageInput?.files?.[0] || null;
+  if (
+    this.user.username !== username ||
+    this.user.bio !== bio ||
+    newProfileImage !== null ||
+    newBannerImage !== null
+  ){
+    // Guarda los cambios realizados en el perfil
+    this.datosEditados = {
+      username: username,
+      bio: bio,
+      profileImage: newProfileImage,
+      bannerImage: newBannerImage
+    };
+    
+  };
   return (
-    this.user.username !== this.originalUser.username ||
-    this.user.bio !== this.originalUser.bio ||
-    this.user.profileImage?.url !== this.originalUser.profileImage?.url ||
-    this.user.bannerImage?.url !== this.originalUser.bannerImage?.url
+    this.user.username !== username ||
+    this.user.bio !== bio ||
+    newProfileImage !== null ||
+    newBannerImage !== null
   );
 }
 

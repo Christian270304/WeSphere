@@ -151,6 +151,10 @@ export class UserService {
     return this.http.post<any>(`${this.apiUrl}/auth/chat/create`, { userId }, { withCredentials: true });
   }
 
+  updateUser( data: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/auth/user/edit`, data, { withCredentials: true });
+  }
+
 }
 
 

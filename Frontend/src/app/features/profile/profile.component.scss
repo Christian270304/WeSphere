@@ -237,21 +237,21 @@ header {
 
 
 
-.bio[contenteditable="true"] {
-    max-height: 100px; /* o lo que consideres */
-    overflow-y: auto;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
+// .bio[contenteditable="true"] {
+//     max-height: 100px; /* o lo que consideres */
+//     overflow-y: auto;
+//     white-space: pre-wrap;
+//     word-break: break-word;
+//   }
   
-  .username[contenteditable="true"],
-  .bio[contenteditable="true"] {
-    border: 1px dashed rgba(255, 255, 255, 0.4);
-    padding: 4px 6px;
-    border-radius: 4px;
-    cursor: text;
-    background-color: rgba(255, 255, 255, 0.05);
-  }
+//   .username[contenteditable="true"],
+//   .bio[contenteditable="true"] {
+//     border: 1px dashed rgba(255, 255, 255, 0.4);
+//     padding: 4px 6px;
+//     border-radius: 4px;
+//     cursor: text;
+//     background-color: rgba(255, 255, 255, 0.05);
+//   }
 
 
   .modal-overlay {
@@ -427,3 +427,29 @@ header {
  .edit-profile-pic-btn {
     display: block;
 }
+
+
+
+.profile-username {
+    display: flex;
+    gap: 20px;
+}
+
+.profile-bio {
+    display: flex;
+    gap: 20px;
+}
+
+.edit-username {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.edit-bio {
+    font-size: 0.95rem;
+    color: var(--gray);
+    margin-bottom: 15px;
+}
+
+

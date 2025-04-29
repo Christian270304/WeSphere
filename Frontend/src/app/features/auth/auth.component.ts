@@ -26,14 +26,16 @@ export class AuthComponent {
 
   constructor(private authService: AuthService, private router: Router, private errorService: ErrorService, private socketService: SocketService) {}
 
-  ngOnInit(): void {
-         
-      this.authService.isAuthenticated$.subscribe((isAuthenticated) => {
-        if (isAuthenticated) {
-          this.router.navigate(['/home']); // Redirige al home si está autenticado
-        }
-      });
-      
+  ngOnInit(): void { 
+    this.authService.checkAuthentication().subscribe((res) => {
+      this.isAuthenticated = res;
+      if (this.isAuthenticated) {
+        this.isLoading = true;
+        setTimeout(() => {
+          this.router.navigate(['/home']);
+        }, 1000);
+      }  
+    });
   }
 
   login() {
