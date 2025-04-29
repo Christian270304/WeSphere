@@ -7,6 +7,7 @@ import { PostController } from './PostController.js';
 import { User, Message, Follower, Media, Chat, ChatMember } from '../models/models.js';
 import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, getNotificationsModel, getSugerenciasModel } from '../models/AuthQueries.js';
 import { io } from '../server.js'
+import { Op, sequelize } from "../config/db.js";
 
 dotenv.config();
 
@@ -456,26 +457,43 @@ export class AuthController {
       const profileImage = req.files?.profileImage?.[0];
       const bannerImage = req.files?.bannerImage?.[0];
 
-      let profileImageId = null;
-      let bannerImageId = null;
+      const currentUser = await User.findOne({ where: { id: userId } });
+      if (!currentUser) {
+        return res.status(404).json({ error: 'Usuario no encontrado.' });
+      }
+
+      let profileImageId = currentUser.profile_picture; 
+      let bannerImageId = currentUser.banner;
 
       if (profileImage) {
         const profileImageBuffer = profileImage.buffer;
-        profileImageId = await PostController.uploadImage(profileImageBuffer, 'profile')
+        const profileImageHash = await getHash(profileImageBuffer);
+        const existingImage = await Media.findOne({ where: { hash: profileImageHash } });
+        if (existingImage) {
+          profileImageId = existingImage.id; 
+        } else {
+          profileImageId = await PostController.uploadImage(profileImageBuffer, 'profile')
+        }
       }
 
       if (bannerImage){
         const bannerImageBuffer = bannerImage.buffer;
         bannerImageId = await PostController.uploadImage(bannerImageBuffer, 'profile')
       }
-
   
-      const updatedUser = await User.update(
-        { username, bio, profileImageId, bannerImageId },
-        { where: { id: userId }, returning: true }
+      const [rowsUpdated] = await User.update(
+        { username, bio, profile_picture: profileImageId, banner: bannerImageId },
+        { where: { id: userId } }
       );
+      
+      if (rowsUpdated === 0) {
+        return res.status(404).json({ error: 'Usuario no encontrado.' });
+      }
+      
+      // Obtener el usuario actualizado
+      const updatedUser = await User.findOne({ where: { id: userId } });
   
-      res.status(200).json({ message: 'Perfil actualizado correctamente.', user: updatedUser[1][0] });
+      res.status(200).json({ message: 'Perfil actualizado correctamente.', user: updatedUser });
     } catch (error) {
       console.error('Error al actualizar el perfil:', error);
       res.status(500).json({ error: 'Error al actualizar el perfil.' });
@@ -484,4 +502,13 @@ export class AuthController {
 
 
 
+}
+
+
+function getHash(buffer) {
+  return new Promise((resolve, reject) => {
+      const hash = crypto.createHash('sha256');
+      hash.update(buffer);
+      resolve(hash.digest('hex'));
+  });
 }

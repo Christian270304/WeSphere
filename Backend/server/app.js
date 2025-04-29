@@ -7,12 +7,7 @@ import postRoutes from './routes/post.route.js';
 import cookieParser from 'cookie-parser';
 import passport from './config/passport-google.js';
 import session from 'express-session';
-import multer from 'multer';
 
-const storage = multer.memoryStorage();
-const upload = multer({
-    storage
-});
 
 
 dotenv.config();
@@ -52,5 +47,5 @@ app.use('/api/posts', postRoutes);
   console.log("✅ Base de datos sincronizada");
 })();
 
-export default { app, upload };
+export default app;
 

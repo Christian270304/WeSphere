@@ -1,7 +1,12 @@
 import express from 'express';
 import { PostController } from '../controllers/PostController.js';
 import { authMiddleware } from "../middlewares/authMiddleware.js";
-import upload from '../app.js'; 
+import multer from 'multer';
+
+const storage = multer.memoryStorage();
+const upload = multer({
+    storage
+});
 
 const uploadMiddleware = upload.fields([
     { name: 'image', maxCount: 1 }, 

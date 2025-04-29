@@ -4,7 +4,12 @@ import express from "express";
 import passport from "../config/passport-reddit.js";
 import "../config/passport-discord.js";
 import "../config/passport-google.js";
-import upload from '../app.js'; 
+import multer from 'multer';
+
+const storage = multer.memoryStorage();
+const upload = multer({
+    storage
+});
 
 import { AuthController } from "../controllers/AuthController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
@@ -29,7 +34,7 @@ router.post('/newMessage', authMiddleware, AuthController.newMessage);
 router.post('/users/:user_id/follow', authMiddleware, AuthController.toggleFollow);
 router.post('/chat/create', authMiddleware, AuthController.createChat);
 
-router.put('/user/:user_id', upload.fields([
+router.put('/user/edit', upload.fields([
   { name: 'profileImage', maxCount: 1 },
   { name: 'bannerImage', maxCount: 1 }
 ]), authMiddleware, AuthController.updateUser);
