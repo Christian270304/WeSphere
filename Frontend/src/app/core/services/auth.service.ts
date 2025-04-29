@@ -28,7 +28,6 @@ export class AuthService {
     
 
     constructor(private http: HttpClient, private router: Router) {
-      this.checkAuthentication(); 
     }
   
     /**
@@ -36,7 +35,10 @@ export class AuthService {
      */
     login(credentials: { username: string; password: string }): Observable<any> {
       return this.http.post(`${this.apiUrl}/auth/login`, credentials, {withCredentials: true}).pipe(
-        tap(() => this.isAuthenticatedSubject.next(true))
+        tap(() => {
+          this.isAuthenticatedSubject.next(true);
+          this.router.navigate(['/home']);
+        })
       );
     }
 
@@ -96,14 +98,19 @@ export class AuthService {
     /**
      * Verifica si el usuario está autenticado llamando al backend.
      */
-    private checkAuthentication(): void {
-      this.http.get<{ authenticated: boolean }>(`${this.apiUrl}/auth/check`, { withCredentials: true })
-        .subscribe((response) => {
-            console.log("Respuesta de autenticacion: ", response);
-            this.isAuthenticatedSubject.next(response.authenticated);
-     
-        });
+    public checkAuthentication(): Observable<boolean> {
+      return this.http.get<{ authenticated: boolean }>(`${this.apiUrl}/auth/check`, { withCredentials: true }).pipe(
+        tap(response => {
+          this.isAuthenticatedSubject.next(response.authenticated);
+        }),
+        map(response => response.authenticated),
+        catchError(() => {
+          this.isAuthenticatedSubject.next(false);
+          return of(false);
+        })
+      );
     }
+    
   
     /**
      * Devuelve el estado actual de autenticación.
