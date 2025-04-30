@@ -6,10 +6,11 @@ import { ErrorService } from '../../core/services/error.service';
 import { ErrorMessageComponent } from '../../shared/components/error-message/error-message.component';
 import { HomeComponent } from '../home/home.component';
 import { SocketService } from '../../core/services/socket.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-auth',
-  imports: [FormsModule, ErrorMessageComponent],
+  imports: [FormsModule, ErrorMessageComponent, CommonModule],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.scss'
 })
@@ -23,6 +24,8 @@ export class AuthComponent {
   email: string = '';
   Repassword: string = '';
   confirmPassword: string = '';
+  passwordVisible: boolean = false;
+  passwordVisibleConfirm: boolean = false;
 
   constructor(private authService: AuthService, private router: Router, private errorService: ErrorService, private socketService: SocketService) {}
 
@@ -108,6 +111,13 @@ export class AuthComponent {
     this.isLoginFormVisible = true;
   }
 
+  togglePasswordVisibility(): void {
+    this.passwordVisible = !this.passwordVisible;
+  }
+
+  togglePasswordVisibilityConfirm(): void {
+    this.passwordVisibleConfirm = !this.passwordVisibleConfirm;
+  }
 
   
 }
