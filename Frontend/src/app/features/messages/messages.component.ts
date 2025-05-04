@@ -37,6 +37,7 @@ export class MessagesComponent implements OnInit {
   public newMessage: string = '';
 
   private pendingUserId: number | null = null;
+  private isSendingMessage: boolean = false;
 
   constructor(
     private userService: UserService,
@@ -62,6 +63,7 @@ export class MessagesComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.chatSocketService.leaveChat(this.selectedChatId!);
+    this.socketService.off('receive_message');
   }
 
   // private initializeSocketConnection(): void {
@@ -85,7 +87,8 @@ export class MessagesComponent implements OnInit {
   }
 
   private listenForIncomingMessages(): void {
-    this.socketService.on('receive_message',(msg) => {
+    console.log('Registrando evento receive_message');
+    this.socketService.on('receive_message', (msg) => {
       console.log("Mensaje recibido: ", msg);
       if (msg && msg.chat_id === this.selectedChatId && msg.userId !== this.userId) {
         this.messages.push(msg);
@@ -135,25 +138,36 @@ export class MessagesComponent implements OnInit {
   }
 
   public sendMessage(): void {
-    if (!this.newMessage.trim() || !this.selectedChatId || !this.userId || !this.otherUser) return;
-
+    if (this.isSendingMessage) return;
+    if ( !this.newMessage.trim() || !this.selectedChatId || !this.userId || !this.otherUser) return;
+  
+    this.isSendingMessage = true;
+    
     const messageData = {
       chat_id: this.selectedChatId,
       userId: this.userId,
       content: this.newMessage,
     };
-
-    this.userService.sendMessage(messageData).subscribe((msg) => {
-      console.log("Mensaje enviado user: ", msg);
-      this.newMessage = '';
-      this.scrollToBottom();
-
-      const message = {
-        type: 'message',
-        content: msg.content,
-      }
-      this.chatSocketService.sendNotification(this.otherUser, message);
-    });
+    console.log("Mensaje a enviar: ", messageData);
+    if (this.isSendingMessage) {
+      this.userService.sendMessageService(messageData).subscribe((msg) => {
+        if (msg !== null) {
+          console.log("Mensaje enviado user: ", msg);
+        this.newMessage = '';
+        this.scrollToBottom();
+    
+        const message = {
+          type: 'message',
+          content: msg.content,
+        };
+        this.chatSocketService.sendNotification(this.userId! ,this.otherUser, message);
+        
+        this.isSendingMessage = false;
+        }
+      }, () => {
+        this.isSendingMessage = false;
+      });
+    }
   }
 
   public closeChat(chatId: number): void {

@@ -26,7 +26,26 @@
                   <span>{{ unreadCount }} Notificaciones</span>
                   <ul>
                     <li *ngFor="let notif of notifications">
-                      {{ notif.message }}
+                      @if (notif.type === 'comment') {
+                        <i class="fas fa-comment"></i>
+                      } @else if (notif.type === 'like') {
+                        <i class="fas fa-thumbs-up"></i>
+                      } @else if (notif.type === 'follow') {
+                        <i class="fas fa-user-plus"></i>
+                      } @else if (notif.type === 'message') {
+            
+                        <i class="fas fa-comment-dots"></i>
+                      } @else if (notif.type === 'post') {
+                        <i class="fas fa-pencil-alt"></i>
+                      } @else if (notif.type === 'mention') {
+                        <i class="fas fa-at"></i>
+                      } @else if (notif.type === 'tag') {
+                        <i class="fas fa-tag"></i>
+                      }
+                       <!-- {{ notif.sender }} {{ notif.action }} a la publicació "{{ notif.postTitle }}" el {{ notif.date | date:'short' }}  -->
+
+                      
+                      {{ notif.content }}
                     </li>
                   </ul>
                 </div>
