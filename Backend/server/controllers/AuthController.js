@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import { PostController } from './PostController.js';
 
 import { User, Message, Follower, Media, Chat, ChatMember } from '../models/models.js';
-import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, getNotificationsModel, getSugerenciasModel } from '../models/AuthQueries.js';
+import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, getNotificationsModel, getSugerenciasModel, saveNotificationModel } from '../models/AuthQueries.js';
 import { io } from '../server.js'
 import { Op, sequelize } from "../config/db.js";
 
@@ -192,7 +192,7 @@ export class AuthController {
       const newMessage = await newMessageModel(id, chat_id, content); 
       if (!newMessage) return res.status(404).json({ msg: "Mensaje no creado" });
 
-      // console.log("Nuevo mensaje: ", newMessage);
+      console.log("Nuevo mensaje: ", newMessage);
 
       io.to(`chat:${chat_id}`).emit('receive_message', newMessage);
 
@@ -499,6 +499,18 @@ export class AuthController {
       res.status(500).json({ error: 'Error al actualizar el perfil.' });
     }
   };
+
+  static async saveNotification(userId, otherUserId, notification) {
+    try {
+  
+      const newNotification = await saveNotificationModel( userId, otherUserId, notification)
+  
+      return newNotification;
+    } catch (error) {
+      console.error('Error al guardar la notificación:', error);
+      throw error; 
+    }
+  }
 
 
 
