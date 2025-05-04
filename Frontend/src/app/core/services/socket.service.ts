@@ -47,6 +47,11 @@ export class SocketService {
     }
   }
 
+  off(event: string): void {
+    console.log(`Eliminando listener para el evento: ${event}`);
+    this.socket!.off(event);
+  }
+
   disconnect(): void {
     if (this.socket) {
       this.socket.disconnect();

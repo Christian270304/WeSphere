@@ -25,8 +25,8 @@ export class ChatSocketService {
     this.socketService.emit('send_message', data);
   }
 
-  sendNotification(userId: number, notification: { type: string; content: string; referenceId?: number }) {
-    this.socketService.emit('send_notification', { userId, notification });
+  sendNotification(userId: number, otherUserId: number, notification: { type: string; content: string; }) {
+    this.socketService.emit('send_notification', { userId, otherUserId, notification });
   }
 
   onMessage(callback: (msg: any) => void) {

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -117,18 +118,20 @@ export class UserService {
       return this.chats$;
   }
 
-  sendMessage (content: {chat_id: number, content: string, userId: number}) {
-    this.http.post<any>(`${this.apiUrl}/auth/newMessage`, content, {withCredentials: true}).subscribe(
-       (response) => {
-        this.newMessageSubject.next(response.newMessage);
-        // const currentMessages = this.messagesSubject.value || [];
-        // this.messagesSubject.next([...currentMessages]);
-      },
-       (error) => {
+  sendMessageService(content: { chat_id: number; content: string; userId: number }): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/newMessage`, content, { withCredentials: true }).pipe(
+      tap((response) => {
+        if (response && response.newMessage) {
+          this.newMessageSubject.next(response.newMessage); // Emitir solo el nuevo mensaje
+        } else {
+          console.error('El backend devolvió una respuesta nula o inválida.');
+        }
+      }),
+      catchError((error) => {
         console.error('Error al enviar el mensaje:', error);
-      }
+        return of(null); // Devuelve un valor nulo en caso de error
+      })
     );
-    return this.newMessage$;
   }
 
   getFollowStatus(userId: number): Observable<any> {
