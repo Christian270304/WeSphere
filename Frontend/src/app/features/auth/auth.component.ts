@@ -92,15 +92,39 @@ export class AuthComponent {
   }
   
   loginWithGoogle () {
-    this.authService.loginWithOAuth('google');
+    this.authService.loginWithOAuth('google').then((success) => {
+      if (success) {
+        this.isAuthenticated = true;
+        this.socketService.connect(); 
+        this.router.navigate(['/home']);
+      } else {
+        this.errorService.setError('Error al iniciar sesión con Google.');
+      }
+    });
   }
 
   loginWithReddit () {
-    this.authService.loginWithOAuth('reddit');
+    this.authService.loginWithOAuth('reddit').then((success) => {
+      if (success) {
+        this.isAuthenticated = true;
+        this.socketService.connect(); 
+        this.router.navigate(['/home']);
+      } else {
+        this.errorService.setError('Error al iniciar sesión con Reddit.');
+      }
+    });;
   }
 
   loginWithDiscord () {
-    this.authService.loginWithOAuth('discord');
+    this.authService.loginWithOAuth('discord').then((success) => {
+      if (success) {
+        this.isAuthenticated = true;
+        this.socketService.connect(); 
+        this.router.navigate(['/home']);
+      } else {
+        this.errorService.setError('Error al iniciar sesión con Discord.');
+      }
+    });;
   }
 
   toggleRegisterForm(): void {
