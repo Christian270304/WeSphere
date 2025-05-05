@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { SocketService } from './socket.service';
-import { Socket } from 'socket.io-client';
 
 @Injectable({
   providedIn: 'root'

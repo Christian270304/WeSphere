@@ -5,6 +5,7 @@ import { map, catchError, tap } from 'rxjs/operators';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
+import { SocketService } from './socket.service';
 
 const authConfig: AuthConfig = {
     issuer: 'https://accounts.google.com', 
@@ -48,38 +49,54 @@ export class AuthService {
       );
     }
 
-    loginWithOAuth (oauth = '') {
-      const width = 500;
-      const height = 600;
-
-      const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-
-      if (isMobile) {
-        window.location.href = `${this.apiUrl}/auth/${oauth}`;
-        return;
-      }
-
-      const left = window.screenX + (window.innerWidth - width) / 2;
-      const top = window.screenY + (window.innerHeight - height) / 2;
-
-      const popup = window.open(
-        `${this.apiUrl}/auth/${oauth}`,
-        '_blank',
-        `width=${width},height=${height},top=${top},left=${left}`
-      );
+    loginWithOAuth(oauth: string): Promise<boolean> {
+      return new Promise((resolve, reject) => {
+        const width = 500;
+        const height = 600;
     
-      const listener = (event: MessageEvent) => {
-        // Seguridad: verifica origen
-        if (event.origin !== 'http://localhost:3000') return;
+        const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
     
-        if (event.data.success) {
-          this.isAuthenticatedSubject.next(true); 
-          this.router.navigate(['/home']);
-          window.removeEventListener('message', listener); 
+        if (isMobile) {
+          window.location.href = `${this.apiUrl}/auth/${oauth}`;
+          resolve(false); 
+          return;
         }
-      };
     
-      window.addEventListener('message', listener);
+        const left = window.screenX + (window.innerWidth - width) / 2;
+        const top = window.screenY + (window.innerHeight - height) / 2;
+    
+        const popup = window.open(
+          `${this.apiUrl}/auth/${oauth}`,
+          '_blank',
+          `width=${width},height=${height},top=${top},left=${left}`
+        );
+    
+        const listener = (event: MessageEvent) => {
+          // Seguridad: verifica origen
+          if (event.origin !== 'http://localhost:3000') return;
+    
+          if (event.data.success) {
+            this.isAuthenticatedSubject.next(true);
+            this.router.navigate(['/home']);
+            resolve(true); 
+          } else {
+            resolve(false); 
+          }
+    
+          window.removeEventListener('message', listener);
+          popup?.close();
+        };
+    
+        window.addEventListener('message', listener);
+    
+        const interval = setInterval(() => {
+          if (popup?.closed) {
+            clearInterval(interval);
+            window.removeEventListener('message', listener);
+            resolve(false); 
+          }
+        }, 500);
+      });
     }
 
     /**

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { AuthService } from './auth.service';
+import { ChatSocketService } from './chat-socket.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,9 @@ export class SocketService {
       });
 
       this.socket.on('connect', () => {
+        userId.subscribe((id: number) => {
+          this.socket!.emit('join_user', id)
+        });
         console.log('Conectado al servidor de Socket.IO');
       });
 
