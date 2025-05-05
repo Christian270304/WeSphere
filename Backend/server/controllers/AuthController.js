@@ -292,21 +292,21 @@ export class AuthController {
 
   static async toggleFollow(req, res) {
     try {
-      const { id: follower_id } = req.user; // ID del usuario actual
-      const { user_id: following_id } = req.params; // ID del usuario a seguir/dejar de seguir
-  
-      // Verificar si ya sigue al usuario
+      const { id: follower_id } = req.user; 
+      const { user_id: following_id } = req.params; 
+
       const existingFollow = await Follower.findOne({
         where: { follower_id, following_id }
       });
   
       if (existingFollow) {
-        // Si ya lo sigue, eliminar la relación
         await existingFollow.destroy();
         return res.json({ following: false });
       } else {
-        // Si no lo sigue, crear la relación
         await Follower.create({ follower_id, following_id });
+        const user = await User.findOne({ where: { id: follower_id } });
+        const notification = { type: 'follow', content: 'te ha seguido', user };
+        io.to(`user:${following_id}`).emit('receive_notification', { follower_id, notification });
         return res.json({ following: true });
       }
     } catch (error) {
@@ -317,8 +317,8 @@ export class AuthController {
 
   static async getFollowStatus(req, res) {
     try {
-      const { id: follower_id } = req.user; // ID del usuario actual
-      const { user_id: following_id } = req.params; // ID del usuario del perfil
+      const { id: follower_id } = req.user; 
+      const { user_id: following_id } = req.params; 
   
       const isFollowing = await Follower.findOne({
         where: { follower_id, following_id }
@@ -398,20 +398,17 @@ export class AuthController {
       });
   
       if (existingChat) {
-        // Si ya existe, devolver el chat_id y el id del otro usuario
         return res.json({
           chat_id: existingChat.chat_id,
           other_user_id: otherUserId
         });
       }
   
-      // Crear el nuevo chat
       const newChat = await Chat.create({
         is_group: false,
         created_at: new Date(),
       });
 
-      // Crear el chat memebers
       const chatMembers = await ChatMember.create({
         chat_id: newChat.id,
         user_id: userId,
@@ -447,8 +444,7 @@ export class AuthController {
     try {
       const { id: userId } = req.user; 
       const { username, bio } = req.body;
-  
-      // Verificar si el username ya existe (excepto para el usuario actual)
+
       const existingUser = await User.findOne({ where: { username, id: { [Op.ne]: userId } } });
       if (existingUser) {
         return res.status(400).json({ error: 'El nombre de usuario ya existe.' });

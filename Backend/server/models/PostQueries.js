@@ -1,5 +1,6 @@
-import { Post, User, Media, Follower, Like, Comment, SavedPosts } from './models.js';
+import { Post, User, Media, Follower, Like, Comment, SavedPosts, Notificacion } from './models.js';
 import { Op , sequelize } from "../config/db.js";
+import { io } from '../server.js'
 
 // Función para obtener posts recomendados
 export const getRecommendedPosts = async (type = 'recomendado', user_id) => {
@@ -168,6 +169,34 @@ const followedUsers = await Follower.findAll({
     
         // Incrementar el contador de comentarios en el post
         await Post.increment('comments_count', { where: { id: post_id } });
+
+        const post = await Post.findByPk(post_id, { include: [{ model: User, as: 'user' }] });
+        const userId = post.user_id;
+        const existingNotification = await Notificacion.findOne({
+          where: {
+            type: 'comment',
+            user_id: userId,
+            reference_id: post_id 
+          }
+        });
+
+        if (!existingNotification) {
+          const user = await User.findByPk(user_id);
+            const notification = {
+            type: 'comment',
+            content: `L'usuari ${user.username} ha comentat en una de les teves publicacions.`,
+            };
+          const newNotification = await Notificacion.create({
+            user_id: user.id,
+            type: 'comment',
+            content: `L'usuari ${user.username} ha comentat la teva publicació`,
+            reference_id: post_id,
+            is_read: false,
+            created_at: new Date(),
+          })
+          io.to(`user:${userId}`).emit('receive_notification', { userId: user_id, notification });
+        }
+
         
         return comment;
     } catch (error) {
