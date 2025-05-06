@@ -1,10 +1,11 @@
 .sidebar-card {
-    background-color: white;
+    background-color: var(--white);
     border-radius: var(--border-radius);
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 .sidebar-header {
+    color: var(--text);
     padding: 15px 20px;
     border-bottom: 1px solid var(--light-gray);
     font-weight: 600;
@@ -70,6 +71,7 @@
 }
 
 .suggestion-name {
+    color: var(--text);
     font-weight: 600;
     margin-bottom: 3px;
 }
