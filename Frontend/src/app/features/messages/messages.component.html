@@ -3,7 +3,7 @@
         <div class="main-content">
             <!-- Sidebar -->
             <div class="sidebar">
-                <h3 style="font-weight: 600; margin-bottom: 20px;">Chats</h3>
+                <h3>Chats</h3>
                 <div class="chat-list">
                     @for (chat of chats; track $index) {
                         <div [class.active]="chat.chat_id === selectedChatId" class="chat-item" id="{{ chat.chat_id }}" (click)="selectChat(chat.chat_id)">
@@ -23,7 +23,7 @@
                 @if (selectedChatId) {
                     <div class="chat-header">
                         <div class="chat-header-avatar">
-                            <img [src]="profileUser.profileImage.url" alt="María García">
+                            <img [src]="profileUser.profileImage.url" alt="Foto de perfil de {{ profileUser.username }}">
                         </div>
                         <div class="chat-header-info">
                             <div class="chat-header-name">{{ profileUser.username }}</div>
