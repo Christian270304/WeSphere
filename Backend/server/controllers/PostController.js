@@ -58,9 +58,11 @@ export class PostController {
         try {
           const { id } = req.user;
           const { type } = req.params;
-        const posts = await getRecommendedPosts(type,id);
-    
-        res.json({ posts });
+          const limit = parseInt(req.query.limit) || 20;
+          const offset = parseInt(req.query.offset) || 0;
+          const posts = await getRecommendedPosts(type, id, limit, offset);
+      
+          res.json({ posts });
         } catch (err) {
         res.status(500).json({ error: err.message });
         }
