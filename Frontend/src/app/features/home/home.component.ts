@@ -1,4 +1,8 @@
-import { Component } from '@angular/core';
+import { Component,
+  ElementRef,
+  AfterViewInit,
+  ViewChild,
+  OnDestroy } from '@angular/core';
 import { AuthService } from '../../core/services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { PostsComponent } from '../../shared/components/posts/posts.component';
@@ -7,33 +11,45 @@ import { HttpClient } from '@angular/common/http';
 import { HeaderStateService } from '../../core/services/header-state.service';
 import { UserService } from '../../core/services/user.service';
 import { SuggestionComponent } from '../../shared/components/suggestion/suggestion.component';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-home',
-  imports: [PostsComponent, RouterModule, SuggestionComponent],
+  imports: [PostsComponent, RouterModule, SuggestionComponent, NavbarComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent {
+export class HomeComponent implements AfterViewInit, OnDestroy {
   private apiUrl = environment.apiUrl
   isAuthenticated = false; 
   liked = false; 
   likeCount = 150; 
   selectedImage = '';
+  cargarMasPosts = false;
   public placeholderText = '';
+  isLoading = false;
+  observer!: IntersectionObserver;
 
   public user: any = {}; 
 
   constructor (private http: HttpClient, private headerStateService: HeaderStateService, private userService: UserService) {}
 
-  
+  @ViewChild('observer', { static: false }) observerElement!: ElementRef;
+
+  ngAfterViewInit() {
+    this.setupIntersectionObserver();
+  }
+
+  ngOnDestroy() {
+    if (this.observer) this.observer.disconnect();
+  }
 
   ngOnInit() {
     this.headerStateService.setHideElements(false);
  
     this.userService.getUser().subscribe((user) => {
       this.user = user;
-      this.placeholderText = `¿Qué estás pensando, ${user.username}?`;
+      this.placeholderText = `Què estàs pensant, ${user.username}?`;
     });
   }
 
@@ -198,10 +214,22 @@ fullscreenBtn.addEventListener("click", toggleFullScreen);
     }
   }
 
-  // toggleLike() {
-  //   this.liked = !this.liked; // Cambia entre like y no like
-  //   this.likeCount += this.liked ? 1 : -1; // Suma o resta un like
-  // }
+  setupIntersectionObserver() {
+    this.observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !this.isLoading) {
+        this.isLoading = true; 
+        this.onLoadMorePosts();
+      }
+    });
 
+    if (this.observerElement) {
+      this.observer.observe(this.observerElement.nativeElement);
+    }
+  }
+  @ViewChild(PostsComponent) postsComponent!: PostsComponent;
+  onLoadMorePosts(): void {
+    this.postsComponent.loadPosts(); 
+    this.isLoading = false;
+  }
   
 }
