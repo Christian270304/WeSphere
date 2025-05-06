@@ -22,57 +22,6 @@ ul {
     grid-template-columns: 240px 1fr;
     gap: 20px;
 }
-/* Sidebar */
-.sidebar {
-position: sticky;
-top: 100px;
-height: calc(100vh - 100px);
-}
-
-.sidebar-menu {
-background-color: white;
-border-radius: var(--border-radius);
-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-overflow: hidden;
-}
-
-.menu-item {
-display: flex;
-align-items: center;
-padding: 15px 20px;
-transition: all 0.3s;
-}
-
-.menu-item.active {
-background-color: rgba(74, 107, 255, 0.1);
-color: var(--primary);
-border-left: 4px solid var(--primary);
-}
-
-.menu-item:hover {
-background-color: var(--light-gray);
-}
-
-.menu-item i {
-margin-right: 15px;
-font-size: 1.2rem;
-}
-
-.menu-item span {
-font-weight: 500;
-}
-
-.menu-section {
-padding: 20px;
-border-bottom: 1px solid var(--light-gray);
-}
-
-.menu-section h3 {
-font-size: 0.9rem;
-text-transform: uppercase;
-color: var(--gray);
-margin-bottom: 15px;
-}
 
 .community-list {
 margin-top: 10px;

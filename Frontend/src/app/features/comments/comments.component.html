@@ -21,9 +21,15 @@
                     <div class="post-text">
                         {{ post.description }}
                     </div>
-                    <div class="post-image">
-                        <img [src]="post.image.url" alt="Proyecto fotográfico">
-                    </div>
+                    @if (post.media.type == 'image') { 
+                        <div class="post-image" [ngClass]="{ 'no-image': post.media == null }">
+                          <img [src]="post.media?.url" alt="Post image" />
+                        </div>
+                      } @else if (post.media.type == 'video') {
+                        <div class="post-video" [ngClass]="{ 'no-image': post.media == null }">
+                          <video controls [src]="post.media?.url" alt="Post video"></video>
+                        </div>
+                      }
                 </div>
                 <!-- <div class="post-stats">
                     <div class="likes-comments">

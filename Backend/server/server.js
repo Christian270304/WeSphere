@@ -1,13 +1,14 @@
 import app from "./app.js";
 import { Server } from 'socket.io';
 import { createServer } from 'http';
+import { AuthController } from "./controllers/AuthController.js";
 
 const PORT = process.env.PORT || 3000;
 
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://wesphere.vercel.app",
+    origin: "http://localhost:4200",
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -46,9 +47,13 @@ io.on('connection', (socket) => {
     // io.to(`user:${otherUserId}`).emit('new_message_notification', { chatId, message });
   });
 
-  socket.on('send_notification', ({ userId, notification }) => {
-    console.log(`🔔 Enviando notificación al usuario ${userId}:`, notification);
-    io.to(`user:${userId}`).emit('receive_notification', notification);
+  socket.on('send_notification', ({ userId, otherUserId, notification }) => {
+    // Guardar la notificación en la base de datos 
+    const newNotification = AuthController.saveNotification(userId, otherUserId, notification);
+
+    if (!newNotification) return;
+    console.log(`🔔 El usuario ${userId} ha enviando una notificación al usuario ${otherUserId}:`, notification);
+    io.to(`user:${otherUserId}`).emit('receive_notification',{userId, notification});
   });
 
   socket.on('disconnect', () => {

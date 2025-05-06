@@ -53,11 +53,9 @@ export class CommentsComponent {
     const inputComment = document.querySelector('input[name="comment"]') as HTMLInputElement;
     let commentText = inputComment.value.trim(); 
     if (!commentText) {
-      alert('No puedes enviar un comentario vacío.');
       return;
     }
-    const user_id = localStorage.getItem('userId');
-    this.http.post(`${this.apiUrl}/posts/comment/${this.postId}`, { user_id: user_id, content: commentText }).subscribe(
+    this.http.post(`${this.apiUrl}/posts/comment/${this.postId}`, { content: commentText }, {withCredentials: true}).subscribe(
       (response) => {
         console.log('Comentario creado exitosamente:', response);
         inputComment.value = ''; 

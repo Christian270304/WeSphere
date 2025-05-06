@@ -1,4 +1,4 @@
-import { ChatMember, Message, User, Media, Chat, Follower } from "./models.js";
+import { ChatMember, Message, User, Media, Chat, Follower, Notificacion } from "./models.js";
 import { Op, sequelize } from "../config/db.js";
 
 
@@ -181,6 +181,25 @@ export const getUser = async (id) => {
       });
 
       return suggestions;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+
+  export const saveNotificationModel = async (user_id, reference_id, notificacion) => {
+    try {
+      const { type, content } = notificacion;
+      console.log("notificacion", type, content);
+      const notification = await Notificacion.create({
+        user_id,
+        type,
+        content,
+        reference_id,
+        is_read: false,
+        created_at: new Date(),
+      });
+  
+      return notification;
     } catch (err) {
       throw new Error(err);
     }

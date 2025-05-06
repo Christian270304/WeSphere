@@ -3,7 +3,6 @@ import { PostController } from '../controllers/PostController.js';
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import multer from 'multer';
 
-// Moverlo a app.js
 const storage = multer.memoryStorage();
 const upload = multer({
     storage

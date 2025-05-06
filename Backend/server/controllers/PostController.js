@@ -1,10 +1,11 @@
-import { Post, Media, User, Like, SavedPosts } from '../models/models.js';
+import { Post, Media, User, Like, SavedPosts, Notificacion } from '../models/models.js';
 import { getRecommendedPosts, getComments, createComment, getPostSaved, savePost } from '../models/PostQueries.js';
 import { v2 as cloudinary } from 'cloudinary';
 import sharp from 'sharp';
 import streamifier from 'streamifier';
 import dontenv from 'dotenv';
 import crypto from 'crypto';
+import { io } from '../server.js'
 import { type } from 'os';
 
 dontenv.config();
@@ -57,9 +58,11 @@ export class PostController {
         try {
           const { id } = req.user;
           const { type } = req.params;
-        const posts = await getRecommendedPosts(type,id);
-    
-        res.json({ posts });
+          const limit = parseInt(req.query.limit) || 20;
+          const offset = parseInt(req.query.offset) || 0;
+          const posts = await getRecommendedPosts(type, id, limit, offset);
+      
+          res.json({ posts });
         } catch (err) {
         res.status(500).json({ error: err.message });
         }
@@ -221,13 +224,37 @@ export class PostController {
         const existingLike = await Like.findOne({ where: { user_id: id, post_id } });
     
         if (existingLike) {
-          // Si ya existe, eliminar el like
           await existingLike.destroy();
           await Post.decrement('likes_count', { where: { id: post_id } });
         } else {
-          // Si no existe, agregar el like
           await Like.create({ user_id: id, post_id });
           await Post.increment('likes_count', { where: { id: post_id } });
+
+          const post = await Post.findByPk(post_id, { include: [{ model: User, as: 'user' }] });
+          const userId = post.user_id;
+          const existingNotification = await Notificacion.findOne({
+            where: {
+              type: 'like',
+              user_id: userId,
+              reference_id: post_id 
+            }
+          });
+
+          if (!existingNotification) {
+            // Buscar el usuario al que está dirigido el like
+            const user = await User.findByPk(id);
+            const notification = {type: 'like', content: `L'usuari ${user.username} ha donat m'agrada a la teva publicació`};
+ 
+            const newNotification = await Notificacion.create({
+              user_id: userId,
+              type: 'like',
+              content: `L'usuari ${user.username} ha donat m'agrada a la teva publicació`,
+              reference_id: post_id,
+              is_read: false,
+              created_at: new Date(),
+            })
+            io.to(`user:${userId}`).emit('receive_notification', { userId, notification });
+          }
         }
     
         // Obtener el estado actualizado del post
@@ -238,7 +265,7 @@ export class PostController {
               model: Like,
               as: 'likes',
               where: { user_id: id },
-              required: false // Esto asegura que no falle si no hay likes
+              required: false 
             }
           ]
         });
@@ -246,7 +273,7 @@ export class PostController {
         res.json({
           id: updatedPost.id,
           likes_count: updatedPost.likes_count,
-          liked: updatedPost.likes.length > 0 // Si hay likes, el usuario ha dado like
+          liked: updatedPost.likes.length > 0 
         });
       } catch (error) {
         console.error('Error en likePost:', error);
@@ -279,7 +306,8 @@ export class PostController {
 
     static async postComment(req, res) {
       try {
-        const { user_id, content } = req.body;
+        const { id: user_id } = req.user;
+        const { content } = req.body;
         const { post_id } = req.params;
     
         // Verificar si el contenido del comentario no está vacío

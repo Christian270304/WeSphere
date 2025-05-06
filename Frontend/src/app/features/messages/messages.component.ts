@@ -37,6 +37,7 @@ export class MessagesComponent implements OnInit {
   public newMessage: string = '';
 
   private pendingUserId: number | null = null;
+  private isSendingMessage: boolean = false;
 
   constructor(
     private userService: UserService,
@@ -62,6 +63,7 @@ export class MessagesComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.chatSocketService.leaveChat(this.selectedChatId!);
+    this.socketService.off('receive_message');
   }
 
   // private initializeSocketConnection(): void {
@@ -85,7 +87,8 @@ export class MessagesComponent implements OnInit {
   }
 
   private listenForIncomingMessages(): void {
-    this.socketService.on('receive_message',(msg) => {
+    console.log('Registrando evento receive_message');
+    this.socketService.on('receive_message', (msg) => {
       console.log("Mensaje recibido: ", msg);
       if (msg && msg.chat_id === this.selectedChatId && msg.userId !== this.userId) {
         this.messages.push(msg);
@@ -98,50 +101,73 @@ export class MessagesComponent implements OnInit {
 
     if (userId) {
       const chat = this.chats.find((chat) => chat.other_users[0].user_id === userId);
-      if(!chat) return;
-      this.otherUser = chat.other_users[0].user_id;
-      this.selectedChatId = chat.chat_id;
+      if (!chat) {
+        // Si el chat no existe, crearlo
+        this.userService.createChat(userId).subscribe((newChat) => {
+          // Agregar el nuevo chat a la lista de chats
+          this.chats.push(newChat);
+  
+          // Seleccionar el nuevo chat
+          this.selectedChatId = newChat.chat_id;
+          this.otherUser = newChat.other_users[0].user_id;
+        });
+      } else {
+        this.otherUser = chat.other_users[0].user_id;
+        this.selectedChatId = chat.chat_id;
+      }
+      
     } else {
       this.selectedChatId = chatId;
       const chat = this.chats.find((chat) => chat.chat_id === chatId);
-    console.log("Prueba chats: ",chat);
-    if (!chat) return;
+      console.log("Prueba chats: ",chat);
+      if (!chat) return;
 
-    this.otherUser = chat.other_users[0].user_id;
+      this.otherUser = chat.other_users[0].user_id;
     }
 
     this.userService.getUserById(this.otherUser).subscribe((user) => {
       this.profileUser = user;
     });
     
-    this.chatSocketService.joinChat(this.selectedChatId);
+    this.chatSocketService.joinChat(this.selectedChatId!);
 
-    this.userService.getMessages(this.selectedChatId).subscribe((messages) => {
+    this.userService.getMessages(this.selectedChatId!).subscribe((messages) => {
       this.messages = messages;
       this.scrollToBottom();
     });
   }
 
   public sendMessage(): void {
-    if (!this.newMessage.trim() || !this.selectedChatId || !this.userId || !this.otherUser) return;
-
+    if (this.isSendingMessage) return;
+    if ( !this.newMessage.trim() || !this.selectedChatId || !this.userId || !this.otherUser) return;
+  
+    this.isSendingMessage = true;
+    
     const messageData = {
       chat_id: this.selectedChatId,
       userId: this.userId,
       content: this.newMessage,
     };
-
-    this.userService.sendMessage(messageData).subscribe((msg) => {
-      console.log("Mensaje enviado user: ", msg);
-      this.newMessage = '';
-      this.scrollToBottom();
-
-      const message = {
-        type: 'message',
-        content: msg.content,
-      }
-      this.chatSocketService.sendNotification(this.otherUser, message);
-    });
+    console.log("Mensaje a enviar: ", messageData);
+    if (this.isSendingMessage) {
+      this.userService.sendMessageService(messageData).subscribe((msg) => {
+        if (msg !== null) {
+          console.log("Mensaje enviado user: ", msg);
+        this.newMessage = '';
+        this.scrollToBottom();
+    
+        const message = {
+          type: 'message',
+          content: msg.content,
+        };
+        this.chatSocketService.sendNotification(this.userId! ,this.otherUser, message);
+        
+        this.isSendingMessage = false;
+        }
+      }, () => {
+        this.isSendingMessage = false;
+      });
+    }
   }
 
   public closeChat(chatId: number): void {

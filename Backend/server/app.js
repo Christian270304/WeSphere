@@ -9,6 +9,7 @@ import passport from './config/passport-google.js';
 import session from 'express-session';
 
 
+
 dotenv.config();
 
 const app = express();
@@ -16,7 +17,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: 'https://wesphere.vercel.app',  
+  origin: 'http://localhost:4200',  
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],  
   credentials: true,  

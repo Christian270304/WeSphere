@@ -13,42 +13,13 @@
                         <div class="suggestion-name">{{ suggestion.username }}</div>
                         <!-- <div class="suggestion-bio">Diseñadora UX/UI</div> -->
                     </div>
-                    <!-- <div class="follow-button" (click)="follow(suggestion.id)">Seguir</div> -->
-                    <button class=" follow-button" (click)="toggleFollow(suggestion.id)">
-                        {{ suggestion.isFollowing ? 'Deixar de seguir' : 'Seguir' }}
-                      </button>
+                    <button 
+                        [ngClass]="suggestion.isFollowing ? 'unfollow-button' : 'follow-button'" 
+                        (click)="toggleFollow(suggestion.id)">
+                        {{ suggestion.isFollowing ? 'Unfollow' : 'Follow' }}
+                    </button>
                 </div>
             }
-            <!-- <div class="suggestion-item">
-                <div class="profile-pic">
-                    <img src="/api/placeholder/40/40" alt="Laura Gómez">
-                </div>
-                <div class="suggestion-info">
-                    <div class="suggestion-name">Laura Gómez</div>
-                    <div class="suggestion-bio">Diseñadora UX/UI</div>
-                </div>
-                <div class="follow-button">Seguir</div>
-            </div>
-            <div class="suggestion-item">
-                <div class="profile-pic">
-                    <img src="/api/placeholder/40/40" alt="Juan Pérez">
-                </div>
-                <div class="suggestion-info">
-                    <div class="suggestion-name">Juan Pérez</div>
-                    <div class="suggestion-bio">Desarrollador Web</div>
-                </div>
-                <div class="follow-button">Seguir</div>
-            </div>
-            <div class="suggestion-item">
-                <div class="profile-pic">
-                    <img src="/api/placeholder/40/40" alt="Club de Fotografía">
-                </div>
-                <div class="suggestion-info">
-                    <div class="suggestion-name">Club de Fotografía</div>
-                    <div class="suggestion-bio">Comunidad • 25K miembros</div>
-                </div>
-                <div class="follow-button">Unirse</div>
-            </div> -->
         </div>
     </div>
 </div>

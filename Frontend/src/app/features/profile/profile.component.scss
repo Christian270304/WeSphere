@@ -237,21 +237,21 @@ header {
 
 
 
-.bio[contenteditable="true"] {
-    max-height: 100px; /* o lo que consideres */
-    overflow-y: auto;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
+// .bio[contenteditable="true"] {
+//     max-height: 100px; /* o lo que consideres */
+//     overflow-y: auto;
+//     white-space: pre-wrap;
+//     word-break: break-word;
+//   }
   
-  .username[contenteditable="true"],
-  .bio[contenteditable="true"] {
-    border: 1px dashed rgba(255, 255, 255, 0.4);
-    padding: 4px 6px;
-    border-radius: 4px;
-    cursor: text;
-    background-color: rgba(255, 255, 255, 0.05);
-  }
+//   .username[contenteditable="true"],
+//   .bio[contenteditable="true"] {
+//     border: 1px dashed rgba(255, 255, 255, 0.4);
+//     padding: 4px 6px;
+//     border-radius: 4px;
+//     cursor: text;
+//     background-color: rgba(255, 255, 255, 0.05);
+//   }
 
 
   .modal-overlay {
@@ -273,3 +273,183 @@ header {
     text-align: center;
   }
   
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+.empty-icon {
+    font-size: 3rem;
+    color: var(--gray);
+    margin-bottom: 20px;
+}
+.empty-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 10px;
+}
+.empty-description {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 20px;
+}
+.empty-action {
+    padding: 10px 20px;
+    border-radius: 30px;
+    background-color: var(--primary);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.empty-action:hover {
+    background-color: var(--primary-dark);
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Profile Header */
+.profile-header {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    position: relative;
+}
+
+/* Cover Photo */
+.cover-photo {
+    width: 100%;
+    height: 200px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.cover-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Edit Banner Button */
+.edit-banner-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    padding: 8px 16px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+    display: none; /* Hidden by default */
+}
+
+.edit-banner-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Profile Picture */
+.profile-pic {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 160px;
+    left: 20px;
+    z-index: 2;
+}
+
+.profile-pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Edit Profile Picture Button */
+.edit-profile-pic-btn {
+    position: absolute;
+    bottom: 35%;
+    right: 35%;
+    padding: 6px 12px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 25%;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+    display: none; /* Hidden by default */
+}
+
+.edit-profile-pic-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Profile Info */
+.profile-info {
+    margin-left: 160px;
+}
+
+.username {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.bio {
+    font-size: 0.95rem;
+    color: var(--gray);
+    margin-bottom: 15px;
+}
+
+/* Show buttons when editing is enabled */
+ .edit-banner-btn,
+ .edit-profile-pic-btn {
+    display: block;
+}
+
+
+
+.profile-username {
+    display: flex;
+    gap: 20px;
+}
+
+.profile-bio {
+    display: flex;
+    gap: 20px;
+}
+
+.edit-username {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.edit-bio {
+    font-size: 0.95rem;
+    color: var(--gray);
+    margin-bottom: 15px;
+}
+
+

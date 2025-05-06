@@ -5,6 +5,7 @@ import { map, catchError, tap } from 'rxjs/operators';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
+import { SocketService } from './socket.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,6 @@ export class AuthService {
     
 
     constructor(private http: HttpClient, private router: Router) {
-      this.checkAuthentication(); 
     }
   
     /**
@@ -24,7 +24,10 @@ export class AuthService {
      */
     login(credentials: { username: string; password: string }): Observable<any> {
       return this.http.post(`${this.apiUrl}/auth/login`, credentials, {withCredentials: true}).pipe(
-        tap(() => this.isAuthenticatedSubject.next(true))
+        tap(() => {
+          this.isAuthenticatedSubject.next(true);
+          this.router.navigate(['/home']);
+        })
       );
     }
 
@@ -34,38 +37,54 @@ export class AuthService {
       );
     }
 
-    loginWithOAuth (oauth = '') {
-      const width = 500;
-      const height = 600;
-
-      const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-
-      if (isMobile) {
-        window.location.href = `${this.apiUrl}/auth/${oauth}`;
-        return;
-      }
-
-      const left = window.screenX + (window.innerWidth - width) / 2;
-      const top = window.screenY + (window.innerHeight - height) / 2;
-
-      const popup = window.open(
-        `${this.apiUrl}/auth/${oauth}`,
-        '_blank',
-        `width=${width},height=${height},top=${top},left=${left}`
-      );
+    loginWithOAuth(oauth: string): Promise<boolean> {
+      return new Promise((resolve, reject) => {
+        const width = 500;
+        const height = 600;
+    
+        const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+    
+        if (isMobile) {
+          window.location.href = `${this.apiUrl}/auth/${oauth}`;
+          resolve(false); 
+          return;
+        }
+    
+        const left = window.screenX + (window.innerWidth - width) / 2;
+        const top = window.screenY + (window.innerHeight - height) / 2;
+    
+        const popup = window.open(
+          `${this.apiUrl}/auth/${oauth}`,
+          '_blank',
+          `width=${width},height=${height},top=${top},left=${left}`
+        );
     
       const listener = (event: MessageEvent) => {
         // Seguridad: verifica origen
         if (event.origin !== 'https://wesphere-production.up.railway.app') return;
     
-        if (event.data.success) {
-          this.isAuthenticatedSubject.next(true); 
-          this.router.navigate(['/home']);
-          window.removeEventListener('message', listener); 
-        }
-      };
+          if (event.data.success) {
+            this.isAuthenticatedSubject.next(true);
+            this.router.navigate(['/home']);
+            resolve(true); 
+          } else {
+            resolve(false); 
+          }
     
-      window.addEventListener('message', listener);
+          window.removeEventListener('message', listener);
+          popup?.close();
+        };
+    
+        window.addEventListener('message', listener);
+    
+        const interval = setInterval(() => {
+          if (popup?.closed) {
+            clearInterval(interval);
+            window.removeEventListener('message', listener);
+            resolve(false); 
+          }
+        }, 500);
+      });
     }
 
     /**
@@ -84,14 +103,19 @@ export class AuthService {
     /**
      * Verifica si el usuario está autenticado llamando al backend.
      */
-    private checkAuthentication(): void {
-      this.http.get<{ authenticated: boolean }>(`${this.apiUrl}/auth/check`, { withCredentials: true })
-        .subscribe((response) => {
-            console.log("Respuesta de autenticacion: ", response);
-            this.isAuthenticatedSubject.next(response.authenticated);
-     
-        });
+    public checkAuthentication(): Observable<boolean> {
+      return this.http.get<{ authenticated: boolean }>(`${this.apiUrl}/auth/check`, { withCredentials: true }).pipe(
+        tap(response => {
+          this.isAuthenticatedSubject.next(response.authenticated);
+        }),
+        map(response => response.authenticated),
+        catchError(() => {
+          this.isAuthenticatedSubject.next(false);
+          return of(false);
+        })
+      );
     }
+    
   
     /**
      * Devuelve el estado actual de autenticación.

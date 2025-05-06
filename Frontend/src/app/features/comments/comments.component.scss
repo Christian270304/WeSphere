@@ -189,6 +189,19 @@ header {
     width: 100%;
     display: block;
 }
+.post-video {
+    width: 100%;
+    height: 300px;
+    background: #ddd;
+    border-radius: 10px;
+    margin: 15px 0;
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit; // Mantiene el borde redondeado del contenedor
+    }
 .post-stats {
     display: flex;
     justify-content: space-between;

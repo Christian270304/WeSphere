@@ -74,7 +74,7 @@ export class HeaderComponent {
   listenForIncomingNotifications() {
     this.notificationService.onNotification((notification) => {
       console.log('Nueva notificación recibida:', notification);
-      this.notifications.unshift(notification);
+      this.notifications.unshift(notification.notification);
       this.unreadCount++;
     });
   }

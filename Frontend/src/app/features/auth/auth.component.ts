@@ -6,10 +6,11 @@ import { ErrorService } from '../../core/services/error.service';
 import { ErrorMessageComponent } from '../../shared/components/error-message/error-message.component';
 import { HomeComponent } from '../home/home.component';
 import { SocketService } from '../../core/services/socket.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-auth',
-  imports: [FormsModule, ErrorMessageComponent],
+  imports: [FormsModule, ErrorMessageComponent, CommonModule],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.scss'
 })
@@ -23,17 +24,21 @@ export class AuthComponent {
   email: string = '';
   Repassword: string = '';
   confirmPassword: string = '';
+  passwordVisible: boolean = false;
+  passwordVisibleConfirm: boolean = false;
 
   constructor(private authService: AuthService, private router: Router, private errorService: ErrorService, private socketService: SocketService) {}
 
-  ngOnInit(): void {
-         
-      this.authService.isAuthenticated$.subscribe((isAuthenticated) => {
-        if (isAuthenticated) {
-          this.router.navigate(['/home']); // Redirige al home si está autenticado
-        }
-      });
-      
+  ngOnInit(): void { 
+    this.authService.checkAuthentication().subscribe((res) => {
+      this.isAuthenticated = res;
+      if (this.isAuthenticated) {
+        this.isLoading = true;
+        setTimeout(() => {
+          this.router.navigate(['/home']);
+        }, 1000);
+      }  
+    });
   }
 
   login() {
@@ -87,15 +92,39 @@ export class AuthComponent {
   }
   
   loginWithGoogle () {
-    this.authService.loginWithOAuth('google');
+    this.authService.loginWithOAuth('google').then((success) => {
+      if (success) {
+        this.isAuthenticated = true;
+        this.socketService.connect(); 
+        this.router.navigate(['/home']);
+      } else {
+        this.errorService.setError('Error al iniciar sesión con Google.');
+      }
+    });
   }
 
   loginWithReddit () {
-    this.authService.loginWithOAuth('reddit');
+    this.authService.loginWithOAuth('reddit').then((success) => {
+      if (success) {
+        this.isAuthenticated = true;
+        this.socketService.connect(); 
+        this.router.navigate(['/home']);
+      } else {
+        this.errorService.setError('Error al iniciar sesión con Reddit.');
+      }
+    });;
   }
 
   loginWithDiscord () {
-    this.authService.loginWithOAuth('discord');
+    this.authService.loginWithOAuth('discord').then((success) => {
+      if (success) {
+        this.isAuthenticated = true;
+        this.socketService.connect(); 
+        this.router.navigate(['/home']);
+      } else {
+        this.errorService.setError('Error al iniciar sesión con Discord.');
+      }
+    });;
   }
 
   toggleRegisterForm(): void {
@@ -106,6 +135,13 @@ export class AuthComponent {
     this.isLoginFormVisible = true;
   }
 
+  togglePasswordVisibility(): void {
+    this.passwordVisible = !this.passwordVisible;
+  }
+
+  togglePasswordVisibilityConfirm(): void {
+    this.passwordVisibleConfirm = !this.passwordVisibleConfirm;
+  }
 
   
 }

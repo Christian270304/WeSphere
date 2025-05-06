@@ -71,9 +71,12 @@ form {
 }
 
 .input-group {
+    display: flex;
     position: relative;
+    align-items: center;
     width: 100%;
     margin: 25px 0;
+    gap: 10px;
 }
 
 .input-group input {
@@ -93,7 +96,10 @@ form {
 }
 
 .input-group-register {
+    display: flex;
     position: relative;
+    align-items: center;
+    gap: 10px;
     width: 100%;
     margin: 15px 0;
 }
@@ -207,6 +213,7 @@ form {
     }
     
     .form-section {
+        width: 100%;
         padding: 40px 30px;
     }
 }

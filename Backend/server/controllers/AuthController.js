@@ -1,10 +1,13 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import crypto from 'crypto';
+import { PostController } from './PostController.js';
 
-import { User, Message, Follower, Media } from '../models/models.js';
-import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, getNotificationsModel, getSugerenciasModel } from '../models/AuthQueries.js';
+import { User, Message, Follower, Media, Chat, ChatMember } from '../models/models.js';
+import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, getNotificationsModel, getSugerenciasModel, saveNotificationModel } from '../models/AuthQueries.js';
 import { io } from '../server.js'
+import { Op, sequelize } from "../config/db.js";
 
 dotenv.config();
 
@@ -189,7 +192,7 @@ export class AuthController {
       const newMessage = await newMessageModel(id, chat_id, content); 
       if (!newMessage) return res.status(404).json({ msg: "Mensaje no creado" });
 
-      // console.log("Nuevo mensaje: ", newMessage);
+      console.log("Nuevo mensaje: ", newMessage);
 
       io.to(`chat:${chat_id}`).emit('receive_message', newMessage);
 
@@ -289,21 +292,21 @@ export class AuthController {
 
   static async toggleFollow(req, res) {
     try {
-      const { id: follower_id } = req.user; // ID del usuario actual
-      const { user_id: following_id } = req.params; // ID del usuario a seguir/dejar de seguir
-  
-      // Verificar si ya sigue al usuario
+      const { id: follower_id } = req.user; 
+      const { user_id: following_id } = req.params; 
+
       const existingFollow = await Follower.findOne({
         where: { follower_id, following_id }
       });
   
       if (existingFollow) {
-        // Si ya lo sigue, eliminar la relación
         await existingFollow.destroy();
         return res.json({ following: false });
       } else {
-        // Si no lo sigue, crear la relación
         await Follower.create({ follower_id, following_id });
+        const user = await User.findOne({ where: { id: follower_id } });
+        const notification = { type: 'follow', content: 'te ha seguido', user };
+        io.to(`user:${following_id}`).emit('receive_notification', { follower_id, notification });
         return res.json({ following: true });
       }
     } catch (error) {
@@ -314,8 +317,8 @@ export class AuthController {
 
   static async getFollowStatus(req, res) {
     try {
-      const { id: follower_id } = req.user; // ID del usuario actual
-      const { user_id: following_id } = req.params; // ID del usuario del perfil
+      const { id: follower_id } = req.user; 
+      const { user_id: following_id } = req.params; 
   
       const isFollowing = await Follower.findOne({
         where: { follower_id, following_id }
@@ -375,5 +378,145 @@ export class AuthController {
     }
   }
 
+  static async createChat(req, res) {
+    try {
+      const { userId: otherUserId } = req.body;
+      const { id: userId } = req.user;
 
+      console.log("Crear chat: ", userId, otherUserId);
+  
+      // Verificar si el chat ya existe
+      const existingChat = await ChatMember.findOne({
+        where: { user_id: userId },
+        include: {
+          model: Chat,
+          include: {
+            model: ChatMember,
+            where: { user_id: otherUserId }
+          }
+        }
+      });
+  
+      if (existingChat) {
+        return res.json({
+          chat_id: existingChat.chat_id,
+          other_user_id: otherUserId
+        });
+      }
+  
+      const newChat = await Chat.create({
+        is_group: false,
+        created_at: new Date(),
+      });
+
+      const chatMembers = await ChatMember.create({
+        chat_id: newChat.id,
+        user_id: userId,
+      })
+  
+      const otherUser = await User.findOne({
+        where: { id: otherUserId },
+        attributes: ['id', 'username'],
+        include: {
+          model: Media,
+          as: 'profileImage',
+          attributes: ['url']
+        }
+      });
+  
+      res.json(
+        {
+          chat_id: newChat.id,
+          other_user: {
+            user_id: otherUser.id,
+            username: otherUser.username,
+            profile_image: otherUser.profileImage ? otherUser.profileImage.url : null
+          }
+        }
+      );
+    } catch (error) {
+      console.error('Error al crear el chat:', error);
+      res.status(500).json({ error: 'Error al crear el chat' });
+    }
+  }
+
+  static async updateUser(req, res) {
+    try {
+      const { id: userId } = req.user; 
+      const { username, bio } = req.body;
+
+      const existingUser = await User.findOne({ where: { username, id: { [Op.ne]: userId } } });
+      if (existingUser) {
+        return res.status(400).json({ error: 'El nombre de usuario ya existe.' });
+      }
+
+      const profileImage = req.files?.profileImage?.[0];
+      const bannerImage = req.files?.bannerImage?.[0];
+
+      const currentUser = await User.findOne({ where: { id: userId } });
+      if (!currentUser) {
+        return res.status(404).json({ error: 'Usuario no encontrado.' });
+      }
+
+      let profileImageId = currentUser.profile_picture; 
+      let bannerImageId = currentUser.banner;
+
+      if (profileImage) {
+        const profileImageBuffer = profileImage.buffer;
+        const profileImageHash = await getHash(profileImageBuffer);
+        const existingImage = await Media.findOne({ where: { hash: profileImageHash } });
+        if (existingImage) {
+          profileImageId = existingImage.id; 
+        } else {
+          profileImageId = await PostController.uploadImage(profileImageBuffer, 'profile')
+        }
+      }
+
+      if (bannerImage){
+        const bannerImageBuffer = bannerImage.buffer;
+        bannerImageId = await PostController.uploadImage(bannerImageBuffer, 'profile')
+      }
+  
+      const [rowsUpdated] = await User.update(
+        { username, bio, profile_picture: profileImageId, banner: bannerImageId },
+        { where: { id: userId } }
+      );
+      
+      if (rowsUpdated === 0) {
+        return res.status(404).json({ error: 'Usuario no encontrado.' });
+      }
+      
+      // Obtener el usuario actualizado
+      const updatedUser = await User.findOne({ where: { id: userId } });
+  
+      res.status(200).json({ message: 'Perfil actualizado correctamente.', user: updatedUser });
+    } catch (error) {
+      console.error('Error al actualizar el perfil:', error);
+      res.status(500).json({ error: 'Error al actualizar el perfil.' });
+    }
+  };
+
+  static async saveNotification(userId, otherUserId, notification) {
+    try {
+  
+      const newNotification = await saveNotificationModel( userId, otherUserId, notification)
+  
+      return newNotification;
+    } catch (error) {
+      console.error('Error al guardar la notificación:', error);
+      throw error; 
+    }
+  }
+
+
+
+}
+
+
+function getHash(buffer) {
+  return new Promise((resolve, reject) => {
+      const hash = crypto.createHash('sha256');
+      hash.update(buffer);
+      resolve(hash.digest('hex'));
+  });
 }

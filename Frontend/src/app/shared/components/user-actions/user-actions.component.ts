@@ -11,8 +11,10 @@ import { UserService } from '../../../core/services/user.service';
 })
 export class UserActionsComponent {
   @Output() editProfile: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() save: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() userId: number | null = null;
   @Input() isOwn: boolean = false;
+  @Input() cancelarEdicion: boolean = false;
   isEditing: boolean = false;
   isFollowing: boolean = false;
 
@@ -31,6 +33,13 @@ export class UserActionsComponent {
     }
   }
 
+  ngOnChanges() {
+    if (this.cancelarEdicion) {
+      this.isEditing = false;
+      this.cancelarEdicion = false;
+    }
+  }
+
   async logout() {
     await this.authService.logout();
   }
@@ -42,8 +51,19 @@ export class UserActionsComponent {
   }
 
   toggleEditProfile(): void {
-    this.isEditing = !this.isEditing; // Cambiar el estado
-    this.editProfile.emit(this.isEditing); // Emitir el estado al padre
+    if (!this.isEditing) {
+      this.isEditing = !this.isEditing;
+      this.editProfile.emit(this.isEditing);
+    } else  {
+      this.editProfile.emit(false)
+    }
+     
+  }
+
+  saveChanges(): void {
+    this.isEditing = false; // Cambiar el estado
+    // this.editProfile.emit(this.isEditing);
+    this.save.emit(true); // Emitir el evento de guardado al padre
   }
 
   toggleFollow(): void {

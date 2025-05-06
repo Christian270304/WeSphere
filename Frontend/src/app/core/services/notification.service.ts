@@ -8,13 +8,8 @@ export class NotificationService {
 
   constructor(private socketService: SocketService) {}
 
-  private hasSubscribed = false;
-
   onNotification(callback: (data: any) => void) {
-    if (!this.hasSubscribed) {
-      this.socketService.on('receive_notification', callback);
-      this.hasSubscribed = true;
-    }
+    this.socketService.on('receive_notification', callback);
   }
 
   sendNotification(data: { userId: number; type: string; content: string; referenceId?: number }): void {

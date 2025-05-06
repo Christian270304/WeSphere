@@ -13,7 +13,8 @@
                             <input type="text" [(ngModel)]="username" name="username" placeholder="Username" required autofocus>
                         </div>
                         <div class="input-group">
-                            <input type="password" [(ngModel)]="password" name="password" placeholder="Contrasenya" required>
+                            <input [type]="passwordVisible ? 'text' : 'password'" [(ngModel)]="password" name="password" placeholder="Contrasenya" required> 
+                            <label for="password" (click)="togglePasswordVisibility()"><i [ngClass]="{'fas fa-eye': !passwordVisible, 'fa fa-eye-slash': passwordVisible }"></i></label>
                         </div>
                         <app-error-message ></app-error-message>
                         <button class="btn-submit">Inicia sessió</button>
@@ -25,17 +26,17 @@
                         <p class="mt-3">No tens compte? <a href="#" (click)="toggleRegisterForm()">Registra't</a></p>
                     </div>   
                     <div class="signup-section" id="signupSection">
-                        <h2 class="signup-title">¡Únete a WeSphere!</h2>
-                        <p class="signup-description">Conecta con amigos, comparte tus momentos y descubre nuevas experiencias en nuestra red social</p>
-                        <button class="btn-ghost" (click)="toggleRegisterForm(); $event.preventDefault()">Comenzar ahora</button>
+                        <h2 class="signup-title">Uneix-te a WeSphere!</h2>
+                        <p class="signup-description">Connecta amb amics, comparteix els teus moments i descobreix noves experiències a la nostra xarxa social</p>
+                        <button class="btn-ghost" (click)="toggleRegisterForm(); $event.preventDefault()">Comença ara</button>
                     </div>
                 </form> 
             } @else if (!isLoginFormVisible) {
                 <form (submit)="register()" id="registerForm">
                     <div class="signup-section" id="signupSection">
-                        <h2 class="signup-title">¡Únete a WeSphere!</h2>
-                        <p class="signup-description">Conecta con amigos, comparte tus momentos y descubre nuevas experiencias en nuestra red social</p>
-                        <button class="btn-ghost" (click)="toggleLoginForm(); $event.preventDefault()">Comenzar ahora</button>
+                        <h2 class="signup-title">Ja tens un compte?</h2>
+                        <p class="signup-description">Inicia sessió per connectar amb amics, compartir moments i descobrir noves experiències a la nostra xarxa social.</p>
+                        <button class="btn-ghost" (click)="toggleLoginForm(); $event.preventDefault()">Inicia sessió ara</button>
                     </div>
                     <div class="form-section" id="registerSection">
                     
@@ -47,10 +48,12 @@
                             <input type="email" [(ngModel)]="email" name="email" placeholder="Correu Electronic" required>
                         </div>
                         <div class="input-group-register">
-                            <input type="password" [(ngModel)]="Repassword" name="password" placeholder="Contrasenya" required>
+                            <input [type]="passwordVisible ? 'text' : 'password'" [(ngModel)]="Repassword" name="password" placeholder="Contrasenya" required>
+                            <label for="password" (click)="togglePasswordVisibility()"><i [ngClass]="{'fas fa-eye': !passwordVisible, 'fa fa-eye-slash': passwordVisible }"></i></label>
                         </div>
                         <div class="input-group-register">
-                            <input type="password" [(ngModel)]="confirmPassword" name="confirm_password" placeholder="Repeteix la contrasenya" required>
+                            <input [type]="passwordVisibleConfirm ? 'text' : 'password'" [(ngModel)]="confirmPassword" name="confirm_password" placeholder="Repeteix la contrasenya" required>
+                            <label for="password" (click)="togglePasswordVisibilityConfirm()"><i [ngClass]="{'fas fa-eye': !passwordVisibleConfirm, 'fa fa-eye-slash': passwordVisibleConfirm }"></i></label>
                         </div>
                         <app-error-message ></app-error-message>
                         <button class="btn-submit">Crear Compte</button>
