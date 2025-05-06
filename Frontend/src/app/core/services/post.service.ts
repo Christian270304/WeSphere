@@ -14,14 +14,13 @@ export class PostService {
 
   constructor(private http: HttpClient) {}
 
-  getPosts(userArticles = false, userId: number | null = null, saved = false) {
-    console.log("Datos: ", userArticles, userId, saved);
+  getPosts(userArticles = false, userId: number | null = null, saved = false, limit: number = 20, offset: number = 0) {
     if (userArticles) {
-      console.log("Entro en userArticles");
       this.http.get<any>(`${this.apiUrl}/posts/user/${userId}`, {withCredentials: true}).subscribe(
         (data) => {
           console.log("Posts obtenidos:", data);
           if (Array.isArray(data.posts)) {
+            this.postsSubject.next([]);
             this.postsSubject.next(data.posts);
           } else {
             console.error("Error: La API no devolvió un array", data);
@@ -35,17 +34,17 @@ export class PostService {
       );
       return this.posts$;
     } else if (saved) {
-      console.log("Entro en saved");
+      this.postsSubject.next([]);
+
       this.http.get<any>(`${this.apiUrl}/posts/savedposts`, {withCredentials: true}).subscribe(
         (data) => {
           this.postsSubject.next([]);
-          console.log("Saved posts:", data);
-          
           if (Array.isArray(data.posts)) {
             if (data.posts.length === 0) {
               console.log("No hay publicaciones guardadas");
-              this.postsSubject.next([]); // Emitir un array vacío
+              this.postsSubject.next([]); 
             } else {
+              
               this.postsSubject.next(data.posts); // Emitir las publicaciones
             }
           } else {
@@ -61,8 +60,7 @@ export class PostService {
       );
       return this.posts$;
     } else {
-      console.log("Entro en else");
-      this.http.get<any>(`${this.apiUrl}/posts/`, {withCredentials: true}).subscribe(
+      this.http.get<any>(`${this.apiUrl}/posts/?limit=${limit}&offset=${offset}`, {withCredentials: true}).subscribe(
         (data) => {
           if (Array.isArray(data.posts)) {
             this.postsSubject.next(data.posts);
@@ -97,5 +95,7 @@ export class PostService {
   getComments(postId: number) {
     return this.http.get<any>(`${this.apiUrl}/posts/comments/${postId}`, {withCredentials: true});
   }
+
+  
 
 }
