@@ -26,17 +26,17 @@
                         <p class="mt-3">No tens compte? <a href="#" (click)="toggleRegisterForm()">Registra't</a></p>
                     </div>   
                     <div class="signup-section" id="signupSection">
-                        <h2 class="signup-title">¡Únete a WeSphere!</h2>
-                        <p class="signup-description">Conecta con amigos, comparte tus momentos y descubre nuevas experiencias en nuestra red social</p>
-                        <button class="btn-ghost" (click)="toggleRegisterForm(); $event.preventDefault()">Comenzar ahora</button>
+                        <h2 class="signup-title">Uneix-te a WeSphere!</h2>
+                        <p class="signup-description">Connecta amb amics, comparteix els teus moments i descobreix noves experiències a la nostra xarxa social</p>
+                        <button class="btn-ghost" (click)="toggleRegisterForm(); $event.preventDefault()">Comença ara</button>
                     </div>
                 </form> 
             } @else if (!isLoginFormVisible) {
                 <form (submit)="register()" id="registerForm">
                     <div class="signup-section" id="signupSection">
-                        <h2 class="signup-title">¡Únete a WeSphere!</h2>
-                        <p class="signup-description">Conecta con amigos, comparte tus momentos y descubre nuevas experiencias en nuestra red social</p>
-                        <button class="btn-ghost" (click)="toggleLoginForm(); $event.preventDefault()">Comenzar ahora</button>
+                        <h2 class="signup-title">Ja tens un compte?</h2>
+                        <p class="signup-description">Inicia sessió per connectar amb amics, compartir moments i descobrir noves experiències a la nostra xarxa social.</p>
+                        <button class="btn-ghost" (click)="toggleLoginForm(); $event.preventDefault()">Inicia sessió ara</button>
                     </div>
                     <div class="form-section" id="registerSection">
                     
