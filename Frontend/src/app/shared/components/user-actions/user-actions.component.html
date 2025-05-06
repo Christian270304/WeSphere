@@ -1,14 +1,14 @@
 <div class="profile-actions">
     @if (isOwn) {
         <button class="action-button edit-profile" (click)="toggleEditProfile()">
-            {{ isEditing ? 'Cancelar' : 'Editar perfil' }}
+            {{ isEditing ? 'Cancel·lar' : 'Editar perfil' }}
         </button>
         @if (isEditing) {
-            <button class="action-button save-profile" (click)="saveChanges()">Guardar</button>
+            <button class="action-button save-profile" (click)="saveChanges()">Desar</button>
         }
     }
     @if (!isOwn) {
-        <button class="action-button message-button" (click)="sendMessage()">Enviar mensaje</button>
+        <button class="action-button message-button" (click)="sendMessage()">Enviar missatge</button>
     }
     @if (!isOwn) {
         <button class="action-button follow-button" (click)="toggleFollow()">
@@ -16,6 +16,6 @@
         </button>
       }
     @if (isOwn) {
-        <button class="action-button logout-button" (click)="logout()">Cerrar Sesion</button>
+        <button class="action-button logout-button" (click)="logout()">Tancar Sessió</button>
     }
 </div>
