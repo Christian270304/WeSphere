@@ -177,7 +177,7 @@ object-fit: cover;
 .empty-state {
     text-align: center;
     padding: 40px;
-    background-color: white;
+    background-color: var(--white);
     border-radius: var(--border-radius);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
@@ -189,7 +189,7 @@ object-fit: cover;
 .empty-title {
     font-size: 1.2rem;
     font-weight: 600;
-    color: var(--dark);
+    color: var(--text);
     margin-bottom: 10px;
 }
 .empty-description {
