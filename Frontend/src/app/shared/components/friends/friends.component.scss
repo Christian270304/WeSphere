@@ -1,5 +1,5 @@
 .sidebar-card {
-    background-color: white;
+    background-color: var(--white);
     border-radius: var(--border-radius);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     min-height: 50%;
@@ -16,6 +16,7 @@
     padding: 15px 20px;
     border-bottom: 1px solid var(--light-gray);
     font-weight: 600;
+    color: var(--text);
 }
 
 .friends-list {
@@ -46,4 +47,5 @@
 
 .friend-name {
     font-weight: 600;
+    color: var(--text);
 }
