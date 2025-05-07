@@ -48,7 +48,6 @@ export class MessagesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // this.initializeSocketConnection();
     this.listenForIncomingMessages();
   
     this.route.queryParams.subscribe(params => {
@@ -66,10 +65,6 @@ export class MessagesComponent implements OnInit {
     this.socketService.off('receive_message');
   }
 
-  // private initializeSocketConnection(): void {
-  //   this.chatSocketService.connect();
-  // }
-
   private loadUserAndChats(): void {
     this.authService.getUserIdFromToken().subscribe((id) => {
       this.userId = id;
@@ -77,6 +72,7 @@ export class MessagesComponent implements OnInit {
   
       this.userService.getChats().subscribe((chats) => {
         this.chats = chats;
+        console.log("Chats: ", this.chats);
   
         if (this.pendingUserId) {
           this.selectChat(0, Number(this.pendingUserId));
@@ -87,9 +83,7 @@ export class MessagesComponent implements OnInit {
   }
 
   private listenForIncomingMessages(): void {
-    console.log('Registrando evento receive_message');
     this.socketService.on('receive_message', (msg) => {
-      console.log("Mensaje recibido: ", msg);
       if (msg && msg.chat_id === this.selectedChatId && msg.userId !== this.userId) {
         this.messages.push(msg);
         this.scrollToBottom();
@@ -109,7 +103,10 @@ export class MessagesComponent implements OnInit {
   
           // Seleccionar el nuevo chat
           this.selectedChatId = newChat.chat_id;
+          console.log("Nuevo chat creado: ", newChat);
           this.otherUser = newChat.other_users[0].user_id;
+          console.log("Nuevo user: ", this.otherUser);
+          console.log("Todos los chats: ", this.chats);
         });
       } else {
         this.otherUser = chat.other_users[0].user_id;
@@ -119,7 +116,6 @@ export class MessagesComponent implements OnInit {
     } else {
       this.selectedChatId = chatId;
       const chat = this.chats.find((chat) => chat.chat_id === chatId);
-      console.log("Prueba chats: ",chat);
       if (!chat) return;
 
       this.otherUser = chat.other_users[0].user_id;
@@ -148,11 +144,9 @@ export class MessagesComponent implements OnInit {
       userId: this.userId,
       content: this.newMessage,
     };
-    console.log("Mensaje a enviar: ", messageData);
     if (this.isSendingMessage) {
       this.userService.sendMessageService(messageData).subscribe((msg) => {
         if (msg !== null) {
-          console.log("Mensaje enviado user: ", msg);
         this.newMessage = '';
         this.scrollToBottom();
     
