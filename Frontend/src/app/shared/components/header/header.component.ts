@@ -20,6 +20,7 @@ export class HeaderComponent {
   theme: string = 'light'; 
   unreadCount: number = 0;
   showDropdown = false;
+  isMobile: boolean = false;
 
   // Cambiar el tema
   toggleTheme(): void {
@@ -48,6 +49,10 @@ export class HeaderComponent {
   ) {}
 
   ngOnInit() {
+    const isMobile = window.innerWidth <= 768; 
+    if (isMobile) {
+      this.isMobile = true;
+    }
     this.listenForIncomingNotifications();
     // Cargar el tema guardado desde localStorage
     this.theme = localStorage.getItem('theme') || 'light';
