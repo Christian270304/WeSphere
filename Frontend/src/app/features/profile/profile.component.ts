@@ -45,7 +45,10 @@ export class ProfileComponent {
   constructor(private route: ActivatedRoute, private headerStateService: HeaderStateService, private userService: UserService,  private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
-    this.headerStateService.setHideElements(true);
+    const isMobile = window.innerWidth <= 768; 
+    if (!isMobile) {
+      this.headerStateService.setHideElements(true);
+    } 
 
     this.loadProfile();
   }
