@@ -386,23 +386,46 @@ export class AuthController {
       console.log("Crear chat: ", userId, otherUserId);
   
       // Verificar si el chat ya existe
-      const existingChat = await ChatMember.findOne({
-        where: { user_id: userId },
-        include: {
-          model: Chat,
-          include: {
-            model: ChatMember,
-            where: { user_id: otherUserId }
-          }
-        }
+      const chatsWithBothUsers = await Chat.findAll({
+        include: [{
+          model: ChatMember,
+          where: {
+            user_id: [userId, otherUserId]
+          },
+          required: true
+        }]
       });
-  
+
+      console.log("Chats con ambos usuarios: ", chatsWithBothUsers);
+      
+      const existingChat = chatsWithBothUsers.find(chat =>
+        chat.chat_members.length === 2 &&
+        chat.chat_members.some(cm => cm.user_id === userId) &&
+        chat.chat_members.some(cm => cm.user_id === otherUserId)
+      );
+      
       if (existingChat) {
+        const lastMessage = await Message.findOne({
+          where: { chat_id: existingChat.id },
+          order: [['created_at', 'DESC']],
+          attributes: ['content']
+        });
+      
+        const otherUser = existingChat.chat_members.find(cm => cm.user_id === otherUserId);
+      
         return res.json({
-          chat_id: existingChat.chat_id,
-          other_user_id: otherUserId
+          chat_id: existingChat.id,
+          last_message: lastMessage ? lastMessage.content : '',
+          other_users: [
+            {
+              user_id: otherUserId,
+              username: otherUser?.User?.username,
+              profile_image: otherUser?.User?.profileImage?.url || null
+            }
+          ]
         });
       }
+      
   
       const newChat = await Chat.create({
         is_group: false,
@@ -412,6 +435,11 @@ export class AuthController {
       const chatMembers = await ChatMember.create({
         chat_id: newChat.id,
         user_id: userId,
+      });
+
+      const chatMembers2 = await ChatMember.create({
+        chat_id: newChat.id,
+        user_id: otherUserId,
       })
   
       const otherUser = await User.findOne({
@@ -424,16 +452,17 @@ export class AuthController {
         }
       });
   
-      res.json(
-        {
-          chat_id: newChat.id,
-          other_user: {
+      res.json({
+        chat_id: newChat.id,
+        last_message: '', 
+        other_users: [
+          {
             user_id: otherUser.id,
             username: otherUser.username,
             profile_image: otherUser.profileImage ? otherUser.profileImage.url : null
           }
-        }
-      );
+        ]
+      });
     } catch (error) {
       console.error('Error al crear el chat:', error);
       res.status(500).json({ error: 'Error al crear el chat' });
