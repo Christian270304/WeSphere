@@ -18,6 +18,7 @@ export class PostsComponent implements OnChanges {
   @Input() userId: number | null = null;
   @Input() saved: boolean = false;
   @Input() cargarMas: boolean = false;
+  @Input() explorer: boolean = false;
   @Output() noPosts = new EventEmitter<boolean>();
   liked = false; 
   isLoading = true;
@@ -104,10 +105,20 @@ export class PostsComponent implements OnChanges {
           this.isLoading = false;
         }
       });
+    } else if (this.explorer) {
+      this.posts = [];
+      this.postsService.getPostsExplorer(this.limit, this.offset).subscribe(posts => {
+          this.noPosts.emit(false); 
+          this.addUniquePosts(posts); 
+          this.offset += this.limit; 
+          setTimeout(() => {
+            this.isLoading = false; 
+          }, 2000);
+      });
     } else {
       this.postsService.getPosts( this.limit, this.offset).subscribe({
         next: (posts) => {
-  
+          console.log('Posts:', posts);
           if (posts.length === 0 ) {
             this.noPosts.emit(true); 
           } else {

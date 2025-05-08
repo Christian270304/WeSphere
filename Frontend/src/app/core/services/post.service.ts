@@ -12,20 +12,20 @@ export class PostService {
   private postsSubject = new BehaviorSubject<any>(null);
   private postsUserSubject = new BehaviorSubject<any>(null);
   private postsSavedSubject = new BehaviorSubject<any>(null);
+  private postsExplorerSubject = new BehaviorSubject<any>(null);
   posts$ = this.postsSubject.asObservable();
   postsUser$ = this.postsUserSubject.asObservable();
   postsSaved$ = this.postsSavedSubject.asObservable();
+  postsExplorer$ = this.postsExplorerSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
   getPosts( limit: number = 20, offset: number = 0) {
-      this.http.get<any>(`${this.apiUrl}/posts/?limit=${limit}&offset=${offset}`, {withCredentials: true}).pipe(
+      this.http.get<any>(`${this.apiUrl}/posts/recomendado?limit=${limit}&offset=${offset}`, {withCredentials: true}).pipe(
         tap((data) => {
           if (Array.isArray(data.posts)) {
             this.postsSubject.next(data.posts);
-            console.log("Posts obtenidos usuario:", this.postsSubject.value);
           } else {
-            console.error("Error: La API no devolvió un array", data);
             this.postsSubject.next([]);
           }
         }),
@@ -39,13 +39,31 @@ export class PostService {
       return this.posts$;
   }
 
+  getPostsExplorer( limit: number = 20, offset: number = 0) {
+    this.http.get<any>(`${this.apiUrl}/posts/explorar?limit=${limit}&offset=${offset}`, {withCredentials: true}).pipe(  
+        
+        tap((data) => {
+          if (Array.isArray(data.posts)) {
+            this.postsExplorerSubject.next(data.posts);
+          } else {
+            this.postsExplorerSubject.next([]);
+          }
+        }),
+        catchError((error) => {
+          console.error("Error al obtener posts:", error);
+          this.postsExplorerSubject.next([]);
+          return of(null); 
+        })
+      ).subscribe();
+      return this.postsExplorer$;
+    }
+
   getPostsByUserId(userId: number) {
     this.http.get<any>(`${this.apiUrl}/posts/user/${userId}`, { withCredentials: true }).pipe(
       tap((data) => {
         if (Array.isArray(data.posts)) {
           this.postsUserSubject.next(data.posts);
         } else {
-          console.error("Error: La API no devolvió un array", data);
           this.postsUserSubject.next([]);
         }
       }),
