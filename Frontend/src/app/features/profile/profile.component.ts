@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, Output } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { UserStatsComponent } from '../../shared/components/user-stats/user-stats.component';
 import { UserActionsComponent } from '../../shared/components/user-actions/user-actions.component';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -8,11 +8,12 @@ import { HeaderStateService } from '../../core/services/header-state.service';
 import { UserService } from '../../core/services/user.service';
 import { FormsModule } from '@angular/forms';
 import { FriendsComponent } from '../../shared/components/friends/friends.component';
-import { urlencoded } from 'express';
+import { ErrorService } from '../../core/services/error.service';
+import { ErrorMessageComponent } from '../../shared/components/error-message/error-message.component';
 
 @Component({
   selector: 'app-profile',
-  imports: [CommonModule, UserStatsComponent, UserActionsComponent, RouterModule, PostsComponent, FormsModule, FriendsComponent],
+  imports: [CommonModule, UserStatsComponent, UserActionsComponent, RouterModule, PostsComponent, FormsModule, FriendsComponent, ErrorMessageComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
@@ -42,7 +43,7 @@ export class ProfileComponent {
     bannerImage: null as File | null 
   };
 
-  constructor(private route: ActivatedRoute, private headerStateService: HeaderStateService, private userService: UserService,  private cdr: ChangeDetectorRef) {}
+  constructor(private route: ActivatedRoute, private headerStateService: HeaderStateService, private userService: UserService,  private cdr: ChangeDetectorRef, private errorService: ErrorService) {}
 
   ngOnInit() {
     const isMobile = window.innerWidth <= 768; 
@@ -107,7 +108,6 @@ public editableUser: any = {
 };
 
 public handleEditProfile(event: boolean) {
-  console.log(event);
   if (event) {
     this.editandoPerfil = true;
     this.editableUser = {
@@ -123,21 +123,30 @@ public handleEditProfile(event: boolean) {
       profileImage: { url: this.user.profileImage?.url || ''},
       bannerImage: { url: this.user.bannerImage?.url || ''}
     };
-    // Capturar los nuevos valores de los inputs
-    const newUsername = document.querySelector('div.edit-username') as HTMLDivElement;
-    const username = newUsername.innerText;
-    if (this.editableUser.username === username) {
+    if (this.hayCambios()){
+      this.mostrarConfirmacion = true;
+    } else {
       this.editandoPerfil = false;
-      
-
-        this.cancelar = true;
+      this.cancelar = true;
         setTimeout(() => {
           this.cancelar = false;
         }, 100);
-      
-    } else if (this.editableUser.username != username) {
-      this.mostrarConfirmacion = true;
     }
+    // // Capturar los nuevos valores de los inputs
+    // const newUsername = document.querySelector('div.edit-username') as HTMLDivElement;
+    // const username = newUsername.innerText;
+    // if (this.editableUser.username === username) {
+    //   this.editandoPerfil = false;
+      
+
+    //     this.cancelar = true;
+    //     setTimeout(() => {
+    //       this.cancelar = false;
+    //     }, 100);
+      
+    // } else if (this.editableUser.username != username) {
+    //   this.mostrarConfirmacion = true;
+    // }
    
   }
 }
@@ -157,38 +166,38 @@ public handleSave(event: boolean) {
   
     this.userService.updateUser(formData).subscribe({
       next: (response) => {
-        window.location.reload();
+        if (response) {
+          window.location.reload(); 
+        }
       },
       error: (err) => {
-        console.error('Error al guardar cambios:', err);
+        const Username = document.querySelector('div.username') as HTMLDivElement;
+        Username.innerHTML = this.originalUser.username;
+        this.errorService.setError(err.error.error);
       }
     });
   }
 }
 
-
-seleccionarNuevaImagen(tipo: 'banner' | 'profile') {
-  const input = document.querySelector(`#image`) as HTMLInputElement;
-  if (input) {
-    input.click();
-  }
-}
-
-
 confirmarCancelar() {
+  
+
+  const bio = document.querySelector('div.edit-bio') as HTMLDivElement;
   const username = document.querySelector('div.edit-username') as HTMLDivElement;
-  username.innerHTML = this.editableUser.username;
+  const banner = document.querySelector('#banner') as HTMLImageElement;
+  const profile = document.querySelector('#profile') as HTMLImageElement;
+  console.log(this.originalUser);
+  banner.src = this.originalUser.bannerImage?.url;
+  profile.src = this.originalUser.profileImage?.url;
+  bio.innerHTML = this.originalUser.bio;
+  username.innerHTML = this.originalUser.username;
+
   this.mostrarConfirmacion = false;
   this.editandoPerfil = false;
   this.cancelar = true;
-
   setTimeout(() => {
     this.cancelar = false;
   }, 100);
-  
-  // this.user = structuredClone(this.originalUser);
-  // this.editandoPerfil = false;
-  // this.mostrarConfirmacion = false;
 }
 
 
@@ -241,6 +250,29 @@ limitarTexto(event: Event, maxLength: number) {
   }
 }
 
+onProfileImageChange(event: Event): void {
+  const input = event.target as HTMLInputElement;
 
-  
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+
+    const imageUrl = URL.createObjectURL(file);
+    this.user.profileImage.url = imageUrl;
+
+    setTimeout(() => URL.revokeObjectURL(imageUrl), 100);
+  }
+}
+
+onBannerImageChange(event: Event): void {
+  const input = event.target as HTMLInputElement;
+
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+
+    const imageUrl = URL.createObjectURL(file);
+    this.user.bannerImage.url = imageUrl;
+
+    setTimeout(() => URL.revokeObjectURL(imageUrl), 100);
+  }
+}
 }
