@@ -158,6 +158,19 @@ export class UserService {
     return this.http.put<any>(`${this.apiUrl}/auth/user/edit`, data, { withCredentials: true });
   }
 
+  getStatusProfile(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/status/profile`, { withCredentials: true });
+  }
+
+  setStatusProfile(isPrivate: boolean): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/status/profile`, { is_private: isPrivate }, { withCredentials: true });
+  }
+
+  isFollowing(userId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/follow/${userId}`, { withCredentials: true });
+  }
+
+  
 }
 
 
