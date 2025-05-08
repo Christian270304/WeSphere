@@ -62,7 +62,7 @@ export class MessagesComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.chatSocketService.leaveChat(this.selectedChatId!);
-    this.socketService.off('receive_message');
+    // this.socketService.off('receive_message');
   }
 
   private loadUserAndChats(): void {
@@ -98,6 +98,7 @@ export class MessagesComponent implements OnInit {
       if (!chat) {
         // Si el chat no existe, crearlo
         this.userService.createChat(userId).subscribe((newChat) => {
+          console.log("Nuevo chat creado: ", newChat);
           // Agregar el nuevo chat a la lista de chats
           this.chats.push(newChat);
   
@@ -107,10 +108,32 @@ export class MessagesComponent implements OnInit {
           this.otherUser = newChat.other_users[0].user_id;
           console.log("Nuevo user: ", this.otherUser);
           console.log("Todos los chats: ", this.chats);
+
+          this.userService.getUserById(this.otherUser).subscribe((user) => {
+            this.profileUser = user;
+          });
+          
+          this.chatSocketService.joinChat(this.selectedChatId!);
+      
+          this.userService.getMessages(this.selectedChatId!).subscribe((messages) => {
+            this.messages = messages;
+            this.scrollToBottom();
+          });
         });
       } else {
         this.otherUser = chat.other_users[0].user_id;
         this.selectedChatId = chat.chat_id;
+
+        this.userService.getUserById(this.otherUser).subscribe((user) => {
+          this.profileUser = user;
+        });
+        
+        this.chatSocketService.joinChat(this.selectedChatId!);
+    
+        this.userService.getMessages(this.selectedChatId!).subscribe((messages) => {
+          this.messages = messages;
+          this.scrollToBottom();
+        });
       }
       
     } else {
@@ -119,18 +142,20 @@ export class MessagesComponent implements OnInit {
       if (!chat) return;
 
       this.otherUser = chat.other_users[0].user_id;
+
+      this.userService.getUserById(this.otherUser).subscribe((user) => {
+        this.profileUser = user;
+      });
+      
+      this.chatSocketService.joinChat(this.selectedChatId!);
+  
+      this.userService.getMessages(this.selectedChatId!).subscribe((messages) => {
+        this.messages = messages;
+        this.scrollToBottom();
+      });
     }
 
-    this.userService.getUserById(this.otherUser).subscribe((user) => {
-      this.profileUser = user;
-    });
     
-    this.chatSocketService.joinChat(this.selectedChatId!);
-
-    this.userService.getMessages(this.selectedChatId!).subscribe((messages) => {
-      this.messages = messages;
-      this.scrollToBottom();
-    });
   }
 
   public sendMessage(): void {
