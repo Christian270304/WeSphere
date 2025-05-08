@@ -2,8 +2,8 @@ import dotenv from 'dotenv';
 
 import { verifyUserCredentials, generateAuthToken, getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, 
   getNotificationsModel, getSugerenciasModel, saveNotificationModel, toggleFollowQuery, createUser, verifyAuthToken,
-  getFollowStatusQuery, getMessagesQuery, getFriendsQuery, findExistingChat, createNewChat,
-  getLastMessage, getUserInfo, checkExistingUsername, getUserById, updateUserProfile, uploadImageModel
+  getFollowStatusQuery, getMessagesQuery, getFriendsQuery, findExistingChat, createNewChat, getProfileStatusQuery,
+  getLastMessage, getUserInfo, checkExistingUsername, getUserById, updateUserProfile, uploadImageModel, deleteUserById
 } from '../models/AuthQueries.js';
 
 dotenv.config();
@@ -349,6 +349,47 @@ export class AuthController {
     }
   }
 
+  static async getProfileStatus(req, res) {
+    try {
+      const { id: user_id } = req.user; 
+  
+      const profileStatus = await getProfileStatusQuery(user_id);
+
+      if (!profileStatus) return res.status(404).json({ msg: "Estado de perfil no encontrado" });
+  
+      res.json({ profileStatus });
+    } catch (error) {
+      console.error('Error en getProfileStatus:', error);
+      res.status(500).json({ error: 'Error al obtener el estado de perfil' });
+    }
+  }
+
+  static async getFollowStatusById(req, res) {
+    try {
+      const { id: follower_id } = req.user;
+      const { userId } = req.params;
+
+      const userAuthenticated = await getUserById(follower_id);
+    
+      if (userAuthenticated.id === parseInt(userId)) {
+        return res.status(200).json({ 
+          isFollowing: true 
+        });
+      }
+
+      const user = await getUser(userId);
+
+      if (!user) return res.status(404).json({ msg: "Usuario no encontrado" });
+
+      const isFollowing = await getFollowStatusQuery(follower_id, user.id);
+
+      res.json({ isFollowing });
+    } catch (error) {
+      console.error('Error en getFollowStatusByUsername:', error);
+      res.status(500).json({ error: 'Error al obtener el estado de seguimiento' });
+    }
+  }
+
   static async createChat(req, res) {
     try {
       const { userId: otherUserId } = req.body;
@@ -392,6 +433,41 @@ export class AuthController {
     } catch (error) {
       console.error('Error al crear el chat:', error);
       res.status(500).json({ error: 'Error al crear el chat' });
+    }
+  }
+
+  static async updateProfileStatus(req, res) {
+    try {
+      const { id: userId } = req.user;
+      const { is_private } = req.body;
+
+      const updatedStatus = await updateUserProfile(userId, { is_private });
+
+      if (!updatedStatus) {
+        return res.status(404).json({ msg: "Estado de perfil no encontrado" });
+      }
+
+      res.json({ msg: "Estado de perfil actualizado", updatedStatus });
+    } catch (error) {
+      console.error('Error al actualizar el estado de perfil:', error);
+      res.status(500).json({ error: 'Error al actualizar el estado de perfil' });
+    }
+  }
+
+  static async deleteAccount(req, res) {
+    try {
+      const { id: userId } = req.user;
+  
+      const result = await deleteUserById(userId);
+  
+      if (result > 0) {
+        return res.status(200).json({ msg: 'Cuenta eliminada correctamente.' });
+      } else {
+        return res.status(400).json({ msg: 'No se pudo eliminar la cuenta.' });
+      }
+    } catch (error) {
+      console.error('Error al eliminar la cuenta:', error);
+      res.status(500).json({ error: 'Error al eliminar la cuenta.' });
     }
   }
 

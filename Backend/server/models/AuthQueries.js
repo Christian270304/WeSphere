@@ -1,4 +1,4 @@
-import { ChatMember, Message, User, Media, Chat, Follower, Notificacion } from "./models.js";
+import { ChatMember, Message, User, Media, Chat, Follower, Notificacion, AuthProvider } from "./models.js";
 import { Op, sequelize } from "../config/db.js";
 import { io } from '../server.js';
 import crypto from 'crypto';
@@ -235,6 +235,20 @@ export const getUser = async (id) => {
     }
   }
 
+  export const getProfileStatusQuery = async (user_id) => {
+    try {
+      const user = await User.findOne({
+        where: { id: user_id },
+        attributes: ['id', 'is_private']
+      });
+      
+      console.log("User: ", user);
+      return user;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+
   export const saveNotificationModel = async (user_id, reference_id, notificacion) => {
     try {
       const { type, content } = notificacion;
@@ -396,6 +410,25 @@ export const getUser = async (id) => {
     return await User.findOne({
       where: { username, id: { [Op.ne]: userId } }
     });
+  };
+
+  export const deleteUserById = async (userId) => {
+    try {
+      const result = await User.destroy({
+        where: { id: userId } 
+      });
+
+      const authProviders = await AuthProvider.findAll({ where: { user_id: userId } });
+
+      if (authProviders.length > 0) {
+        await AuthProvider.destroy({ where: { user_id: userId } });
+      }
+  
+      return result; 
+    } catch (error) {
+      console.error('Error al eliminar el usuario:', error);
+      throw error;
+    }
   };
   
   export const getUserById = async (userId) => {
