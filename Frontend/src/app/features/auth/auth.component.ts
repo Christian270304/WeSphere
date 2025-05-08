@@ -32,12 +32,16 @@ export class AuthComponent {
   ngOnInit(): void { 
     this.authService.checkAuthentication().subscribe((res) => {
       this.isAuthenticated = res;
+      console.log('Estat d\'autenticació:', this.isAuthenticated);
       if (this.isAuthenticated) {
         this.isLoading = true;
         setTimeout(() => {
           this.router.navigate(['/home']);
         }, 1000);
-      }  
+      } else {
+        this.isLoading = false;
+        this.router.navigate(['/']);
+      } 
     });
   }
 
