@@ -1,6 +1,26 @@
 import { Post, User, Media, Follower, Like, Comment, SavedPosts, Notificacion } from './models.js';
+import dontenv from 'dotenv';
+import crypto from 'crypto';
+import sharp from 'sharp';
+import { v2 as cloudinary } from 'cloudinary';
+import streamifier from 'streamifier';
 import { Op , sequelize } from "../config/db.js";
 import { io } from '../server.js'
+
+dontenv.config();
+
+// Configuration
+cloudinary.config({ 
+    cloud_name: process.env.CLOUD_NAME, 
+    api_key: process.env.CLOUD_API_KEY, 
+    api_secret: process.env.CLOUD_API_SECRET 
+});
+
+
+export const createPost = async (postData) => {
+    return await Post.create(postData);
+};
+
 
 // Función para obtener posts recomendados
 export const getRecommendedPosts = async (type = 'recomendado', user_id, limit = 10, offset = 0) => {
@@ -56,6 +76,9 @@ const getPostsForRecommended = async (followedIds, user_id, limit, offset) => {
             `), 'score']
         ],
         where: {
+            ...(followedIds.length > 0
+                ? { user_id: { [Op.notIn]: followedIds } }
+                : {}),
             created_at: { [Op.gte]: sequelize.literal('NOW() - INTERVAL 6 MONTH') }
         },
         order: [
@@ -148,6 +171,10 @@ const getNewContentPosts = async (user_id, limit, offset) => {
     return formatPosts(posts, user_id);
 };
 
+export const getPostById = async (id) => {
+    return await Post.findByPk(id);
+};
+
 const formatPosts = (posts, user_id) => {
     return posts.map(post => {
         const liked = post.likes?.some(like => String(like.user_id) === String(user_id));
@@ -199,6 +226,62 @@ export const getComments = async (Id) => {
         return error;
     }
 }
+
+export const findExistingLike = async (userId, postId) => {
+    return await Like.findOne({ where: { user_id: userId, post_id: postId } });
+  };
+  
+  export const createLike = async (userId, postId) => {
+    await Like.create({ user_id: userId, post_id: postId });
+    await Post.increment('likes_count', { where: { id: postId } });
+  };
+  
+  export const deleteLike = async (userId, postId) => {
+    const existingLike = await Like.findOne({ where: { user_id: userId, post_id: postId } });
+    if (existingLike) {
+      await existingLike.destroy();
+      await Post.decrement('likes_count', { where: { id: postId } });
+    }
+  };
+  
+  export const getPostWithUser = async (postId) => {
+    return await Post.findByPk(postId, { include: [{ model: User, as: 'user' }] });
+  };
+  
+  export const findExistingNotification = async (userId, postId) => {
+    return await Notificacion.findOne({
+      where: {
+        type: 'like',
+        user_id: userId,
+        reference_id: postId,
+      },
+    });
+  };
+  
+  export const createNotification = async (userId, postId, content) => {
+    return await Notificacion.create({
+      user_id: userId,
+      type: 'like',
+      content,
+      reference_id: postId,
+      is_read: false,
+      created_at: new Date(),
+    });
+  };
+  
+  export const getUpdatedPost = async (postId, userId) => {
+    return await Post.findByPk(postId, {
+      attributes: ['id', 'likes_count'],
+      include: [
+        {
+          model: Like,
+          as: 'likes',
+          where: { user_id: userId },
+          required: false,
+        },
+      ],
+    });
+  };
 
 export const createComment = async (post_id, user_id, content) => {
     try {
@@ -266,24 +349,95 @@ export const getPostSaved = async (user_id) => {
     }
 }
 
-export const savePost = async (post_id, user_id, res) => {
-    try {
-        // Verificar si el post ya está guardado por el usuario
-        const existingSavedPost = await SavedPosts.findOne({
-            where: { post_id, user_id }
-        });
-
-        if (existingSavedPost) {
-            // Si ya está guardado, eliminarlo
-            await existingSavedPost.destroy();
-            return res.json({ saved: false });
-        } else {
-            // Si no está guardado, agregarlo
-            await SavedPosts.create({ user_id: id, post_id });
-            return res.json({ saved: true });
-        }
-    } catch (error) {
-        console.error('Error en savePost:', error);
-        return error;
+export const findSavedPost = async (userId, postId) => {
+    return await SavedPosts.findOne({ where: { user_id: userId, post_id: postId } });
+  };
+  
+  // Guardar un post
+  export const savePost = async (userId, postId) => {
+    return await SavedPosts.create({ user_id: userId, post_id: postId });
+  };
+  
+  // Eliminar un post guardado
+  export const deleteSavedPost = async (userId, postId) => {
+    const savedPost = await SavedPosts.findOne({ where: { user_id: userId, post_id: postId } });
+    if (savedPost) {
+      await savedPost.destroy();
+      return true; // Indica que el post fue eliminado
     }
-}
+    return false; // Indica que no había un post guardado
+  };
+
+export const uploadImage = async (imageBuffer, folder = 'posts') => {
+    const imageHash = await getFileHash(imageBuffer);
+  
+    // Verificar si la imagen ya existe
+    const existingImage = await Media.findOne({ where: { hash: imageHash } });
+    if (existingImage) {
+      return existingImage.id;
+    }
+  
+    // Optimizar la imagen con Sharp
+    const optimizedImage = await sharp(imageBuffer)
+      .resize({ width: 600 })
+      .webp({ quality: 70 })
+      .toBuffer();
+  
+    // Subir la imagen a Cloudinary
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: `uploads/${folder}`, format: 'webp' },
+        async (error, result) => {
+          if (error) {
+            return reject(error);
+          }
+          try {
+            const image = await Media.create({ hash: imageHash, url: result.secure_url, type: 'image' });
+            resolve(image.id);
+          } catch (err) {
+            reject(err);
+          }
+        }
+      );
+      streamifier.createReadStream(optimizedImage).pipe(uploadStream);
+    });
+  };
+  
+  // Subir un video a Cloudinary
+  export const uploadVideo = async (videoBuffer, folder = 'posts') => {
+    const videoHash = await getFileHash(videoBuffer);
+  
+    // Verificar si el video ya existe
+    const existingVideo = await Media.findOne({ where: { hash: videoHash } });
+    if (existingVideo) {
+      return existingVideo.id;
+    }
+  
+    // Subir el video a Cloudinary
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: `uploads/${folder}`, resource_type: 'video' },
+        async (error, result) => {
+          if (error) {
+            return reject(error);
+          }
+          try {
+            const video = await Media.create({ hash: videoHash, url: result.secure_url, type: 'video' });
+            resolve(video.id);
+          } catch (err) {
+            reject(err);
+          }
+        }
+      );
+      streamifier.createReadStream(videoBuffer).pipe(uploadStream);
+    });
+  };
+  
+  // Generar un hash para un archivo
+  export const getFileHash = (buffer) => {
+    return new Promise((resolve) => {
+      const hash = crypto.createHash('sha256');
+      hash.update(buffer);
+      resolve(hash.digest('hex'));
+    });
+  };
