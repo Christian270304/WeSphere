@@ -15,7 +15,7 @@ const uploadMiddleware = upload.fields([
 
 const router = express.Router();
 
-router.get('/', authMiddleware, PostController.getPosts);
+router.get('/:type', authMiddleware, PostController.getPosts);
 router.get('/user/:id', authMiddleware, PostController.getPostsById);
 router.get('/comments/:post_id', authMiddleware, PostController.getComments);
 router.get('/savedposts', authMiddleware, PostController.getPostSaved);
