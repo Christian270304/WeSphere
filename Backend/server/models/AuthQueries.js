@@ -1,5 +1,10 @@
 import { ChatMember, Message, User, Media, Chat, Follower, Notificacion } from "./models.js";
 import { Op, sequelize } from "../config/db.js";
+import { io } from '../server.js';
+import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { uploadImage } from '../models/PostQueries.js';
 
 
 export const verifyUser = async (username, email) => {
@@ -14,6 +19,44 @@ export const verifyUser = async (username, email) => {
     throw new Error(err);
   }
 }
+
+export const verifyUserCredentials = async (username, password) => {
+  const user = await User.findOne({ where: { username } });
+
+  if (!user) {
+    throw new Error('Usuario no encontrado');
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new Error('Contraseña incorrecta');
+  }
+
+  return user;
+};
+
+export const verifyAuthToken = (token) => {
+  try {
+    if (!token) {
+      return { authenticated: false };
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return { authenticated: true, userId: decoded.id };
+  } catch (err) {
+    console.error('Error al verificar el token:', err.message);
+    return { authenticated: false };
+  }
+};
+
+export const generateAuthToken = (userId) => {
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+};
+
+export const createUser = async (userData) => {
+  return await User.create(userData);
+};
+
 
 export const getChatsModel = async (user_id) => {
   const userChats = await ChatMember.findAll({
@@ -148,6 +191,12 @@ export const getUser = async (id) => {
         content,
         created_at: new Date(),
       });
+
+      if (!message) {
+        throw new Error('Error al crear el missatge');
+      }
+
+      io.to(`chat:${chat_id}`).emit('receive_message', message);
       
       return message;
     } catch (err) {
@@ -189,6 +238,9 @@ export const getUser = async (id) => {
   export const saveNotificationModel = async (user_id, reference_id, notificacion) => {
     try {
       const { type, content } = notificacion;
+      if (content === null) {
+        content = "No hi ha contingut";
+      }
       console.log("notificacion", type, content);
       const notification = await Notificacion.create({
         user_id,
@@ -204,3 +256,171 @@ export const getUser = async (id) => {
       throw new Error(err);
     }
   }
+
+  export const toggleFollowQuery = async (follower_id, following_id) => {
+    try {
+      const existingFollow = await Follower.findOne({
+        where: { follower_id, following_id }
+      });
+  
+      if (existingFollow) {
+        await existingFollow.destroy();
+        return { following: false };
+      } else {
+        await Follower.create({ follower_id, following_id });
+
+        const user = await User.findOne({ where: { id: follower_id } });
+
+        const notification = { type: 'follow', content: 't\'ha seguit', user };
+        io.to(`user:${following_id}`).emit('receive_notification', { follower_id, notification });
+  
+        return { following: true };
+      }
+    } catch (error) {
+      console.error('Error en toggleFollowQuery:', error);
+      throw error;
+    }
+  };
+
+  export const getFollowStatusQuery = async (follower_id, following_id) => {
+    try {
+      const isFollowing = await Follower.findOne({
+        where: { follower_id, following_id }
+      });
+      return !!isFollowing; 
+    } catch (error) {
+      console.error('Error en getFollowStatusQuery:', error);
+      throw error;
+    }
+  };
+
+  export const getMessagesQuery = async (chat_id) => {
+    try {
+      const messages = await Message.findAll({
+        where: { chat_id },
+        order: [['created_at', 'ASC']]
+      });
+  
+      return messages;
+    } catch (error) {
+      console.error('Error en getMessagesQuery:', error);
+      throw error;
+    }
+  };
+
+  export const getFriendsQuery = async (follower_id) => {
+    try {
+      const followingRecords = await Follower.findAll({
+        where: { follower_id },
+        attributes: ['following_id']
+      });
+  
+      const followingIds = followingRecords.map(record => record.following_id);
+  
+      if (followingIds.length === 0) {
+        return [];
+      }
+  
+      const friends = await User.findAll({
+        where: { id: followingIds },
+        attributes: ['id', 'username'],
+        include: {
+          model: Media,
+          as: 'profileImage',
+          attributes: ['url']
+        }
+      });
+  
+      return friends;
+    } catch (error) {
+      console.error('Error en getFriendsQuery:', error);
+      throw error;
+    }
+  };
+
+  export const findExistingChat = async (userId, otherUserId) => {
+    const chatsWithBothUsers = await Chat.findAll({
+      include: [
+        {
+          model: ChatMember,
+          where: {
+            user_id: [userId, otherUserId]
+          },
+          required: true
+        }
+      ]
+    });
+  
+    const existingChat = chatsWithBothUsers.find(chat =>
+      chat.chat_members.length === 2 &&
+      chat.chat_members.some(cm => cm.user_id === userId) &&
+      chat.chat_members.some(cm => cm.user_id === otherUserId)
+    );
+  
+    return existingChat;
+  };
+  
+  export const createNewChat = async (userId, otherUserId) => {
+    const newChat = await Chat.create({
+      is_group: false,
+      created_at: new Date()
+    });
+  
+    await ChatMember.create({ chat_id: newChat.id, user_id: userId });
+    await ChatMember.create({ chat_id: newChat.id, user_id: otherUserId });
+  
+    return newChat;
+  };
+  
+  export const getLastMessage = async (chatId) => {
+    return await Message.findOne({
+      where: { chat_id: chatId },
+      order: [['created_at', 'DESC']],
+      attributes: ['content']
+    });
+  };
+  
+  export const getUserInfo = async (userId) => {
+    return await User.findOne({
+      where: { id: userId },
+      attributes: ['id', 'username'],
+      include: {
+        model: Media,
+        as: 'profileImage',
+        attributes: ['url']
+      }
+    });
+  };
+
+  export const checkExistingUsername = async (username, userId) => {
+    return await User.findOne({
+      where: { username, id: { [Op.ne]: userId } }
+    });
+  };
+  
+  export const getUserById = async (userId) => {
+    return await User.findOne({ where: { id: userId } });
+  };
+  
+  export const updateUserProfile = async (userId, updateData) => {
+    return await User.update(updateData, { where: { id: userId } });
+  };
+
+  export const uploadImageModel = async (imageBuffer, folder) => {
+    const imageHash = await getHash(imageBuffer);
+    const existingImage = await Media.findOne({ where: { hash: imageHash } });
+  
+    if (existingImage) {
+      return existingImage.id;
+    } else {
+      return await uploadImage(imageBuffer, folder);
+    }
+  };
+  
+  export const getHash = (buffer) => {
+    return new Promise((resolve, reject) => {
+      const hash = crypto.createHash('sha256');
+      hash.update(buffer);
+      resolve(hash.digest('hex'));
+    });
+  };
