@@ -20,6 +20,7 @@
     background-color: var(--light);
     color: var(--dark);
     line-height: 1.6;
+    min-height: 100vh;
 }
 a {
     text-decoration: none;
@@ -37,9 +38,6 @@ ul {
 /* Main Content */
 .main-content {
     padding-top: 80px;
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 20px;
 }
 /* Explore Feed */
 .explore-feed {
@@ -50,7 +48,7 @@ ul {
 .explore-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 10px 20px;
     background-color: white;
     border-radius: var(--border-radius);
@@ -171,6 +169,14 @@ ul {
 .action-button i {
     font-size: 1.1rem;
 }
+
+.loading-posts {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
 /* Right Sidebar */
 .right-sidebar {
     position: sticky;
