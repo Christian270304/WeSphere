@@ -1,4 +1,6 @@
 import { CommonModule } from '@angular/common';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { UserStatsComponent } from '../../shared/components/user-stats/user-stats.component';
 import { UserActionsComponent } from '../../shared/components/user-actions/user-actions.component';
@@ -26,10 +28,13 @@ export class ProfileComponent {
   public noExists: boolean = false;
   public username: string | null = null;
   public mostrarConfirmacion = false;
+  public isPrivate: boolean = false;
 
   public cancelar: boolean = false;
 
   public originalUser: any;
+
+  private destroy$ = new Subject<void>();
   noPosts: boolean = false; 
 
   
@@ -46,6 +51,7 @@ export class ProfileComponent {
   constructor(private route: ActivatedRoute, private headerStateService: HeaderStateService, private userService: UserService,  private cdr: ChangeDetectorRef, private errorService: ErrorService) {}
 
   ngOnInit() {
+    this.isPrivate = false;
     const isMobile = window.innerWidth <= 768; 
     if (!isMobile) {
       this.headerStateService.setHideElements(true);
@@ -55,45 +61,70 @@ export class ProfileComponent {
   }
 
   ngOnDestroy() {
+    this.destroy$.next(); 
+    this.destroy$.complete();
     this.userId = null;
+    this.isPrivate = false;
   }
 
-private loadProfile() {
-  this.route.paramMap.subscribe(params => {
-    const usernameFromUrl = params.get('username');
-    this.userId = null;  
+  private loadProfile() {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+      const usernameFromUrl = params.get('username');
+      this.userId = null;
 
-    if (!usernameFromUrl) {
-      this.userService.getUser().subscribe(user => {
-        if (user) {
-          this.originalUser = structuredClone(user); 
-          this.user = user;
-          this.userId = user.id;
-          this.isOwnProfile = true;
-          this.noExists = false;
-        } else {
-          this.noExists = true;  
-        }
-      });
-    } else {
-      this.userService.getUserByUsername(usernameFromUrl).subscribe((profileUser) => {
-        if (profileUser) {
-          
+      if (!usernameFromUrl) {
+        this.userService
+          .getUser()
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((user) => {
+            if (user) {
+              this.originalUser = structuredClone(user);
+              this.user = user;
+              this.userId = user.id;
+              this.isOwnProfile = true;
+              this.noExists = false;
+            } else {
+              this.noExists = true;
+            }
+          });
+      } else {
+        this.userService
+          .getUserByUsername(usernameFromUrl)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((profileUser) => {
+            if (profileUser) {
+              this.user = profileUser.user;
+              this.userId = profileUser.user.id;
+              this.isOwnProfile =
+                profileUser.current_user_id === profileUser.user.id;
+              this.noExists = false;
+              this.cdr.detectChanges();
 
-          this.user = profileUser.user;
-          this.userId = profileUser.user.id;
-          this.isOwnProfile = profileUser.current_user_id === profileUser.user.id;
-          this.noExists = false; 
-          this.cdr.detectChanges();
-          console.log(this.user); 
-        } else {
-          this.noExists = true;  
-          this.cdr.detectChanges(); 
-        }
-      });
-    }
-  });
-}
+              if (profileUser.user.is_private) {
+                this.noPosts = true;
+                this.isPrivate = true;
+
+                this.userService
+                  .isFollowing(profileUser.user.id)
+                  .pipe(takeUntil(this.destroy$))
+                  .subscribe({
+                    next: (isFollowing) => {
+                      if (isFollowing.isFollowing) {
+                        this.noPosts = false;
+                        this.isPrivate = false;
+                        this.cdr.detectChanges();
+                      }
+                    },
+                  });
+              }
+            } else {
+              this.noExists = true;
+              this.cdr.detectChanges();
+            }
+          });
+      }
+    });
+  }
 
   handleNoPosts(event: boolean): void {
     this.noPosts = event; 
