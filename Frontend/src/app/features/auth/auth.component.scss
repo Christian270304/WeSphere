@@ -4,7 +4,7 @@
     margin: 0;
     padding: 0;
     font-family: 'Poppins', sans-serif;
-    background: #f0f9ff;
+    background: var(--light);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -26,7 +26,7 @@
 .container {
     position: relative;
     z-index: 1;
-    background: white;
+    background: var(--white);
     border-radius: 20px;
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     width: 90%;
@@ -64,7 +64,7 @@ form {
 }
 
 .form-title {
-    color: #2c3e50;
+    color: var(--text);
     font-size: 2.5rem;
     margin-bottom: 20px;
     text-align: center;
@@ -141,7 +141,7 @@ form {
 }
 
 .social-icon {
-    color: #333;
+    color: var(--text);
     font-size: 1.5rem;
     transition: transform 0.2s;
 }
@@ -227,7 +227,7 @@ form {
     align-items: center;
     justify-content: center;
     height: 100vh; /* Ocupa toda la pantalla */
-    background-color: rgba(255, 255, 255, 0.9); /* Fondo semitransparente */
+    background-color: var(--white); /* Fondo semitransparente */
     position: fixed;
     top: 0;
     left: 0;
