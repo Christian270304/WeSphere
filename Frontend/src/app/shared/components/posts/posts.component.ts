@@ -94,7 +94,7 @@ export class PostsComponent implements OnChanges {
           this.isLoading = false;
         }
       });
-    } else if (this.saved && !this.userArticles) {
+    } else if (this.saved) {
       this.posts = [];
       this.postsService.getSavedPosts().subscribe(savedPosts => {
         if (savedPosts.length === 0 ) {
@@ -118,7 +118,6 @@ export class PostsComponent implements OnChanges {
     } else {
       this.postsService.getPosts( this.limit, this.offset).subscribe({
         next: (posts) => {
-          console.log('Posts:', posts);
           if (posts.length === 0 ) {
             this.noPosts.emit(true); 
           } else {
@@ -137,10 +136,6 @@ export class PostsComponent implements OnChanges {
         }
       });
     }
-  }
-
-  savePost(post: any): void {
-
   }
 
   private addUniquePosts(newPosts: any[]): void {
