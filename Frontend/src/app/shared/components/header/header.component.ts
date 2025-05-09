@@ -93,8 +93,14 @@ export class HeaderComponent {
   }
 
   @HostListener('document:click', ['$event'])
-  closeDropdown(event: Event) {
-    if (!(event.target as HTMLElement).closest('.user-profile')) {
+  closeDropdown(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+
+    if (!target.closest('.nav-icon') && !target.closest('.dropdown')) {
+      this.showDropdown = false;
+    }
+
+    if (!target.closest('.user-profile')) {
       this.dropdownOpen = false;
     }
   }
