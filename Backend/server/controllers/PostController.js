@@ -1,23 +1,7 @@
-import { Post, Media, User, Like, SavedPosts, Notificacion } from '../models/models.js';
 import { getRecommendedPosts, getComments, createComment, getPostSaved, createPost, uploadImage, uploadVideo, getPostById, findExistingLike, findSavedPost, savePost, deleteSavedPost,
-  createLike,
-  deleteLike,
-  getPostWithUser,
-  findExistingNotification,
-  createNotification,
-  getUpdatedPost, } from '../models/PostQueries.js';
-
-
-import dontenv from 'dotenv';
+  createLike, getPostsByUserId, deleteLike, getPostWithUser, findExistingNotification, createNotification, getUpdatedPost, getUserById } from '../models/PostQueries.js';
 
 import { io } from '../server.js'
-import { type } from 'os';
-
-dontenv.config();
-
-
-
-
 
 export class PostController {
   static async createPost(req, res) {
@@ -152,7 +136,7 @@ export class PostController {
           const existingNotification = await findExistingNotification(postOwnerId, postId);
   
           if (!existingNotification) {
-            const user = await User.findByPk(userId);
+            const user = await getUserById(userId);
             const notificationContent = `L'usuari ${user.username} ha donat m'agrada a la teva publicació`;
   
             const newNotification = await createNotification(postOwnerId, postId, notificationContent);
@@ -276,18 +260,12 @@ export class PostController {
     // }
 
     static async getPostsById(req, res) {
-        try {
-          const { id } = req.params;
-        const posts = await Post.findAll({ 
-          include: [
-            { model: User, as: "user", attributes: ['username'], include: { model: Media, as: 'profileImage', attributes: ['url'] } },
-            { model: Media, as: "media", attributes: ['url', 'type'] }
-          ],
-          where: { user_id: id } });
-    
+    try {
+        const { id } = req.params;
+        const posts = await getPostsByUserId(id);
         res.json({ posts });
-        } catch (err) {
+    } catch (err) {
         res.status(500).json({ error: err.message });
-        }
     }
+}
 }

@@ -175,6 +175,10 @@ export const getPostById = async (id) => {
     return await Post.findByPk(id);
 };
 
+export const getUserById = async (id) => {
+    return await User.findByPk(id);
+};
+
 const formatPosts = (posts, user_id) => {
     return posts.map(post => {
         const liked = post.likes?.some(like => String(like.user_id) === String(user_id));
@@ -325,6 +329,22 @@ export const createComment = async (post_id, user_id, content) => {
     }
 }
 
+export const getPostsByUserId = async (userId) => {
+    try {
+        const posts = await Post.findAll({
+            include: [
+                { model: User, as: "user", attributes: ['username'], include: { model: Media, as: 'profileImage', attributes: ['url'] } },
+                { model: Media, as: "media", attributes: ['url', 'type'] }
+            ],
+            where: { user_id: userId }
+        });
+        return posts;
+    } catch (error) {
+        console.error('Error en getPostsByUserId:', error);
+        throw error;
+    }
+};
+
 export const getPostSaved = async (user_id) => {
     try {
         const saved = await SavedPosts.findAll({
@@ -333,6 +353,10 @@ export const getPostSaved = async (user_id) => {
         });
 
         const postIds = saved.map(savedPost => savedPost.post_id);
+
+        if (postIds.length === 0) {
+            return [];
+        }
 
         const posts = await Post.findAll({
             where: { id: postIds },
@@ -347,7 +371,7 @@ export const getPostSaved = async (user_id) => {
         console.error('Error en getPostSaved:', error);
         return error;
     }
-}
+};
 
 export const findSavedPost = async (userId, postId) => {
     return await SavedPosts.findOne({ where: { user_id: userId, post_id: postId } });

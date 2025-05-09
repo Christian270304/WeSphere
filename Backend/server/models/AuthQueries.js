@@ -1,3 +1,4 @@
+import dotenv from 'dotenv';
 import { ChatMember, Message, User, Media, Chat, Follower, Notificacion, AuthProvider } from "./models.js";
 import { Op, sequelize } from "../config/db.js";
 import { io } from '../server.js';
@@ -6,6 +7,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { uploadImage } from '../models/PostQueries.js';
 
+dotenv.config();
 
 export const verifyUser = async (username, email) => {
   try {
@@ -108,7 +110,7 @@ export const getChatsModel = async (user_id) => {
         const user = member.user;  
         
         if (!user) {
-          console.log('User not found for member ID:', member.user_id);
+            return null;
         }
   
         const profileImage = user && user.profileImage ? user.profileImage.url : null;
@@ -242,7 +244,6 @@ export const getUser = async (id) => {
         attributes: ['id', 'is_private']
       });
       
-      console.log("User: ", user);
       return user;
     } catch (err) {
       throw new Error(err);
@@ -255,7 +256,6 @@ export const getUser = async (id) => {
       if (content === null) {
         content = "No hi ha contingut";
       }
-      console.log("notificacion", type, content);
       const notification = await Notificacion.create({
         user_id,
         type,
