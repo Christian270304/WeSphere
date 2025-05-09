@@ -21,7 +21,6 @@ export class AppComponent {
   }
 
   ngOnInit(): void {
-    // Desconectar el socket si el usuario no está autenticado
     this.authService.isAuthenticated().subscribe((isAuthenticated: boolean) => {
       if (!isAuthenticated) {
         this.socketService.disconnect();

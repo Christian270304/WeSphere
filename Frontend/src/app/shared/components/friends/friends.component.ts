@@ -16,7 +16,6 @@ import { Component } from '@angular/core';
      this.userService.getFriends().subscribe({
        next: (response) => {
          this.friends = response.friends; 
-         console.log('Amigos:', this.friends); // Verifica que los amigos se hayan cargado correctamente
        },
        error: (err) => {
          console.error('Error al obtener amigos:', err);

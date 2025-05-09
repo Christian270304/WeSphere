@@ -1,7 +1,7 @@
 <div class="right-sidebar">
     <div class="sidebar-card">
         <div class="sidebar-header">
-            Sugerencias para ti
+            Suggeriments per a tu
         </div>
         <div class="suggestion-list">
             @for (suggestion of suggestions; track $index) {
@@ -11,7 +11,6 @@
                     </div>
                     <div class="suggestion-info">
                         <div class="suggestion-name">{{ suggestion.username }}</div>
-                        <!-- <div class="suggestion-bio">Diseñadora UX/UI</div> -->
                     </div>
                     <button 
                         [ngClass]="suggestion.isFollowing ? 'unfollow-button' : 'follow-button'" 

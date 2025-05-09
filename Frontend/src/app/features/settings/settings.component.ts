@@ -29,7 +29,6 @@ export class SettingsComponent {
   togglePrivate(): void {
     this.isPrivate = !this.isPrivate;
     this.userService.setStatusProfile(this.isPrivate).subscribe((res) => {
-      console.log('Perfil actualizado:', res);
     }, error => {
       console.error('Error al actualizar el perfil:', error);
     });
@@ -53,7 +52,6 @@ export class SettingsComponent {
 
   deleteAccount() {
     this.authService.deleteAccount().subscribe((res) => {
-      console.log('Compte eliminat:', res);
     }, error => {
       console.error('Error al eliminar el compte:', error);
     });
