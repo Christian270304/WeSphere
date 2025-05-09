@@ -8,10 +8,10 @@
                     @for (chat of chats; track $index) {
                         <div [class.active]="chat.chat_id === selectedChatId" class="chat-item" id="{{ chat.chat_id }}" (click)="selectChat(chat.chat_id)">
                             <div class="chat-avatar">
-                                <img [src]="chat.other_users[0]?.profile_image" alt="Foto de perfil de {{ chat.other_users[0]?.username }}">
+                                <img [src]="chat.other_users[0].profile_image" alt="Foto de perfil de {{ chat.other_users[0].username }}">
                             </div>
                             <div class="chat-info">
-                                <div class="chat-name">{{ chat.other_users[0]?.username }}</div>
+                                <div class="chat-name">{{ chat.other_users[0].username }}</div>
                                 <div class="chat-preview">{{ chat.last_message }}</div>
                             </div>
                         </div>
@@ -48,7 +48,7 @@
                             }
                         }
                         <input [(ngModel)]="newMessage" (keydown.enter)="sendMessage()" id="message" type="text" class="chat-input" placeholder="Escribe un mensaje...">
-                        <!-- <button (click)="sendMessage()" id="send" class="send-button"><i class="fas fa-paper-plane"></i></button> -->
+                        <button (click)="sendMessage()" id="send" class="send-button"><i class="fas fa-paper-plane"></i></button>
                     </div>
                 }
             </div>
