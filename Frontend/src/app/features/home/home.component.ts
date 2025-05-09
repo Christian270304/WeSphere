@@ -138,6 +138,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   private submitPost(formData: FormData, inputElement: HTMLInputElement, fileInput: HTMLInputElement): void {
     this.http.post(`${this.apiUrl}/posts/create`, formData, { withCredentials: true }).subscribe(
       () => {
+        this.message = 'Post creat amb èxit!';
+        setTimeout(() => {
+          this.message = '';
+        }, 3000);
         this.resetPostForm(inputElement, fileInput);
       },
       (error) => {

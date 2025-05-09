@@ -199,6 +199,15 @@ ul {
     font-size: 1.4rem;
 }
 
+.message {
+    display: flex;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: var(--text);
+    margin-top: 10px;
+    background-color: rgb(106, 243, 106);
+}
+
 .create-post-actions {
     display: flex;
     justify-content: space-around;
