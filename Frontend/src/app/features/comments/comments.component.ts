@@ -26,7 +26,6 @@ export class CommentsComponent {
     this.postId = postId ? Number(postId) : null;
   
     if (this.postId) {
-      console.log('Post ID recibido:', this.postId);
       this.loadComments(this.postId);
     } else {
       console.error('No se recibió un postId');
@@ -36,7 +35,6 @@ export class CommentsComponent {
   loadComments(postId: number): void {
     this.postService.getComments(postId).subscribe((response) => {
       this.post = response.Post; 
-      console.log('Post cargado:', this.post);
     });
   }
 
@@ -57,7 +55,6 @@ export class CommentsComponent {
     }
     this.http.post(`${this.apiUrl}/posts/comment/${this.postId}`, { content: commentText }, {withCredentials: true}).subscribe(
       (response) => {
-        console.log('Comentario creado exitosamente:', response);
         inputComment.value = ''; 
         this.loadComments(this.postId!); 
       },
