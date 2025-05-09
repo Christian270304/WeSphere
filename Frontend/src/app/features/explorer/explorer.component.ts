@@ -35,7 +35,6 @@ export class ExplorerComponent implements AfterViewInit {
     setTimeout(() => {
       this.postsComponent.loadPosts();
       this.isLoading = false;
-      console.log('Más publicaciones cargadas');
     }, 2000);
   }
 }
