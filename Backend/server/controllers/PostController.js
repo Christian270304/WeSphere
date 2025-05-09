@@ -11,22 +11,20 @@ export class PostController {
       const videoFile = req.files?.video?.[0];
       const imageFile = req.files?.image?.[0];
 
-      if (!videoFile && !imageFile) {
-        return res.status(400).json({ error: 'No se ha enviado ningún archivo.' });
-      }
-
-      const fileBuffer = videoFile ? videoFile.buffer : imageFile.buffer;
-      const fileType = videoFile ? videoFile.mimetype : imageFile.mimetype;
-
       let mediaId = null;
-
-      if (fileBuffer && fileType) {
-        if (fileType.startsWith('image/')) {
-          mediaId = await uploadImage(fileBuffer);
-        } else if (fileType.startsWith('video/')) {
-          mediaId = await uploadVideo(fileBuffer);
-        } else {
-          return res.status(400).json({ error: 'El archivo debe ser una imagen o un video.' });
+      
+      if (imageFile || videoFile) {
+        const fileBuffer = videoFile ? videoFile.buffer : imageFile.buffer;
+        const fileType = videoFile ? videoFile.mimetype : imageFile.mimetype;
+      
+        if (fileBuffer && fileType) {
+          if (fileType.startsWith('image/')) {
+            mediaId = await uploadImage(fileBuffer);
+          } else if (fileType.startsWith('video/')) {
+            mediaId = await uploadVideo(fileBuffer);
+          } else {
+            return res.status(400).json({ error: 'El archivo debe ser una imagen o un video.' });
+          }
         }
       }
 

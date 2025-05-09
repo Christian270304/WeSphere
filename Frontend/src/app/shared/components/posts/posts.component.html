@@ -16,14 +16,16 @@
       <div class="post-content">
         {{ post.description }}
       </div>
-      @if (post.media.type == 'image') { 
-        <div class="post-image" [ngClass]="{ 'no-image': post.media == null }">
-          <img [src]="post.media?.url" alt="Post image" />
-        </div>
-      } @else if (post.media.type == 'video') {
-        <div class="post-video" [ngClass]="{ 'no-image': post.media == null }">
-          <video controls [src]="post.media?.url" alt="Post video"></video>
-        </div>
+      @if (post.media != null) {
+        @if (post.media.type == 'image') { 
+          <div class="post-image" [ngClass]="{ 'no-image': post.media == null }">
+            <img [src]="post.media?.url" alt="Post image" />
+          </div>
+        } @else if (post.media.type == 'video') {
+          <div class="post-video" [ngClass]="{ 'no-image': post.media == null }">
+            <video controls [src]="post.media?.url" alt="Post video"></video>
+          </div>
+        }
       }
       <div class="action-buttons">
         @if (post.allow_likes == true && !userArticles) {
