@@ -139,7 +139,6 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     this.http.post(`${this.apiUrl}/posts/create`, formData, { withCredentials: true }).subscribe(
       () => {
         this.resetPostForm(inputElement, fileInput);
-        console.log('Post creado exitosamente');
       },
       (error) => {
         console.error('Error al crear el post:', error);
@@ -194,7 +193,6 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     setTimeout(() => {
       this.postsComponent.loadPosts();
       this.isLoading = false;
-      console.log('Más publicaciones cargadas');
     }, 2000);
   }
 }
