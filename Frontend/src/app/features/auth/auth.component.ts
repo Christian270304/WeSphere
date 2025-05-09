@@ -15,24 +15,23 @@ import { CommonModule } from '@angular/common';
   styleUrl: './auth.component.scss'
 })
 export class AuthComponent {
-  isAuthenticated = false;
-  isLoading = false;
-  isLoginFormVisible:boolean = true;
-  username: string = '';
-  password: string = '';
-  Reusername: string = '';
-  email: string = '';
-  Repassword: string = '';
-  confirmPassword: string = '';
-  passwordVisible: boolean = false;
-  passwordVisibleConfirm: boolean = false;
+  public isAuthenticated = false;
+  public isLoading = false;
+  public isLoginFormVisible:boolean = true;
+  public username: string = '';
+  public password: string = '';
+  public Reusername: string = '';
+  public email: string = '';
+  public Repassword: string = '';
+  public confirmPassword: string = '';
+  public passwordVisible: boolean = false;
+  public passwordVisibleConfirm: boolean = false;
 
   constructor(private authService: AuthService, private router: Router, private errorService: ErrorService, private socketService: SocketService) {}
 
   ngOnInit(): void { 
     this.authService.checkAuthentication().subscribe((res) => {
       this.isAuthenticated = res;
-      console.log('Estat d\'autenticació:', this.isAuthenticated);
       if (this.isAuthenticated) {
         this.isLoading = true;
         setTimeout(() => {

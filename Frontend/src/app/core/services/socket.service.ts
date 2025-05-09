@@ -45,14 +45,12 @@ export class SocketService {
   }
 
   emit(event: string, data: any): void {
-    console.log("Emitiendo evento: ", event, " con datos: ", data, " desde el socket: ", this.socket);
     if (this.socket) {
       this.socket.emit(event, data);
     }
   }
 
   off(event: string): void {
-    console.log(`Eliminando listener para el evento: ${event}`);
     this.socket!.off(event);
   }
 

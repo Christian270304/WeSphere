@@ -72,7 +72,6 @@ export class MessagesComponent implements OnInit {
   
       this.userService.getChats().subscribe((chats) => {
         this.chats = chats;
-        console.log("Chats: ", this.chats);
   
         if (this.pendingUserId) {
           this.selectChat(0, Number(this.pendingUserId));
@@ -96,18 +95,11 @@ export class MessagesComponent implements OnInit {
     if (userId) {
       const chat = this.chats.find((chat) => chat.other_users[0].user_id === userId);
       if (!chat) {
-        // Si el chat no existe, crearlo
         this.userService.createChat(userId).subscribe((newChat) => {
-          console.log("Nuevo chat creado: ", newChat);
-          // Agregar el nuevo chat a la lista de chats
           this.chats.push(newChat);
   
-          // Seleccionar el nuevo chat
           this.selectedChatId = newChat.chat_id;
-          console.log("Nuevo chat creado: ", newChat);
           this.otherUser = newChat.other_users[0].user_id;
-          console.log("Nuevo user: ", this.otherUser);
-          console.log("Todos los chats: ", this.chats);
 
           this.userService.getUserById(this.otherUser).subscribe((user) => {
             this.profileUser = user;

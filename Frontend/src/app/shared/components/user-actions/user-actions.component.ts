@@ -66,9 +66,8 @@ export class UserActionsComponent {
   }
 
   saveChanges(): void {
-    this.isEditing = false; // Cambiar el estado
-    // this.editProfile.emit(this.isEditing);
-    this.save.emit(true); // Emitir el evento de guardado al padre
+    this.isEditing = false;
+    this.save.emit(true); 
   }
 
   toggleFollow(): void {

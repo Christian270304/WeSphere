@@ -1,12 +1,8 @@
-import dotenv from 'dotenv';
-
 import { verifyUserCredentials, generateAuthToken, getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, 
   getNotificationsModel, getSugerenciasModel, saveNotificationModel, toggleFollowQuery, createUser, verifyAuthToken,
   getFollowStatusQuery, getMessagesQuery, getFriendsQuery, findExistingChat, createNewChat, getProfileStatusQuery,
   getLastMessage, getUserInfo, checkExistingUsername, getUserById, updateUserProfile, uploadImageModel, deleteUserById
 } from '../models/AuthQueries.js';
-
-dotenv.config();
 
 const DEFAULT_PROFILE_IMAGE_ID = 1;
 const DEFAULT_PROFILE_BANNER_ID = 2;
@@ -179,6 +175,8 @@ export class AuthController {
       const { id } = req.user;
 
       const chats = await getChatsModel(id); 
+
+      if (!chats) return res.status(404).json({ msg: "Chats no encontrados" });
       
       return res.status(200).json({ chats });
     } catch (err) {
@@ -394,8 +392,6 @@ export class AuthController {
     try {
       const { userId: otherUserId } = req.body;
       const { id: userId } = req.user;
-
-      console.log("Crear chat: ", userId, otherUserId);
 
       const existingChat = await findExistingChat(userId, otherUserId);
 

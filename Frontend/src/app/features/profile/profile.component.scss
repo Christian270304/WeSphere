@@ -124,8 +124,6 @@ header {
     display: grid;
     grid-template-areas: 'profile sidebar'
         'posts sidebar';
-    // grid-template-columns: 2fr 1fr;
-
     gap: 20px;
 }
 
