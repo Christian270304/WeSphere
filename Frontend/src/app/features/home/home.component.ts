@@ -1,223 +1,186 @@
-import { Component,
-  ElementRef,
-  AfterViewInit,
-  ViewChild,
-  OnDestroy } from '@angular/core';
-import { AuthService } from '../../core/services/auth.service';
-import { Router, RouterModule } from '@angular/router';
-import { PostsComponent } from '../../shared/components/posts/posts.component';
-import { environment } from '../../../environments/environment';
+import { Component, ElementRef, AfterViewInit, ViewChild, OnDestroy } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 import { HeaderStateService } from '../../core/services/header-state.service';
 import { UserService } from '../../core/services/user.service';
+import { ErrorService } from '../../core/services/error.service';
+import { PostsComponent } from '../../shared/components/posts/posts.component';
 import { SuggestionComponent } from '../../shared/components/suggestion/suggestion.component';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { ErrorMessageComponent } from '../../shared/components/error-message/error-message.component';
 
 @Component({
   selector: 'app-home',
-  imports: [PostsComponent, RouterModule, SuggestionComponent, NavbarComponent],
+  imports: [PostsComponent, RouterModule, SuggestionComponent, NavbarComponent, ErrorMessageComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent implements AfterViewInit, OnDestroy {
-  private apiUrl = environment.apiUrl
-  isAuthenticated = false; 
-  liked = false; 
-  likeCount = 150; 
-  selectedImage = '';
-  cargarMasPosts = false;
+  private apiUrl = environment.apiUrl;
+  public isAuthenticated = false;
+  public liked = false;
+  public likeCount = 150;
+  public selectedImage = '';
+  public cargarMasPosts = false;
   public placeholderText = '';
-  isLoading = false;
-  observer!: IntersectionObserver;
-
-  public user: any = {}; 
-
-  constructor (private http: HttpClient, private headerStateService: HeaderStateService, private userService: UserService) {}
+  public isLoading = false;
+  public message = '';
+  public user: any = {};
+  private observer!: IntersectionObserver;
 
   @ViewChild('observer', { static: false }) observerElement!: ElementRef;
+  @ViewChild(PostsComponent) postsComponent!: PostsComponent;
 
-  ngAfterViewInit() {
+  constructor(
+    private http: HttpClient,
+    private headerStateService: HeaderStateService,
+    private userService: UserService,
+    private errorService: ErrorService
+  ) {}
+
+  ngOnInit(): void {
+    this.headerStateService.setHideElements(false);
+    this.loadUserData();
+  }
+
+  ngAfterViewInit(): void {
     this.setupIntersectionObserver();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this.observer) this.observer.disconnect();
   }
 
-  ngOnInit() {
-    this.headerStateService.setHideElements(false);
- 
+  private loadUserData(): void {
     this.userService.getUser().subscribe((user) => {
       this.user = user;
       this.placeholderText = `Què estàs pensant, ${user.username}?`;
     });
   }
 
-  onFileSelected(event: Event): void {
+  public onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const divVideo = document.querySelector('div.video-container') as HTMLDivElement;
-    const previewImage = document.querySelector('img[class="post-image-preview"]') as HTMLImageElement;
-    const previewVideo = document.querySelector('video[class="post-video-preview"]') as HTMLVideoElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
-      console.log('Archivo seleccionado:', file);
-
-      if (file.type.startsWith('image/')) {
-        previewImage.style.display = 'block';
-        previewVideo.style.display = 'none'; 
-        const reader = new FileReader();
-        reader.onload = (e: any) => {
-          
-          previewImage.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      } else if (file.type.startsWith('video/')) {
-        divVideo.style.display = 'block';
-        previewImage.style.display = 'none'; 
-        previewVideo.style.display = 'block';
-        
-        
-        // Obtener elementos del DOM
-const video = document.getElementById("video") as HTMLVideoElement;
-const playPauseBtn = document.getElementById("playPauseBtn") as HTMLButtonElement;
-const progressBar = document.getElementById("progressBar") as HTMLDivElement;
-const progress = document.getElementById("progress") as HTMLDivElement;
-const volume = document.getElementById("volume") as HTMLInputElement;
-const fullscreenBtn = document.getElementById("fullscreenBtn") as HTMLButtonElement;
-
-// Función para alternar Play/Pause
-function togglePlayPause(): void {
-    if (video.paused) {
-        video.play();
-        playPauseBtn.textContent = "⏸";
-    } else {
-        video.pause();
-        playPauseBtn.textContent = "▶️";
-    }
-}
-
-// Actualizar barra de progreso
-function updateProgress(): void {
-    const progressPercent = (video.currentTime / video.duration) * 100;
-    progress.style.width = `${progressPercent}%`;
-}
-
-// Adelantar video al hacer clic en la barra de progreso
-function setProgress(event: MouseEvent): void {
-    const newTime = (event.offsetX / progressBar.clientWidth) * video.duration;
-    video.currentTime = newTime;
-}
-
-// Control de volumen
-function setVolume(): void {
-    video.volume = parseFloat(volume.value);
-}
-
-// Pantalla completa
-function toggleFullScreen(): void {
-    if (!document.fullscreenElement) {
-        video.requestFullscreen().catch(err => console.error(err));
-    } else {
-        document.exitFullscreen();
-    }
-}
-
-// Event Listeners
-playPauseBtn.addEventListener("click", togglePlayPause);
-video.addEventListener("timeupdate", updateProgress);
-progressBar.addEventListener("click", setProgress);
-volume.addEventListener("input", setVolume);
-fullscreenBtn.addEventListener("click", toggleFullScreen);
-
-
-
-
-        
-        const reader = new FileReader();
-        reader.onload = (e: any) => {
-          
-          if (previewVideo) {
-            previewVideo.src = e.target.result;
-          }
-        };
-        reader.readAsDataURL(file);
-        
-      }
+      this.handleFilePreview(file);
     }
   }
 
-  createPost(): void {
+  private handleFilePreview(file: File): void {
+    const previewImage = document.querySelector('img.post-image-preview') as HTMLImageElement;
+    const previewVideo = document.querySelector('video.post-video-preview') as HTMLVideoElement;
+    const divVideo = document.querySelector('div.video-container') as HTMLDivElement;
+
+    if (file.type.startsWith('image/')) {
+      this.displayImagePreview(file, previewImage, previewVideo, divVideo);
+    } else if (file.type.startsWith('video/')) {
+      this.displayVideoPreview(file, previewImage, previewVideo, divVideo);
+    }
+  }
+
+  private displayImagePreview(file: File, previewImage: HTMLImageElement, previewVideo: HTMLVideoElement, divVideo: HTMLDivElement): void {
+    previewImage.style.display = 'block';
+    previewVideo.style.display = 'none';
+    divVideo.style.display = 'none';
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      previewImage.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  private displayVideoPreview(file: File, previewImage: HTMLImageElement, previewVideo: HTMLVideoElement, divVideo: HTMLDivElement): void {
+    previewImage.style.display = 'none';
+    previewVideo.style.display = 'block';
+    divVideo.style.display = 'block';
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      previewVideo.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  public createPost(): void {
     const inputElement = document.querySelector('div.description input') as HTMLInputElement;
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-    const file = fileInput.files?.[0]; 
+    const file = fileInput.files?.[0];
     let description = inputElement.value.trim();
 
-    if ((!description || description == this.placeholderText) && !file) { 
-      alert('No puedes enviar un post vacío.');
+    if ((!description || description === this.placeholderText) && !file) {
+      this.errorService.setError('No es pot crear un post buit!');
       return;
     }
 
     if (description === this.placeholderText) {
-     description = '';
+      description = '';
     }
-    alert(`Post creado exitosamente ${description} ${file}`);
 
-  const formData = new FormData();
-  formData.append('description', description);
-  if (file) {
-    if (file.type.startsWith('image/')) {
-      formData.append('image', file); 
-    } else if (file.type.startsWith('video/')) {
-      formData.append('video', file); 
-    }
+    const formData = this.preparePostFormData(description, file);
+    this.submitPost(formData, inputElement, fileInput);
   }
 
-
-  this.http.post(`${this.apiUrl}/posts/create`, formData, {withCredentials: true}).subscribe(
-    (response) => {
-      console.log('Post creado exitosamente:', response);
-      inputElement.innerText = this.placeholderText; 
-      if (fileInput) {
-        fileInput.value = ''; 
+  private preparePostFormData(description: string, file?: File): FormData {
+    const formData = new FormData();
+    formData.append('description', description);
+    if (file) {
+      if (file.type.startsWith('image/')) {
+        formData.append('image', file);
+      } else if (file.type.startsWith('video/')) {
+        formData.append('video', file);
       }
-      const previewImage = document.querySelector('img[class="post-image-preview"]') as HTMLImageElement;
-      if (previewImage) {
-        previewImage.src = '';
-      }
-      const previewVideo = document.querySelector('video[class="post-video-preview"]') as HTMLVideoElement;
-      const divVideo = document.querySelector('div.video-container') as HTMLDivElement;
-      if (previewVideo) {
-        previewVideo.src = '';
-        previewVideo.style.display = 'none';
-      }
-      if (divVideo) {
-        divVideo.style.display = 'none';
-      }
-    },
-    (error) => {
-      console.error('Error al crear el post:', error);
     }
-  );
+    return formData;
   }
 
-  clearPlaceholder(): void {
+  private submitPost(formData: FormData, inputElement: HTMLInputElement, fileInput: HTMLInputElement): void {
+    this.http.post(`${this.apiUrl}/posts/create`, formData, { withCredentials: true }).subscribe(
+      () => {
+        this.resetPostForm(inputElement, fileInput);
+        console.log('Post creado exitosamente');
+      },
+      (error) => {
+        console.error('Error al crear el post:', error);
+      }
+    );
+  }
+
+  private resetPostForm(inputElement: HTMLInputElement, fileInput: HTMLInputElement): void {
+    inputElement.value = '';
+    fileInput.value = '';
+
+    const previewImage = document.querySelector('img.post-image-preview') as HTMLImageElement;
+    const previewVideo = document.querySelector('video.post-video-preview') as HTMLVideoElement;
+    const divVideo = document.querySelector('div.video-container') as HTMLDivElement;
+
+    if (previewImage) previewImage.src = '';
+    if (previewVideo) {
+      previewVideo.src = '';
+      previewVideo.style.display = 'none';
+    }
+    if (divVideo) divVideo.style.display = 'none';
+  }
+
+  public clearPlaceholder(): void {
     const inputElement = document.querySelector('div.create-post-input') as HTMLDivElement;
     if (inputElement.innerText === this.placeholderText) {
       inputElement.innerText = '';
     }
   }
 
-  restorePlaceholder(): void {
+  public restorePlaceholder(): void {
     const inputElement = document.querySelector('div.create-post-input') as HTMLDivElement;
     if (inputElement.innerText.trim() === '') {
-      inputElement.innerText = this.placeholderText; 
+      inputElement.innerText = this.placeholderText;
     }
   }
 
-  setupIntersectionObserver() {
-    this.observer = new IntersectionObserver(entries => {
+  private setupIntersectionObserver(): void {
+    this.observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && !this.isLoading) {
-        this.isLoading = true; 
+        this.isLoading = true;
         this.onLoadMorePosts();
       }
     });
@@ -226,10 +189,12 @@ fullscreenBtn.addEventListener("click", toggleFullScreen);
       this.observer.observe(this.observerElement.nativeElement);
     }
   }
-  @ViewChild(PostsComponent) postsComponent!: PostsComponent;
-  onLoadMorePosts(): void {
-    this.postsComponent.loadPosts(); 
-    this.isLoading = false;
+
+  public onLoadMorePosts(): void {
+    setTimeout(() => {
+      this.postsComponent.loadPosts();
+      this.isLoading = false;
+      console.log('Más publicaciones cargadas');
+    }, 2000);
   }
-  
 }

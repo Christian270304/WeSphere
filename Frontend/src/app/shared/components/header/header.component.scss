@@ -61,6 +61,7 @@ header {
     display: flex;
     align-items: center;
     gap: 15px;
+    cursor: pointer;
 }
 
 .nav-icon {
@@ -130,7 +131,7 @@ header {
     position: absolute;
     top: 60px;
     right: 0;
-    background: white;
+    background: var(--white);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     overflow: hidden;
@@ -146,7 +147,7 @@ header {
     display: block;
     padding: 12px 15px;
     text-decoration: none;
-    color: #333;
+    color: var(--text);
     font-size: 0.95rem;
     cursor: pointer;
     transition: background 0.3s;

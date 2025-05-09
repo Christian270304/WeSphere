@@ -1,6 +1,6 @@
 import passport from "passport";
 import GoogleStrategy from "passport-google-oauth20";
-import { PostController } from "../controllers/PostController.js";
+import { uploadImage } from '../models/PostQueries.js';
 import { User, AuthProvider } from "../models/models.js";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
@@ -39,7 +39,7 @@ passport.use(new GoogleStrategy({
       const pictureUrl = photos[0].value;
       const response = await fetch(pictureUrl);
       const imageBuffer = await response.buffer();
-      const imageId = await PostController.uploadImage(imageBuffer, 'profile');
+      const imageId = await uploadImage(imageBuffer, 'profile');
   
       const user = await User.create({
         username,

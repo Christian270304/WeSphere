@@ -1,63 +1,64 @@
 import { Post, Media, User, Like, SavedPosts, Notificacion } from '../models/models.js';
-import { getRecommendedPosts, getComments, createComment, getPostSaved, savePost } from '../models/PostQueries.js';
-import { v2 as cloudinary } from 'cloudinary';
-import sharp from 'sharp';
-import streamifier from 'streamifier';
+import { getRecommendedPosts, getComments, createComment, getPostSaved, createPost, uploadImage, uploadVideo, getPostById, findExistingLike, findSavedPost, savePost, deleteSavedPost,
+  createLike,
+  deleteLike,
+  getPostWithUser,
+  findExistingNotification,
+  createNotification,
+  getUpdatedPost, } from '../models/PostQueries.js';
+
+
 import dontenv from 'dotenv';
-import crypto from 'crypto';
+
 import { io } from '../server.js'
 import { type } from 'os';
 
 dontenv.config();
 
-// Configuration
-cloudinary.config({ 
-    cloud_name: process.env.CLOUD_NAME, 
-    api_key: process.env.CLOUD_API_KEY, 
-    api_secret: process.env.CLOUD_API_SECRET 
-});
+
 
 
 
 export class PostController {
-    static async createPost(req, res) {
-        try {
-        const { id: user_id } = req.user;    
-        const { description = '', likes_count = 0, comments_count = 0, allow_comments = true, allow_likes = true, allow_save = true, created_at = new Date() } = req.body || {};
-        const videoFile = req.files?.video?.[0];
-        const imageFile = req.files?.image?.[0];
+  static async createPost(req, res) {
+    try {
+      const { id: user_id } = req.user;
+      const { description = '', likes_count = 0, comments_count = 0, allow_comments = true, allow_likes = true, allow_save = true, created_at = new Date() } = req.body || {};
+      const videoFile = req.files?.video?.[0];
+      const imageFile = req.files?.image?.[0];
 
-        if (!videoFile && !imageFile) {
-          return res.status(400).json({ error: 'No se ha enviado ningún archivo.' });
+      if (!videoFile && !imageFile) {
+        return res.status(400).json({ error: 'No se ha enviado ningún archivo.' });
+      }
+
+      const fileBuffer = videoFile ? videoFile.buffer : imageFile.buffer;
+      const fileType = videoFile ? videoFile.mimetype : imageFile.mimetype;
+
+      let mediaId = null;
+
+      if (fileBuffer && fileType) {
+        if (fileType.startsWith('image/')) {
+          mediaId = await uploadImage(fileBuffer);
+        } else if (fileType.startsWith('video/')) {
+          mediaId = await uploadVideo(fileBuffer);
+        } else {
+          return res.status(400).json({ error: 'El archivo debe ser una imagen o un video.' });
         }
+      }
 
-        const fileBuffer = videoFile ? videoFile.buffer : imageFile.buffer;
-        const fileType = videoFile ? videoFile.mimetype : imageFile.mimetype;
+      const newPost = await createPost({ user_id, description, mediaId, likes_count, comments_count, allow_comments, allow_likes, allow_save, created_at });
 
-        let mediaId = null;
-
-        if (fileBuffer && fileType) {
-            if (fileType.startsWith('image/')) {
-              mediaId = await PostController.uploadImage(fileBuffer);
-            } else if (fileType.startsWith('video/')) {
-              mediaId = await PostController.uploadVideo(fileBuffer);
-            } else {
-                return res.status(400).json({ error: 'El archivo debe ser una imagen o un video.' });
-            }
-        }
-        
-        const newPost = await Post.create({ user_id, description, mediaId, likes_count, comments_count, allow_comments, allow_likes, allow_save, created_at });
-        
-        res.json({ msg: "Post creado", post: newPost });
-        } catch (err) {
-        res.status(500).json({ error: err.message });
-        }
+      res.json({ msg: 'Post creado', post: newPost });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
+  }
     
     static async getPosts(req, res) {
         try {
           const { id } = req.user;
-          const { type } = req.params;
+          const { type } = req.params.type;
+          
           const limit = parseInt(req.query.limit) || 20;
           const offset = parseInt(req.query.offset) || 0;
           const posts = await getRecommendedPosts(type, id, limit, offset);
@@ -69,23 +70,26 @@ export class PostController {
     }
     
     static async getPost(req, res) {
-        try {
+      try {
         const { id } = req.params;
-        const post = await Post.findByPk(id);
-    
-        if (!post) return res.status(404).json({ msg: "Post no encontrado" });
-    
-        res.json({ post });
-        } catch (err) {
-        res.status(500).json({ error: err.message });
+  
+        const post = await getPostById(id);
+  
+        if (!post) {
+          return res.status(404).json({ msg: 'Publicació no trobada' });
         }
+  
+        res.json({ post });
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      }
     }
 
     static async getComments(req, res) {
       try {
         const { post_id } = req.params;
         const Post = await getComments(post_id);
-        if (!Post) return res.status(404).json({ msg: "Post no encontrado" });
+        if (!Post) return res.status(404).json({ msg: "Publicació no trobada" });
         res.json({ Post });
       } catch (err) {
         res.status(500).json({ error: err.message });
@@ -96,9 +100,10 @@ export class PostController {
         try {
         const { id } = req.params;
         const { title, content, image } = req.body;
-        const post = await Post.findByPk(id);
+        
+        const post = await getPostById(id);
     
-        if (!post) return res.status(404).json({ msg: "Post no encontrado" });
+        if (!post) return res.status(404).json({ msg: "Publicació no trobada" });
     
         post.title = title;
         post.content = content;
@@ -114,166 +119,57 @@ export class PostController {
     static async deletePost(req, res) {
         try {
         const { id } = req.params;
-        const post = await Post.findByPk(id);
+        
+        const post = await getPostById(id);
     
-        if (!post) return res.status(404).json({ msg: "Post no encontrado" });
+        if (!post) return res.status(404).json({ msg: "Publicació no trobada" });
     
         await post.destroy();
     
-        res.json({ msg: "Post eliminado" });
+        res.json({ msg: "Publicació eliminada" });
         } catch (err) {
         res.status(500).json({ error: err.message });
         }
     }
 
-    static async uploadImage(imageBuffer, folder = 'posts') {
-        try {
-            // 1️⃣ Generar hash de la imagen
-            const imageHash = await getImageHash(imageBuffer);
-        
-            // 2️⃣ Buscar si ya existe en la base de datos
-            const existingImage = await Media.findOne({ where: { hash: imageHash } });
-        
-            if (existingImage) {
-              console.log("📌 Imagen ya existente, usando cache.");
-              return existingImage.id; // 🔁 Retorna el ID de la imagen ya guardada
-            }
-        
-            // 3️⃣ Optimizar imagen con Sharp
-            const optimizedImage = await sharp(imageBuffer)
-              .resize({ width: 600 })
-              .webp({ quality: 70 })
-              .toBuffer();
-        
-            // 4️⃣ Subir imagen a Cloudinary
-            return new Promise((resolve, reject) => {
-              const uploadStream = cloudinary.uploader.upload_stream(
-                { folder: `uploads/${folder}`, format: 'webp' },
-                async (error, result) => {
-                  if (error) {
-                    console.error("❌ Error al subir a Cloudinary:", error);
-                    return reject(error);
-                  }
-                  try {
-                    const image = await Media.create({ hash: imageHash, url: result.secure_url, type: 'image' });
-                            
-                    resolve(image.id);
-                  } catch (error) {
-                    console.error("❌ Error al guardar en la base de datos:", error);
-                    reject(error);
-                  }
-                  
-                }
-              );
-        
-              streamifier.createReadStream(optimizedImage).pipe(uploadStream);
-            }); 
-
-        } catch (err) {
-            console.error("❌ Error en `uploadImageAndGetId`:", err);
-           
-        }
-    }
-
-    static async uploadVideo(videoBuffer, folder = 'posts') {
-      try {
-          const videoHash = await getVideoHash(videoBuffer);
-  
-          // 2️⃣ Buscar si ya existe en la base de datos
-          const existingVideo = await Media.findOne({ attributes: ['id', 'hash', 'url'], where: { hash: videoHash } });
-  
-          if (existingVideo) {
-              console.log("📌 Video ya existente, usando cache.");
-              return existingVideo.id; // 🔁 Retorna el ID del video ya guardado
-          }
-  
-          // 3️⃣ Subir video a Cloudinary
-          return new Promise((resolve, reject) => {
-              const uploadStream = cloudinary.uploader.upload_stream(
-                  { folder: `uploads/${folder}`, resource_type: 'video' }, // Especifica que es un video
-                  async (error, result) => {
-                      if (error) {
-                          console.error("❌ Error al subir a Cloudinary:", error);
-                          return reject(error);
-                      }
-                      try {
-                          // 4️⃣ Guardar el video en la base de datos
-                          const video = await Media.create({ hash: videoHash, url: result.secure_url, type: 'video' });
-                          resolve(video.id);
-                      } catch (error) {
-                          console.error("❌ Error al guardar en la base de datos:", error);
-                          reject(error);
-                      }
-                  }
-              );
-  
-              streamifier.createReadStream(videoBuffer).pipe(uploadStream);
-          });
-      } catch (err) {
-          console.error("❌ Error en `uploadVideo`:", err);
-          throw err;
-      }
-  }
+    
 
     static async likePost(req, res) {
       try {
-        const { id } = req.user;
-        const { post_id } = req.params;
-    
-        // Verificar si el usuario ya dio like al post
-        const existingLike = await Like.findOne({ where: { user_id: id, post_id } });
-    
+        const { id: userId } = req.user;
+        const { post_id: postId } = req.params;
+  
+        const existingLike = await findExistingLike(userId, postId);
+  
         if (existingLike) {
-          await existingLike.destroy();
-          await Post.decrement('likes_count', { where: { id: post_id } });
+          await deleteLike(userId, postId);
         } else {
-          await Like.create({ user_id: id, post_id });
-          await Post.increment('likes_count', { where: { id: post_id } });
-
-          const post = await Post.findByPk(post_id, { include: [{ model: User, as: 'user' }] });
-          const userId = post.user_id;
-          const existingNotification = await Notificacion.findOne({
-            where: {
-              type: 'like',
-              user_id: userId,
-              reference_id: post_id 
-            }
-          });
-
+          await createLike(userId, postId);
+  
+          const post = await getPostWithUser(postId);
+          const postOwnerId = post.user_id;
+  
+          const existingNotification = await findExistingNotification(postOwnerId, postId);
+  
           if (!existingNotification) {
-            // Buscar el usuario al que está dirigido el like
-            const user = await User.findByPk(id);
-            const notification = {type: 'like', content: `L'usuari ${user.username} ha donat m'agrada a la teva publicació`};
- 
-            const newNotification = await Notificacion.create({
-              user_id: userId,
-              type: 'like',
-              content: `L'usuari ${user.username} ha donat m'agrada a la teva publicació`,
-              reference_id: post_id,
-              is_read: false,
-              created_at: new Date(),
-            })
-            io.to(`user:${userId}`).emit('receive_notification', { userId, notification });
+            const user = await User.findByPk(userId);
+            const notificationContent = `L'usuari ${user.username} ha donat m'agrada a la teva publicació`;
+  
+            const newNotification = await createNotification(postOwnerId, postId, notificationContent);
+  
+            io.to(`user:${postOwnerId}`).emit('receive_notification', {
+              userId: postOwnerId,
+              notification: newNotification,
+            });
           }
         }
-    
-        // Obtener el estado actualizado del post
-        const updatedPost = await Post.findByPk(post_id, {
-          attributes: ['id', 'likes_count'],
-          include: [
-            {
-              model: Like,
-              as: 'likes',
-              where: { user_id: id },
-              required: false 
-            }
-          ]
-        });
-    
+  
+        const updatedPost = await getUpdatedPost(postId, userId);
+  
         res.json({
           id: updatedPost.id,
           likes_count: updatedPost.likes_count,
-          liked: updatedPost.likes.length > 0 
+          liked: updatedPost.likes.length > 0,
         });
       } catch (error) {
         console.error('Error en likePost:', error);
@@ -283,19 +179,16 @@ export class PostController {
 
     static async savePost(req, res) {
       try {
-        const { id } = req.user;
-        const { post_id } = req.params;
-
-        // Verificar si el post ya está guardado por el usuario
-        const existingSavedPost = await SavedPosts.findOne({ where: { user_id: id, post_id } });
-
+        const { id: userId } = req.user;
+        const { post_id: postId } = req.params;
+  
+        const existingSavedPost = await findSavedPost(userId, postId);
+  
         if (existingSavedPost) {
-          // Si ya está guardado, eliminarlo
-          await existingSavedPost.destroy();
+          await deleteSavedPost(userId, postId);
           return res.json({ saved: false });
         } else {
-          // Si no está guardado, agregarlo
-          await SavedPosts.create({ user_id: id, post_id });
+          await savePost(userId, postId);
           return res.json({ saved: true });
         }
       } catch (error) {
@@ -397,22 +290,4 @@ export class PostController {
         res.status(500).json({ error: err.message });
         }
     }
-}
-
-
-
-function getImageHash(buffer) {
-    return new Promise((resolve, reject) => {
-        const hash = crypto.createHash('sha256');
-        hash.update(buffer);
-        resolve(hash.digest('hex'));
-    });
-}
-
-function getVideoHash(buffer) {
-  return new Promise((resolve, reject) => {
-      const hash = crypto.createHash('sha256');
-      hash.update(buffer);
-      resolve(hash.digest('hex'));
-  });
 }

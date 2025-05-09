@@ -2,7 +2,7 @@
     <div class="container">
         <!-- Header -->
         <div class="section-header">
-            <div class="section-title">Posts Guardados</div>
+            <div class="section-title">Publicacions desades</div>
             <!-- <div class="filter-buttons">
                 <div class="filter-button active">Todos</div>
                 <div class="filter-button">Imágenes</div>
@@ -18,7 +18,6 @@
                 
                 <!-- Post Card -->
                  @if (!noSavedPosts) {
-                    
                     <app-posts [isGrid]="true" [saved]="true" (noPosts)="handleNoPosts($event)"></app-posts>
                  } @else {
                     <!-- Empty State -->
@@ -26,11 +25,11 @@
                         <div class="empty-icon">
                             <i class="far fa-bookmark"></i>
                         </div>
-                        <div class="empty-title">No hi ha posts guardats</div>
+                        <div class="empty-title">No tens cap publicació desada</div>
                         <div class="empty-description">
-                            Comença a guardar els teus posts favorits per accedir-hi més tard.
+                            Comença a desar les teves publicacions preferides per accedir-hi més tard.
                         </div>
-                        <button class="empty-action" [routerLink]="['/explorer']">Explora ara</button>
+                        <button class="empty-action" [routerLink]="['/home']">Explora ara</button>
                     </div>
                  }
             </div>

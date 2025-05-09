@@ -1,0 +1,190 @@
+<div class="body-container">
+    <!-- Main Content -->
+    <div class="container">
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="menu-item" [class.active]="activeSection === 'notifications'" (click)="scrollToSection('notifications')">
+                    <i class="fas fa-bell"></i>
+                    Notificacions
+                </div>
+                <div class="menu-item" [class.active]="activeSection === 'privacy'" (click)="scrollToSection('privacy')">
+                    <i class="fas fa-shield-alt"></i>
+                    Privacitat
+                </div>
+                <div class="menu-item" [class.active]="activeSection === 'theme'" (click)="scrollToSection('theme')">
+                    <i class="fas fa-paint-brush"></i>
+                    Tema
+                </div>
+                <div class="menu-item" [class.active]="activeSection === 'language'" (click)="scrollToSection('language')">
+                    <i class="fas fa-language"></i>
+                    Idioma
+                </div>
+                <div class="menu-item" [class.active]="activeSection === 'security'" (click)="scrollToSection('security')">
+                    <i class="fas fa-lock"></i>
+                    Seguretat
+                </div>
+                <div class="menu-item" [class.active]="activeSection === 'account-management'" (click)="scrollToSection('account-management')">
+                    <i class="fas fa-user-cog"></i>
+                    Gestió del compte
+                </div>
+            </div>
+            <!-- Settings Content -->
+            <div class="settings-content">
+                <!-- Notifications -->
+                <div id="notifications" class="section-header">Preferències de Notificacions</div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <i class="fas fa-comment" style="color: var(--secondary);"></i>
+                        <div>
+                            <div class="setting-title">Notificacions de missatges</div>
+                            <div class="setting-description">Rep notificacions quan algú t'enviï un missatge.</div>
+                        </div>
+                    </div>
+                    <div class="setting-action">
+                        <label class="switch">
+                            <input type="checkbox" class="checkbox">
+                            <div class="slider"></div>
+                        </label>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <i class="fas fa-thumbs-up" style="color: var(--primary);"></i>
+                        <div>
+                            <div class="setting-title">Notificacions de m'agrada</div>
+                            <div class="setting-description">Rep notificacions quan algú reaccioni a les teves publicacions.</div>
+                        </div>
+                    </div>
+                    <div class="setting-action">
+                        <label class="switch">
+                            <input type="checkbox" class="checkbox">
+                            <div class="slider"></div>
+                        </label>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <i class="fas fa-envelope" style="color: var(--gray);"></i>
+                        <div>
+                            <div class="setting-title">Notificacions per correu</div>
+                            <div class="setting-description">Rep actualitzacions importants per correu electrònic.</div>
+                        </div>
+                    </div>
+                    <div class="setting-action">
+                        <label class="switch">
+                            <input type="checkbox" class="checkbox">
+                            <div class="slider"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Privacy -->
+                <div id="privacy" class="section-header">Configuració de Privacitat</div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <i class="fas fa-user-lock" style="color: var(--primary);"></i>
+                        <div>
+                            <div class="setting-title">Compte privat</div>
+                            <div class="setting-description">Fes que el teu perfil sigui visible només per als amics.</div>
+                        </div>
+                    </div>
+                    <div class="setting-action">
+                        <label class="switch">
+                            <input type="checkbox" class="checkbox" [checked]="isPrivate" (click)="togglePrivate()">
+                            <div class="slider"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Theme -->
+                <div id="theme" class="section-header">Tema</div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <i class="fas fa-moon" style="color: var(--secondary);"></i>
+                        <div>
+                            <div class="setting-title">Mode fosc</div>
+                            <div class="setting-description">Activa el mode fosc per a una experiència més còmoda.</div>
+                        </div>
+                    </div>
+                    <div class="setting-action">
+                        <label class="switch" >
+                            <input type="checkbox" class="checkbox" (click)="toggleTheme()">
+                            <div class="slider"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Language -->
+                <div id="language" class="section-header">Configuració d'Idioma</div>
+                <div class="form-group">
+                    <label for="language">Selecciona l'idioma</label>
+                    <select id="language">
+                        <option value="es">Espanyol</option>
+                        <option value="en">Anglès</option>
+                        <option value="ca">Català</option>
+                    </select>
+                </div>
+
+                <!-- Security -->
+                <div id="security" class="section-header">Seguretat</div>
+                <div class="form-group">
+                    <label for="current-password">Contrasenya actual</label>
+                    <input type="password" id="current-password" placeholder="Ingresa tu contraseña actual">
+                </div>
+                <div class="form-group">
+                    <label for="new-password">Contrasenya nova</label>
+                    <input type="password" id="new-password" placeholder="Ingresa tu nueva contraseña">
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Confirma la contrasenya</label>
+                    <input type="password" id="confirm-password" placeholder="Confirma tu nueva contraseña">
+                </div>
+                <button class="save-button">Desar canvis</button>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <i class="fas fa-sign-out-alt" style="color: var(--secondary);"></i>
+                        <div>
+                            <div class="setting-title">Tancar sessió</div>
+                        </div>
+                    </div>
+                    <button class="save-button">Tancar sessió</button>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <i class="fas fa-shield-alt" style="color: var(--primary);"></i>
+                        <div>
+                            <div class="setting-title">Autenticació en dos passos</div>
+                            <div class="setting-description">Afegeix una capa extra de seguretat al teu compte.</div>
+                        </div>
+                    </div>
+                    <button class="save-button">Configurar 2FA</button>
+                </div>
+
+                <!-- Account Management -->
+                <div id="account-management" class="section-header">Gestió del Compte</div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <i class="fas fa-trash-alt" style="color: var(--secondary);"></i>
+                        <div>
+                            <div class="setting-title">Eliminar compte</div>
+                            <div class="setting-description">Elimina permanentment el teu compte i dades.</div>
+                        </div>
+                    </div>
+                    <button class="delete-button" (click)="deleteAccount()">Eliminar compte</button>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <i class="fas fa-download" style="color: var(--primary);"></i>
+                        <div>
+                            <div class="setting-title">Descarregar dades</div>
+                            <div class="setting-description">Descarrega una còpia de les teves dades (publicacions, missatges, etc.).</div>
+                        </div>
+                    </div>
+                    <button class="save-button">Descarregar dades</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

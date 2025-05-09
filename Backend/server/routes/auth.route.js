@@ -26,6 +26,9 @@ router.get('/chats', authMiddleware,  AuthController.getChats);
 router.get('/users/:user_id/follow-status', authMiddleware, AuthController.getFollowStatus);
 router.get('/friends', authMiddleware, AuthController.getFriends);
 router.get('/sugerencias', authMiddleware, AuthController.getSugerencias);
+router.get('/status/profile', authMiddleware, AuthController.getProfileStatus);
+router.get('/follow/:userId', authMiddleware, AuthController.getFollowStatusById);
+
 
 router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
@@ -33,6 +36,9 @@ router.post('/logout', authMiddleware,  AuthController.logout);
 router.post('/newMessage', authMiddleware, AuthController.newMessage);
 router.post('/users/:user_id/follow', authMiddleware, AuthController.toggleFollow);
 router.post('/chat/create', authMiddleware, AuthController.createChat);
+router.post('/status/profile', authMiddleware, AuthController.updateProfileStatus);
+
+router.delete('/user/delete', authMiddleware, AuthController.deleteAccount);
 
 router.put('/user/edit', upload.fields([
   { name: 'profileImage', maxCount: 1 },

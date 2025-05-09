@@ -10,16 +10,16 @@
                   <div class="cover-photo">
                       <img id="banner" [src]="user.bannerImage.url" alt="Foto de portada">
                         <button *ngIf="editandoPerfil" class="edit-banner-btn"  (click)="bannerInput.click()">Canviar portada</button>
-                        <input hidden type="file" name="bannerImage" id="bannerImage" #bannerInput>
+                        <input hidden type="file" name="bannerImage" id="bannerImage" #bannerInput (change)="onBannerImageChange($event)">
                   </div>
               
                   <!-- Profile Picture Section -->
                   <div class="profile-pic">
-                      <img [src]="user.profileImage?.url" alt="Foto de perfil de {{ user.username }}">
+                      <img id="profile" [src]="user.profileImage?.url" alt="Foto de perfil de {{ user.username }}">
                         <button *ngIf="editandoPerfil" class="edit-profile-pic-btn" (click)="profileInput.click()">
                           <i class="fas fa-edit"></i>
                         </button>
-                        <input hidden type="file" name="profileImage" id="profileImage" #profileInput>
+                        <input hidden type="file" name="profileImage" id="profileImage" #profileInput (change)="onProfileImageChange($event)">
                   </div>
               
                   <!-- Profile Info Section -->
@@ -45,6 +45,7 @@
                         <i [ngClass]="{'fas fa-pencil': editandoPerfil, '': !editandoPerfil}"></i>
                       </div>
                       <app-user-stats></app-user-stats>
+                      <app-error-message ></app-error-message>
                       <app-user-actions 
                           [isOwn]="isOwnProfile" 
                           [userId]="userId" 
@@ -65,6 +66,13 @@
                 @if (!noPosts) {
 
                   <app-posts class="profile-posts" [isGrid]="true" [userArticles]="true" [userId]="userId" [saved]="false" (noPosts)="handleNoPosts($event)"></app-posts>
+                } @else if (isPrivate) {
+                  <div class="empty-state">
+                    <div class="empty-icon">
+                    <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="empty-title">Aquest compte és privat, segueix l'usuari</div>
+                  </div>
                 } @else {
                     <div class="empty-state">
                       <div class="empty-icon">

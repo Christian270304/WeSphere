@@ -1,26 +1,26 @@
 <div class="sidebar">
     <div class="sidebar-menu">
-        <div class="menu-item active">
+        <div class="menu-item" [routerLink]="['/home']" routerLinkActive="active">
             <i class="fas fa-home"></i>
             <span>Inici</span>
         </div>
-        <div class="menu-item" [routerLink]="['/explorer']">
+        <div class="menu-item" [routerLink]="['/explorer']" routerLinkActive="active">
             <i class="fas fa-compass"></i>
             <span>Explorar</span>
         </div>
-        <div class="menu-item">
+        <div class="menu-item" routerLinkActive="active">
             <i class="fas fa-bell"></i>
             <span>Notificacions</span>
         </div>
-        <div class="menu-item" [routerLink]="['/messages']">
+        <div class="menu-item" [routerLink]="['/messages']" routerLinkActive="active">
             <i class="fas fa-envelope"></i>
             <span>Missatges</span>
         </div>
-        <div class="menu-item" [routerLink]="['/saved-posts']">
+        <div class="menu-item" [routerLink]="['/saved-posts']" routerLinkActive="active">
             <i class="fas fa-bookmark"></i>
             <span>Desats</span>
         </div>
-        <div class="menu-item" [routerLink]="['/profile']">
+        <div class="menu-item" [routerLink]="['/profile']" routerLinkActive="active">
             <i class="fas fa-user"></i>
             <span>Perfil</span>
         </div>

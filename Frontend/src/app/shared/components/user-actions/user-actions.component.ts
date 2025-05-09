@@ -33,6 +33,11 @@ export class UserActionsComponent {
     }
   }
 
+  ngOnDestroy() {
+    this.isFollowing = false;
+    this.isEditing = false;
+  }
+
   ngOnChanges() {
     if (this.cancelarEdicion) {
       this.isEditing = false;

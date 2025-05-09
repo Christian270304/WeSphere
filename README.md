@@ -9,6 +9,7 @@ WeSphere es una aplicación web de red social diseñada para conectar a un nicho
 - [Instalación](#instalación)
 - [Uso](#uso)
 - [Contribución](#contribución)
+- [Licencia](#licencia)
 
 ## Descripción
 
@@ -67,3 +68,8 @@ Una vez que la aplicación esté en funcionamiento, abre tu navegador web y nave
 4. Envía tus cambios a tu repositorio fork (`git push origin feature/nueva-caracteristica`).
 5. Abre un Pull Request.
 
+## Licencia
+
+Este proyecto está licenciado bajo la [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+Copyright (c) 2025 Christian Torres

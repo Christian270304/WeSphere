@@ -130,4 +130,13 @@ export class AuthService {
       }).pipe(map(res => res.user));
     }
 
+    deleteAccount(): Observable<any> {
+      return this.http.delete<any>(`${this.apiUrl}/auth/user/delete`, { withCredentials: true }).pipe(
+        tap(() => {
+          this.isAuthenticatedSubject.next(false);  
+          this.logout();
+        })
+      );;
+    }
+
   }

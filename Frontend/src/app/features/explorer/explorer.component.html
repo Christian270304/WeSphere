@@ -7,14 +7,18 @@
             <div class="explore-feed">
                 <div class="explore-header">
                     <div class="explore-header-title">Explorar</div>
-                    <div class="explore-header-filter">
+                    <!-- <div class="explore-header-filter">
                         <div class="filter-item active">Recomendados</div>
                         <div class="filter-item">Populares</div>
                         <div class="filter-item">Nuevos</div>
-                    </div>
+                    </div> -->
                 </div>
                 <!-- Post Cards -->
-                 <app-posts [isGrid]="true"></app-posts>
+                 <app-posts [isGrid]="true" [explorer]="true"></app-posts>
+                 <div #observer></div>
+                 @if (isLoading) {
+                    <div class="loading-posts">Carregant més publicacions...</div>
+                }
                 <!-- <div class="post-card">
                     <div class="post-header">
                         <div class="post-author">
@@ -155,8 +159,8 @@
                 </div>
             </div>
             <!-- Right Sidebar -->
-            <div class="right-sidebar">
-                <!-- Trending -->
+            <!-- <div class="right-sidebar">
+               
                 <div class="sidebar-card">
                     <div class="sidebar-header">
                         Tendencias para ti
@@ -184,7 +188,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 

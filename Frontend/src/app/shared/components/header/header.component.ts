@@ -5,6 +5,8 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { ThemeService } from '../../../core/services/theme.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -20,19 +22,20 @@ export class HeaderComponent {
   theme: string = 'light'; 
   unreadCount: number = 0;
   showDropdown = false;
+  isMobile: boolean = false;
 
   // Cambiar el tema
   toggleTheme(): void {
     this.theme = this.theme === 'dark' ? 'light' : 'dark';
-    this.setTheme(this.theme);
-    // Guardar el tema en localStorage
-    localStorage.setItem('theme', this.theme);
+    this.themeService.setTheme(this.theme);
+    this.setTheme(this.theme);  
   }
 
   // Aplicar el tema al body
   private setTheme(theme: string): void {
     if (theme === 'dark') {
       document.body.classList.add('dark-mode');
+      
     } else {
       document.body.classList.remove('dark-mode');
     }
@@ -44,14 +47,20 @@ export class HeaderComponent {
     private userService: UserService, 
     private authService: AuthService, 
     private router: Router,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private themeService: ThemeService,
   ) {}
 
   ngOnInit() {
+    const isMobile = window.innerWidth <= 768; 
+    if (isMobile) {
+      this.isMobile = true;
+    }
     this.listenForIncomingNotifications();
-    // Cargar el tema guardado desde localStorage
-    this.theme = localStorage.getItem('theme') || 'light';
-    this.setTheme(this.theme);
+
+    this.themeService.theme$.subscribe((theme) => {
+      this.theme = theme ;
+    });
     
     this.headerStateService.hideElements$.subscribe((value) => {
       this.hideElements = value;

@@ -32,18 +32,22 @@ export class AuthComponent {
   ngOnInit(): void { 
     this.authService.checkAuthentication().subscribe((res) => {
       this.isAuthenticated = res;
+      console.log('Estat d\'autenticació:', this.isAuthenticated);
       if (this.isAuthenticated) {
         this.isLoading = true;
         setTimeout(() => {
           this.router.navigate(['/home']);
         }, 1000);
-      }  
+      } else {
+        this.isLoading = false;
+        this.router.navigate(['/']);
+      } 
     });
   }
 
   login() {
     if (this.username === '' || this.password === '') {
-      this.errorService.setError('Por favor, completa todos los campos requeridos.'); 
+      this.errorService.setError('Si us plau, completa tots els camps requerits.');
       return;
     }
     this.authService.login({ username: this.username, password: this.password }).subscribe((res) => {
@@ -52,7 +56,7 @@ export class AuthComponent {
       this.router.navigate(['/home']);
   
     }, error => {
-      console.error('Error en el inicio de sesión:', error);
+      console.error('Error en l\'inici de sessió:', error);
       if (error.status === 400) this.errorService.setError(error.error.msg);
     });
   }
@@ -60,28 +64,36 @@ export class AuthComponent {
   register () {
     // Verificar los datos del formulario antes de enviar la solicitud
     if (this.Reusername === '' || this.email === '' || this.Repassword === '' || this.confirmPassword === '') {
-      this.errorService.setError('Por favor, completa todos los campos requeridos.');
+      this.errorService.setError('Si us plau, completa tots els camps requerits.');
       return;
     }
 
     // Verificar que el username no contenga espacios
     if (/\s/.test(this.Reusername)) {
-      this.errorService.setError('El nombre de usuario no puede contener espacios.');
+      this.errorService.setError('El nom d\'usuari no pot contenir espais.');
       return;
     }
 
     // Verificar que el email tenga un formato válido
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(this.email)) {
-      this.errorService.setError('El correo electrónico no es válido.');
+      this.errorService.setError('El correu electrònic no és vàlid.');
       return;
     }
 
     // Verificar que las contraseñas coincidan
     if (this.Repassword !== this.confirmPassword) {
-      this.errorService.setError('Las contraseñas no coinciden.');
+      this.errorService.setError('Les contrasenyes no coincideixen.');
       return;
     }
+
+    // Verificar que la contrsenya tenga al menos 8 caràcteres, una lletra majúscula, una lletra minúscula i un número
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+    if (!passwordPattern.test(this.Repassword)) {
+      this.errorService.setError('La contrasenya ha de tenir almenys 8 caràcters, una lletra majúscula, una lletra minúscula i un número.');
+      return;
+    }
+    
     this.authService.register({ username: this.Reusername, email: this.email, password: this.Repassword}).subscribe((res)=> {
       this.isAuthenticated = true;
       this.socketService.connect(); 
@@ -98,7 +110,7 @@ export class AuthComponent {
         this.socketService.connect(); 
         this.router.navigate(['/home']);
       } else {
-        this.errorService.setError('Error al iniciar sesión con Google.');
+        this.errorService.setError('Error en iniciar sessió amb Google.');
       }
     });
   }
@@ -110,7 +122,7 @@ export class AuthComponent {
         this.socketService.connect(); 
         this.router.navigate(['/home']);
       } else {
-        this.errorService.setError('Error al iniciar sesión con Reddit.');
+        this.errorService.setError('Error en iniciar sessió amb Reddit.');
       }
     });;
   }
@@ -122,7 +134,7 @@ export class AuthComponent {
         this.socketService.connect(); 
         this.router.navigate(['/home']);
       } else {
-        this.errorService.setError('Error al iniciar sesión con Discord.');
+        this.errorService.setError('Error en iniciar sessió amb Discord.');
       }
     });;
   }

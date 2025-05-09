@@ -18,6 +18,7 @@ export class PostsComponent implements OnChanges {
   @Input() userId: number | null = null;
   @Input() saved: boolean = false;
   @Input() cargarMas: boolean = false;
+  @Input() explorer: boolean = false;
   @Output() noPosts = new EventEmitter<boolean>();
   liked = false; 
   isLoading = true;
@@ -82,50 +83,61 @@ export class PostsComponent implements OnChanges {
   }
 
   public loadPosts(): void {
-    this.postsService.getPosts(this.userArticles, this.userId, this.saved, this.limit, this.offset).subscribe({
-      next: (posts) => {
-        console.log('Posts obtenidos:', posts);
-
-        if (posts.length === 0 ) {
-          console.log('No hay publicaciones');
+    if (this.userArticles && this.userId != null) {
+      this.posts = [];
+      this.postsService.getPostsByUserId(this.userId).subscribe(postsUser => {
+        if (postsUser.length === 0 ) {
           this.noPosts.emit(true); 
         } else {
-          console.log('Hay publicaciones');
           this.noPosts.emit(false);
-
+          this.posts = postsUser;
+          this.isLoading = false;
+        }
+      });
+    } else if (this.saved && !this.userArticles) {
+      this.posts = [];
+      this.postsService.getSavedPosts().subscribe(savedPosts => {
+        if (savedPosts.length === 0 ) {
+          this.noPosts.emit(true); 
+        } else {
+          this.noPosts.emit(false); 
+          this.posts = savedPosts;
+          this.isLoading = false;
+        }
+      });
+    } else if (this.explorer) {
+      this.posts = [];
+      this.postsService.getPostsExplorer(this.limit, this.offset).subscribe(posts => {
+          this.noPosts.emit(false); 
           this.addUniquePosts(posts); 
           this.offset += this.limit; 
           setTimeout(() => {
             this.isLoading = false; 
           }, 2000);
+      });
+    } else {
+      this.postsService.getPosts( this.limit, this.offset).subscribe({
+        next: (posts) => {
+          console.log('Posts:', posts);
+          if (posts.length === 0 ) {
+            this.noPosts.emit(true); 
+          } else {
+            this.noPosts.emit(false);
+  
+            this.addUniquePosts(posts); 
+            this.offset += this.limit; 
+            setTimeout(() => {
+              this.isLoading = false; 
+            }, 2000);
+          }
+        },
+        error: (err) => {
+          console.error('Error al cargar publicaciones:', err);
+          this.loading = false;
         }
-      },
-      error: (err) => {
-        console.error('Error al cargar publicaciones:', err);
-        this.loading = false;
-      }
-    });
+      });
+    }
   }
-
-  // onScroll(): void {
-  //   const container = document.querySelector('.post-container');
-  //   if (container) {
-  //     console.log('Scroll event detected!');
-  //     const scrollTop = container.scrollTop;
-  //     const scrollHeight = container.scrollHeight;
-  //     const clientHeight = container.clientHeight;
-
-  //     if (scrollTop + clientHeight >= scrollHeight - 1 ) { // Ajusta el valor según sea necesario
-  //       console.log('Cargando más publicaciones...');
-        
-  //     }
-  //     // const { scrollTop, scrollHeight, clientHeight } = container;
-  //     // if (scrollTop + clientHeight >= scrollHeight && !this.loading) {
-  //     //   console.log('Cargando más publicaciones...');
-  //     //   this.loadPosts(); // Cargar más publicaciones
-  //     // }
-  //   }
-  // }
 
   savePost(post: any): void {
 

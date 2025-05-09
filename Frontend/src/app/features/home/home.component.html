@@ -34,6 +34,10 @@
                             </div>
                         </div>
                     </div>
+                    <app-error-message></app-error-message>
+                    <div class="message">
+                        {{ message}}
+                    </div>
                     <div class="create-post-actions">
                         <div id="upload-foto" class="post-action" (click)="fileInput.click()">
                             <i class="fas fa-image" style="color: #4CAF50;"></i>
@@ -55,13 +59,12 @@
                 </div>
 
                 <!-- Posts -->
-                <div>
-                    <app-posts [isGrid]="false" [cargarMas]="cargarMasPosts"></app-posts>
-                </div> 
-
+                <app-posts [isGrid]="false" [cargarMas]="cargarMasPosts"></app-posts>
                 <div #observer></div>
-
-                <div *ngIf="isLoading">Carregant més publicacions...</div>
+                
+                @if (isLoading) {
+                    <div class="loading-posts">Carregant més publicacions...</div>
+                }
             </div>
             <!-- Right Sidebar -->
             <div class="right-sidebar">

@@ -1,7 +1,7 @@
 <header>
     <div class="container">
         <div class="header-content">
-            <div class="logo" [routerLink]="['/home']" style="cursor: pointer;" (click)="scrollToTop()">
+            <div class="logo" [routerLink]="['/home']" (click)="scrollToTop()">
                 We<span>Sphere</span>
             </div>
             
@@ -11,11 +11,11 @@
             </div>
             
             <div class="nav-icons">
-                <div class="nav-icon" [routerLink]="['/home']" (click)="scrollToTop()" style="cursor: pointer;">
+                <div class="nav-icon" [routerLink]="['/home']" (click)="scrollToTop()">
                     <i class="fas fa-home"></i>
                 </div>
-                <div class="nav-icon">
-                    <i class="fas fa-users"></i>
+                <div class="nav-icon" [routerLink]="['/saved-posts']">
+                    <i class="fas fa-bookmark"></i>
                 </div>
                 <div class="nav-icon" (click)="toggleDropdownNot()">
                   <i class="fas fa-bell"></i>
@@ -53,13 +53,13 @@
                   </ul>
                 </div>
                 
-                <div class="nav-icon" [routerLink]="['/messages']" style="cursor: pointer;">
+                <div class="nav-icon" [routerLink]="['/messages']">
                     <i class="fas fa-envelope"></i>
                     <!-- <span class="notification-badge">5</span> -->
                 </div>
             </div>
             @if (!hideElements) {
-                <div class="user-profile" (click)="toggleDropdown()" style="cursor: pointer;">
+                <div class="user-profile" (click)="toggleDropdown()">
                     <div class="profile-pic">
                         <img [src]="user?.profileImage?.url || null" *ngIf="user?.profileImage?.url" alt="Usuario">
                     </div>
@@ -68,8 +68,13 @@
                 <!-- Dropdown de opciones -->
                 <div class="profile-dropdown" [class.show]="dropdownOpen" (click)="$event.stopPropagation()">
                     <a [routerLink]="['/profile']">Perfil</a>
-                    <a [routerLink]="['/settings']">Configuración</a>
-                  
+                    
+                    @if (isMobile) {
+                      <a [routerLink]="['/saved-posts']">Desats</a>
+                      <a [routerLink]="['/messages']">Missatges</a>
+                      <a [routerLink]="['/explorer']">Explorar</a>
+                    }
+                    <a [routerLink]="['/settings']">Configuració</a>
                     <div class="dropdown-divider"></div>
                   
                     <div class="bottom-actions">
@@ -106,8 +111,6 @@
                         </label>
                       </div>
                   </div>
-                  
-                  
             }
         </div>
     </div>

@@ -1,13 +1,10 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import crypto from 'crypto';
-import { PostController } from './PostController.js';
 
-import { User, Message, Follower, Media, Chat, ChatMember } from '../models/models.js';
-import { getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, getNotificationsModel, getSugerenciasModel, saveNotificationModel } from '../models/AuthQueries.js';
-import { io } from '../server.js'
-import { Op, sequelize } from "../config/db.js";
+import { verifyUserCredentials, generateAuthToken, getUser, getChatsModel, verifyUser, newMessageModel, getUserByUsername, 
+  getNotificationsModel, getSugerenciasModel, saveNotificationModel, toggleFollowQuery, createUser, verifyAuthToken,
+  getFollowStatusQuery, getMessagesQuery, getFriendsQuery, findExistingChat, createNewChat, getProfileStatusQuery,
+  getLastMessage, getUserInfo, checkExistingUsername, getUserById, updateUserProfile, uploadImageModel, deleteUserById
+} from '../models/AuthQueries.js';
 
 dotenv.config();
 
@@ -17,28 +14,36 @@ const DEFAULT_PROFILE_BANNER_ID = 2;
 export class AuthController {
   static async register(req, res) {
     try {
-      let { username, email, password, profile_picture = null, banner = null, bio = null, is_private = false, created_at = new Date() } = req.body;
+      let {username, email, password, profile_picture = null, banner = null, bio = null, is_private = false, created_at = new Date()} = req.body;
 
-      // Verificar si el usuario ya existe, no se puede registrar con el mismo username ni email
       const existUser = await verifyUser(username, email);
-      if (existUser) return res.status(400).json({ msg: existUser });
+      if (existUser) {
+        return res.status(400).json({ msg: existUser });
+      }
 
       const hashedPassword = await bcrypt.hash(password, 10);
+
       if (!profile_picture) profile_picture = DEFAULT_PROFILE_IMAGE_ID;
       if (!banner) banner = DEFAULT_PROFILE_BANNER_ID;
-      const newUser = await User.create({ username, email, password: hashedPassword, profile_picture, banner, bio, is_private, created_at });
-      if (!newUser) return res.status(400).json({ msg: "Error al crear el usuario" });
-      const user = await User.findOne({ where: { username } });
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-  
+
+      const newUser = await createUser({ username, email, password: hashedPassword, profile_picture, banner, bio, is_private, created_at });
+
+      if (!newUser) {
+        return res.status(400).json({ msg: 'Error al crear el usuario' });
+      }
+
+      const user = await getUserByUsername(username);
+
+      const token = generateAuthToken(user.id);
+
       res.cookie('auth_token', token, {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
-        maxAge: 3600000,
+        maxAge: 3600000
       });
-  
-    return res.json({ user: { id: user.id, username: user.username, email: user.email } });
+
+      return res.json({ user: { id: user.id, username: user.username, email: user.email } });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
@@ -47,27 +52,22 @@ export class AuthController {
   static async login(req, res) {
     try {
       const { username, password } = req.body;
-      console.log("credenciales Login: ",username, password);
 
-      const user = await User.findOne({ where: { username } });
+      const user = await verifyUserCredentials(username, password);
 
-      if (!user) return res.status(400).json({ msg: "Usuario no encontrado" });
+      const token = generateAuthToken(user.id);
 
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) return res.status(400).json({ msg: "Contraseña incorrecta" });
-
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-  
       res.cookie('auth_token', token, {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
         maxAge: 3600000,
       });
-    
+
       return res.json({ user: { id: user.id, username: user.username, email: user.email } });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      console.error('Error en login:', err.message);
+      res.status(400).json({ error: err.message });
     }
   }
 
@@ -128,17 +128,18 @@ export class AuthController {
   }
 
   static async check(req, res) {
-    const token = req.cookies.auth_token; 
-
-    if (!token) {
-      return res.status(401).json({ authenticated: false });
-    }
-
     try {
-      // Verifica el token (por ejemplo, usando JWT)
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      return res.status(200).json({ authenticated: true, user: decoded.id });
+      const token = req.cookies.auth_token;
+
+      const result = verifyAuthToken(token);
+
+      if (!result.authenticated) {
+        return res.status(401).json({ authenticated: false });
+      }
+
+      return res.status(200).json({ authenticated: true, user: result.userId });
     } catch (err) {
+      console.error('Error en check:', err.message);
       return res.status(401).json({ authenticated: false });
     }
   }
@@ -147,8 +148,8 @@ export class AuthController {
     try {
       res.clearCookie('auth_token', {
         httpOnly: true,
-        secure: true, // true en producción
-        sameSite: 'none', // 'none' para producción
+        secure: true,
+        sameSite: 'none', 
       });
       res.json({ msg: "Sesión cerrada" });
     } catch (err) {
@@ -157,19 +158,20 @@ export class AuthController {
   }
 
   static async getMessages(req, res) {
-      try {
-        const { chat_id } = req.params;
-        const messages = await Message.findAll({
-          where: { chat_id: chat_id },
-          order: [['created_at', 'ASC']], 
-      });
-    
-        if (!messages) return res.status(404).json({ msg: "Mensajes no encontrados" });
-    
-        res.json({ messages });
-      } catch (err) {
-        res.status(500).json({ error: err.message });
+    try {
+      const { chat_id } = req.params;
+
+      const messages = await getMessagesQuery(chat_id);
+
+      if (!messages || messages.length === 0) {
+        return res.status(404).json({ msg: "Mensajes no encontrados" });
       }
+
+      res.json({ messages });
+    } catch (err) {
+      console.error('Error en getMessages:', err);
+      res.status(500).json({ error: err.message });
+    }
   }
 
   static async getChats(req, res) {
@@ -192,10 +194,6 @@ export class AuthController {
       const newMessage = await newMessageModel(id, chat_id, content); 
       if (!newMessage) return res.status(404).json({ msg: "Mensaje no creado" });
 
-      console.log("Nuevo mensaje: ", newMessage);
-
-      io.to(`chat:${chat_id}`).emit('receive_message', newMessage);
-
       return res.status(200).json({ newMessage });
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -207,8 +205,9 @@ export class AuthController {
     if (!req.user) {
       return res.status(401).json({ msg: "Error al autenticar con Google" });
     }
+    const { id } = req.user;
 
-    const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = generateAuthToken(id);
     
     // Enviar la cookie al cliente
     res.cookie('auth_token', token, {
@@ -237,7 +236,9 @@ export class AuthController {
       return res.status(401).json({ msg: "Error al autenticar con Reddit" });
     }
 
-    const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const { id } = req.user;
+    
+    const token = generateAuthToken(id);
     
     // Enviar la cookie al cliente
     res.cookie('auth_token', token, {
@@ -266,7 +267,9 @@ export class AuthController {
       return res.status(401).json({ msg: "Error al autenticar con Discord" });
     }
 
-    const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const { id } = req.user;
+    
+    const token = generateAuthToken(id);
     
     // Enviar la cookie al cliente
     res.cookie('auth_token', token, {
@@ -292,23 +295,12 @@ export class AuthController {
 
   static async toggleFollow(req, res) {
     try {
-      const { id: follower_id } = req.user; 
-      const { user_id: following_id } = req.params; 
+      const { id: follower_id } = req.user;
+      const { user_id: following_id } = req.params;
 
-      const existingFollow = await Follower.findOne({
-        where: { follower_id, following_id }
-      });
-  
-      if (existingFollow) {
-        await existingFollow.destroy();
-        return res.json({ following: false });
-      } else {
-        await Follower.create({ follower_id, following_id });
-        const user = await User.findOne({ where: { id: follower_id } });
-        const notification = { type: 'follow', content: 'te ha seguido', user };
-        io.to(`user:${following_id}`).emit('receive_notification', { follower_id, notification });
-        return res.json({ following: true });
-      }
+      const result = await toggleFollowQuery(follower_id, following_id);
+
+      return res.json(result);
     } catch (error) {
       console.error('Error en toggleFollow:', error);
       res.status(500).json({ error: 'Error al gestionar el seguimiento' });
@@ -317,14 +309,12 @@ export class AuthController {
 
   static async getFollowStatus(req, res) {
     try {
-      const { id: follower_id } = req.user; 
-      const { user_id: following_id } = req.params; 
-  
-      const isFollowing = await Follower.findOne({
-        where: { follower_id, following_id }
-      });
-  
-      res.json({ isFollowing: !!isFollowing });
+      const { id: follower_id } = req.user;
+      const { user_id: following_id } = req.params;
+
+      const isFollowing = await getFollowStatusQuery(follower_id, following_id);
+
+      res.json({ isFollowing });
     } catch (error) {
       console.error('Error en getFollowStatus:', error);
       res.status(500).json({ error: 'Error al obtener el estado de seguimiento' });
@@ -333,29 +323,10 @@ export class AuthController {
 
   static async getFriends(req, res) {
     try {
-      const { id: follower_id } = req.user; 
-  
-      const followingRecords = await Follower.findAll({
-        where: { follower_id },
-        attributes: ['following_id']
-      });
-  
-      const followingIds = followingRecords.map(record => record.following_id);
-  
-      if (followingIds.length === 0) {
-        return res.json({ friends: [] }); 
-      }
-  
-      const friends = await User.findAll({
-        where: { id: followingIds },
-        attributes: ['id', 'username'], 
-        include: {
-          model: Media,
-          as: 'profileImage',
-          attributes: ['url'] 
-        }
-      });
-  
+      const { id: follower_id } = req.user;
+
+      const friends = await getFriendsQuery(follower_id);
+
       res.json({ friends });
     } catch (error) {
       console.error('Error en getFriends:', error);
@@ -378,74 +349,134 @@ export class AuthController {
     }
   }
 
+  static async getProfileStatus(req, res) {
+    try {
+      const { id: user_id } = req.user; 
+  
+      const profileStatus = await getProfileStatusQuery(user_id);
+
+      if (!profileStatus) return res.status(404).json({ msg: "Estado de perfil no encontrado" });
+  
+      res.json({ profileStatus });
+    } catch (error) {
+      console.error('Error en getProfileStatus:', error);
+      res.status(500).json({ error: 'Error al obtener el estado de perfil' });
+    }
+  }
+
+  static async getFollowStatusById(req, res) {
+    try {
+      const { id: follower_id } = req.user;
+      const { userId } = req.params;
+
+      const userAuthenticated = await getUserById(follower_id);
+    
+      if (userAuthenticated.id === parseInt(userId)) {
+        return res.status(200).json({ 
+          isFollowing: true 
+        });
+      }
+
+      const user = await getUser(userId);
+
+      if (!user) return res.status(404).json({ msg: "Usuario no encontrado" });
+
+      const isFollowing = await getFollowStatusQuery(follower_id, user.id);
+
+      res.json({ isFollowing });
+    } catch (error) {
+      console.error('Error en getFollowStatusByUsername:', error);
+      res.status(500).json({ error: 'Error al obtener el estado de seguimiento' });
+    }
+  }
+
   static async createChat(req, res) {
     try {
       const { userId: otherUserId } = req.body;
       const { id: userId } = req.user;
 
       console.log("Crear chat: ", userId, otherUserId);
-  
-      // Verificar si el chat ya existe
-      const existingChat = await ChatMember.findOne({
-        where: { user_id: userId },
-        include: {
-          model: Chat,
-          include: {
-            model: ChatMember,
-            where: { user_id: otherUserId }
-          }
-        }
-      });
-  
+
+      const existingChat = await findExistingChat(userId, otherUserId);
+
       if (existingChat) {
+        const lastMessage = await getLastMessage(existingChat.id);
+        const otherUser = await getUserInfo(otherUserId);
+
         return res.json({
-          chat_id: existingChat.chat_id,
-          other_user_id: otherUserId
+          chat_id: existingChat.id,
+          last_message: lastMessage ? lastMessage.content : '',
+          other_users: [
+            {
+              user_id: otherUserId,
+              username: otherUser?.username,
+              profile_image: otherUser?.profileImage?.url || null
+            }
+          ]
         });
       }
-  
-      const newChat = await Chat.create({
-        is_group: false,
-        created_at: new Date(),
-      });
 
-      const chatMembers = await ChatMember.create({
+      const newChat = await createNewChat(userId, otherUserId);
+      const otherUser = await getUserInfo(otherUserId);
+
+      res.json({
         chat_id: newChat.id,
-        user_id: userId,
-      })
-  
-      const otherUser = await User.findOne({
-        where: { id: otherUserId },
-        attributes: ['id', 'username'],
-        include: {
-          model: Media,
-          as: 'profileImage',
-          attributes: ['url']
-        }
-      });
-  
-      res.json(
-        {
-          chat_id: newChat.id,
-          other_user: {
+        last_message: '',
+        other_users: [
+          {
             user_id: otherUser.id,
             username: otherUser.username,
             profile_image: otherUser.profileImage ? otherUser.profileImage.url : null
           }
-        }
-      );
+        ]
+      });
     } catch (error) {
       console.error('Error al crear el chat:', error);
       res.status(500).json({ error: 'Error al crear el chat' });
     }
   }
 
+  static async updateProfileStatus(req, res) {
+    try {
+      const { id: userId } = req.user;
+      const { is_private } = req.body;
+
+      const updatedStatus = await updateUserProfile(userId, { is_private });
+
+      if (!updatedStatus) {
+        return res.status(404).json({ msg: "Estado de perfil no encontrado" });
+      }
+
+      res.json({ msg: "Estado de perfil actualizado", updatedStatus });
+    } catch (error) {
+      console.error('Error al actualizar el estado de perfil:', error);
+      res.status(500).json({ error: 'Error al actualizar el estado de perfil' });
+    }
+  }
+
+  static async deleteAccount(req, res) {
+    try {
+      const { id: userId } = req.user;
+  
+      const result = await deleteUserById(userId);
+  
+      if (result > 0) {
+        return res.status(200).json({ msg: 'Cuenta eliminada correctamente.' });
+      } else {
+        return res.status(400).json({ msg: 'No se pudo eliminar la cuenta.' });
+      }
+    } catch (error) {
+      console.error('Error al eliminar la cuenta:', error);
+      res.status(500).json({ error: 'Error al eliminar la cuenta.' });
+    }
+  }
+
   static async updateUser(req, res) {
     try {
-      const { id: userId } = req.user; 
+      const { id: userId } = req.user;
       const { username, bio } = req.body;
 
-      const existingUser = await User.findOne({ where: { username, id: { [Op.ne]: userId } } });
+      const existingUser = await checkExistingUsername(username, userId);
       if (existingUser) {
         return res.status(400).json({ error: 'El nombre de usuario ya existe.' });
       }
@@ -453,48 +484,41 @@ export class AuthController {
       const profileImage = req.files?.profileImage?.[0];
       const bannerImage = req.files?.bannerImage?.[0];
 
-      const currentUser = await User.findOne({ where: { id: userId } });
+      const currentUser = await getUserById(userId);
       if (!currentUser) {
         return res.status(404).json({ error: 'Usuario no encontrado.' });
       }
 
-      let profileImageId = currentUser.profile_picture; 
+      let profileImageId = currentUser.profile_picture;
       let bannerImageId = currentUser.banner;
 
       if (profileImage) {
-        const profileImageBuffer = profileImage.buffer;
-        const profileImageHash = await getHash(profileImageBuffer);
-        const existingImage = await Media.findOne({ where: { hash: profileImageHash } });
-        if (existingImage) {
-          profileImageId = existingImage.id; 
-        } else {
-          profileImageId = await PostController.uploadImage(profileImageBuffer, 'profile')
-        }
+        profileImageId = await uploadImageModel(profileImage.buffer, 'profile');
       }
 
-      if (bannerImage){
-        const bannerImageBuffer = bannerImage.buffer;
-        bannerImageId = await PostController.uploadImage(bannerImageBuffer, 'profile')
+      if (bannerImage) {
+        bannerImageId = await uploadImageModel(bannerImage.buffer, 'profile');
       }
-  
-      const [rowsUpdated] = await User.update(
-        { username, bio, profile_picture: profileImageId, banner: bannerImageId },
-        { where: { id: userId } }
-      );
-      
+
+      const [rowsUpdated] = await updateUserProfile(userId, {
+        username,
+        bio,
+        profile_picture: profileImageId,
+        banner: bannerImageId
+      });
+
       if (rowsUpdated === 0) {
         return res.status(404).json({ error: 'Usuario no encontrado.' });
       }
-      
-      // Obtener el usuario actualizado
-      const updatedUser = await User.findOne({ where: { id: userId } });
-  
+
+      const updatedUser = await getUserById(userId);
+
       res.status(200).json({ message: 'Perfil actualizado correctamente.', user: updatedUser });
     } catch (error) {
       console.error('Error al actualizar el perfil:', error);
       res.status(500).json({ error: 'Error al actualizar el perfil.' });
     }
-  };
+  }
 
   static async saveNotification(userId, otherUserId, notification) {
     try {
@@ -507,16 +531,4 @@ export class AuthController {
       throw error; 
     }
   }
-
-
-
-}
-
-
-function getHash(buffer) {
-  return new Promise((resolve, reject) => {
-      const hash = crypto.createHash('sha256');
-      hash.update(buffer);
-      resolve(hash.digest('hex'));
-  });
 }
