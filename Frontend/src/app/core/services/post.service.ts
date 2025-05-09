@@ -111,8 +111,7 @@ export class PostService {
   }
 
   toggleSave(postId: number) {
-    return this.http.post<any>(`${this.apiUrl}/posts/save/${postId}`, {}, {withCredentials: true}).pipe(
-      tap(response => console.log('Respuesta del backend:', response)));
+    return this.http.post<any>(`${this.apiUrl}/posts/save/${postId}`, {}, {withCredentials: true});
   }
 
   getComments(postId: number) {
