@@ -14,7 +14,7 @@ export class SocketService {
   connect(): void {
     const userId = this.authService.getUserIdFromToken();
     if (userId && !this.socket) {
-      this.socket = io('http://localhost:3000', {
+      this.socket = io('https://wesphere-production.up.railway.app', {
         withCredentials: true,
       });
 
